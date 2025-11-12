@@ -31,10 +31,9 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: getUser()를 사용해야 토큰 검증됨
   // getSession()은 안전하지 않음!
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
 
+  const user = data?.claims;
   // 보호된 경로 체크
   const protectedPaths = [
     "/posts/create",

@@ -17,16 +17,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signupSchema } from "@/lib/zod/schema/signSchema";
-import { useMutation } from "@tanstack/react-query";
-import { signup } from "@/actions/signActions";
+import { signupSchema } from "@/lib/zod/schemas/authSchema";
+import { SignupFormValues } from "@/lib/zod/schemas/authSchema";
+import { useSignup } from "@/hooks/useAuth";
 import { toast } from "sonner";
-
-type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function SignupUI() {
   const [isLoading, setIsLoading] = useState(false);
-
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -37,30 +34,48 @@ export default function SignupUI() {
       passwordConfirm: "",
     },
   });
+  const signupMutation = useSignup();
 
-  const signupMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      return signup(formData);
-    },
-    onSuccess: () => {
-      toast.success("회원가입이 성공적으로 완료되었습니다.");
-    },
-    onError: () => {
-      toast.error("회원가입에 실패하였습니다.");
-    },
-  });
   async function onSubmit(values: SignupFormValues) {
-    setIsLoading(true);
-    try {
-      if (formRef.current) {
-        const fd = new FormData(formRef.current);
-        signupMutation.mutate(fd);
-      }
-    } catch (error) {
-      console.error("회원가입 실패:", error);
-    } finally {
-      setIsLoading(false);
+    if (!formRef.current) {
+      return;
     }
+    form.clearErrors();
+
+    setIsLoading(true);
+    if (formRef.current) {
+      const fd = new FormData(formRef.current);
+      signupMutation.mutate(fd, {
+        onSuccess: (response) => {
+          if (!response || response.success) {
+            return;
+          }
+          // else {
+          //   const fieldName = response.error.field;
+          //   if (fieldName) {
+          //     form.setError(fieldName as keyof SignupFormValues, {
+          //       type: "server",
+          //       message: response.error.message,
+          //     });
+          //   }
+          // }
+        },
+        onError: (error: Error) => {
+          const fieldName = JSON.parse(error.message).field;
+          if (fieldName) {
+            form.setError(fieldName as keyof SignupFormValues, {
+              type: "server",
+              message: JSON.parse(error.message).message,
+            });
+          }
+          toast.error(
+            JSON.parse(error.message).message ??
+              "회원가입 중 오류가 발생했습니다"
+          );
+        },
+      });
+    }
+    setIsLoading(false);
   }
 
   return (
@@ -102,7 +117,7 @@ export default function SignupUI() {
                     <FormLabel>아이디</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="사용자명을 입력해주세요"
+                        placeholder="아이디를 입력해주세요"
                         disabled={isLoading}
                         {...field}
                       />

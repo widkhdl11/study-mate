@@ -10,66 +10,59 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { Button } from "./ui/button";
+import { useLogout } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/reactQuery/queryKeys";
 
 export function Header() {
-  const router = useRouter();
-  const [user, setUser] = useState<
-    | (User & {
-        notifications: number;
-        name: string;
-        initials: string | undefined;
-      })
-    | null
-  >(null);
-  const { data: userData, isLoading } = useQuery({
-    queryKey: ["user"],
+  const logoutMutation = useLogout();
+  // const [user, setUser] = useState<
+  //   | (User & {
+  //       notifications: number;
+  //       name: string;
+  //       initials: string | undefined;
+  //     })
+  //   | null
+  // >(null);
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: queryKeys.user,
     queryFn: async () => {
       const supabase = await createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      return user;
-    },
-  });
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      await fetch("/auth/signout", {
-        method: "POST",
-      });
-    },
-    onSuccess: () => {
-      toast.success("로그아웃이 성공적으로 완료되었습니다.");
-      setUser(null);
-      router.push("/");
-    },
-    onError: () => {
-      toast.error("로그아웃에 실패하였습니다.");
-    },
-  });
-  // const user = {
-  //   name: "김민준",
-  //   email: "minjun@example.com",
-  //   initials: "KM",
-  //   notifications: 3,
-  // };
-  useEffect(() => {
-    if (userData) {
-      setUser({
-        ...userData,
-        notifications: 3,
-        name: "정재원",
-        initials: userData.email?.charAt(0),
-      });
-    }
-  }, [userData]);
 
+      if (user) {
+        return {
+          // ✅ 여기서 반환한 값이
+          ...user,
+          notifications: 3,
+          name: "정재원",
+          initials: user.email?.charAt(0),
+        };
+      }
+      return null;
+    },
+  });
+  // useEffect(() => {
+  //   if (userData) {
+  //     setUser({
+  //       ...userData,
+  //       notifications: 3,
+  //       name: "정재원",
+  //       initials: userData.email?.charAt(0),
+  //     });
+  //   }
+  // }, [userData]);
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -157,9 +150,10 @@ export function Header() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="cursor-pointer text-destructive focus:text-destructive"
-                    onClick={() => logoutMutation.mutate()}
+                    onClick={handleLogout}
+                    disabled={logoutMutation.isPending}
                   >
-                    로그아웃
+                    {logoutMutation.isPending ? "로그아웃 중..." : "로그아웃"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -2,16 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import Link from "next/link";
-import { useRef, useState } from "react";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -23,16 +15,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { login } from "@/actions/signActions";
-import { loginSchema } from "@/lib/zod/schema/signSchema";
-import { useRouter } from "next/navigation";
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+import {
+  loginSchema,
+  type LoginFormValues,
+} from "@/lib/zod/schemas/authSchema";
+import { useLogin } from "@/hooks/useAuth";
 
 export default function LoginUI() {
-  const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const loginMutation = useLogin();
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -41,29 +33,33 @@ export default function LoginUI() {
     },
   });
 
-  const loginMutation = useMutation({
-    mutationFn: async (values: FormData) => {
-      return login(values);
-    },
-    onSuccess: () => {
-      toast.success("로그인이 성공적으로 완료되었습니다.");
-    },
-    onError: () => {
-      toast.error("로그인에 실패하였습니다.");
-    },
-  });
-
   async function onSubmit(values: LoginFormValues) {
-    setIsLoading(true);
-    try {
-      if (formRef.current) {
-        const fd = new FormData(formRef.current); // ✅ 모든 input(name=...) 자동 수집
-        loginMutation.mutate(fd);
-      }
-    } finally {
-      setIsLoading(false);
+    if (!formRef.current) {
+      return;
     }
+
+    form.clearErrors();
+
+    const formData = new FormData(formRef.current);
+
+    loginMutation.mutate(formData, {
+      onSuccess: (response) => {
+        if (!response || response.success) {
+          return;
+        } else {
+          const fieldName = response.error.field;
+          if (fieldName) {
+            form.setError(fieldName as keyof LoginFormValues, {
+              type: "server",
+              message: response.error.message,
+            });
+          }
+        }
+      },
+    });
   }
+
+  const isLoading = loginMutation.isPending;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4">
@@ -91,9 +87,9 @@ export default function LoginUI() {
 
           <Form {...form}>
             <form
+              ref={formRef}
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-4"
-              ref={formRef}
             >
               {/* 이메일 필드 */}
               <FormField

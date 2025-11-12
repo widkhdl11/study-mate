@@ -11,7 +11,6 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (user) {
-    console.log("$$$user: ", user);
     await supabase.auth.signOut();
   }
 
