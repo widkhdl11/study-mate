@@ -49,14 +49,14 @@ export async function updateSession(request: NextRequest) {
   // 로그인 안했는데 보호된 경로 접근 → 로그인으로
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
   // 로그인했는데 로그인/회원가입 페이지 → 홈으로
   if (
-    (request.nextUrl.pathname === "/login" ||
-      request.nextUrl.pathname === "/signup") &&
+    (request.nextUrl.pathname === "/auth/login" ||
+      request.nextUrl.pathname === "/auth/signup") &&
     user
   ) {
     const url = request.nextUrl.clone();

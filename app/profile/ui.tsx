@@ -1,0 +1,275 @@
+"use client";
+
+import Link from "next/link";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  User,
+  MessageSquare,
+  FileText,
+  BookOpen,
+  Edit,
+  Lock,
+  LogOut,
+} from "lucide-react";
+import MyChatTab from "@/components/profile/info/my-chat-tab";
+import MyPostTab from "@/components/profile/info/my-post-tab";
+import MyStudiesTab from "@/components/profile/info/my-studies-tab";
+import MyInfoTab from "@/components/profile/info/my-info-tab";
+import { useUser } from "@/hooks/useUser";
+import { convertUser } from "@/types/convertion/user";
+import { useGetAllPosts, useGetPost } from "@/hooks/usePost";
+import { PostsResponse } from "@/types/response/post";
+import { useGetStudies } from "@/hooks/useStudy";
+
+export default function UserProfileUI() {
+  // 임시 데이터 - 실제로는 DB에서 조회
+  // const currentUser = {
+  //   id: "user-1",
+  //   name: "박준희",
+  //   email: "junhee@example.com",
+  //   avatar: "/user-profile-avatar.png",
+  //   initials: "PJ",
+  //   bio: "함께 성장하는 스터디 문화를 믿는 개발자",
+  //   birthDate: "1999.05.15",
+  //   gender: "남성",
+  //   joinedDate: "2024.01.01",
+  //   points: 1250,
+  //   level: "Gold",
+  // };
+
+  // 채팅방 목록
+  const chatRooms = [
+    {
+      id: 1,
+      name: "React 심화 스터디",
+      lastMessage: "다음 주 모임 시간을 정하겠습니다.",
+      lastMessageTime: "2시간 전",
+      unreadCount: 3,
+      avatar: "/study-chat.jpg",
+    },
+    {
+      id: 2,
+      name: "Spring Boot 완전 정복",
+      lastMessage: "프로젝트 진행 상황 공유합니다.",
+      lastMessageTime: "1일 전",
+      unreadCount: 0,
+      avatar: "/backend-study.jpg",
+    },
+    {
+      id: 3,
+      name: "TypeScript 마스터즈",
+      lastMessage: "타입 정의 방법에 대해 질문이 있습니다.",
+      lastMessageTime: "3일 전",
+      unreadCount: 1,
+      avatar: "/typescript-study.jpg",
+    },
+  ];
+
+  // // 작성한 모집글
+  // const myPosts = [
+  //   {
+  //     id: 1,
+  //     title: "React 심화 스터디 - 3기 모집",
+  //     content: "React와 Next.js를 심화 학습할 멤버를 모집합니다.",
+  //     image: "/frontend-study-meeting.jpg",
+  //     category: "프론트엔드",
+  //     location: "온라인",
+  //     status: "모집중",
+  //     likes: 24,
+  //     views: 156,
+  //     postedTime: "3일 전",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "TypeScript 완벽 가이드",
+  //     content: "타입스크립트 심화 개념을 함께 학습하는 스터디입니다.",
+  //     image: "/coding-workspace.png",
+  //     category: "프론트엔드",
+  //     location: "서울 강남",
+  //     status: "모집중",
+  //     likes: 18,
+  //     views: 89,
+  //     postedTime: "1주일 전",
+  //   },
+  // ];
+
+  // 내 스터디
+  // const myStudies = [
+  //   {
+  //     id: 1,
+  //     title: "React 심화 스터디",
+  //     description: "React와 Next.js를 깊이 있게 학습합니다.",
+  //     category: "프론트엔드",
+  //     location: "온라인",
+  //     participants: 5,
+  //     maxParticipants: 10,
+  //     meetingDate: "2024.01.15",
+  //     status: "모집중",
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "TypeScript 마스터즈",
+  //     description: "타입스크립트 심화 개념을 습득합니다.",
+  //     category: "프론트엔드",
+  //     location: "서울 강남",
+  //     participants: 8,
+  //     maxParticipants: 10,
+  //     meetingDate: "2024.01.22",
+  //     status: "모집중",
+  //   },
+  // ];
+  const { data: user } = useUser();
+  const currentUser = convertUser(user || []);
+  const { data: posts } = useGetPost();
+  const { data: studies } = useGetStudies();
+
+  const myPosts = posts?.success ? (posts.data as PostsResponse[]) : [];
+  const myStudies = studies?.success ? (studies.data as StudiesResponse[]) : [];
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "모집중":
+        return "bg-green-500 text-white";
+      case "마감":
+        return "bg-red-500 text-white";
+      default:
+        return "bg-slate-500 text-white";
+    }
+  };
+  const getCategoryColor = (category: string) => {
+    const colors: { [key: string]: string } = {
+      프론트엔드: "bg-blue-100 text-blue-700 border-blue-200",
+      백엔드: "bg-purple-100 text-purple-700 border-purple-200",
+      AI: "bg-amber-100 text-amber-700 border-amber-200",
+      모바일: "bg-green-100 text-green-700 border-green-200",
+      디자인: "bg-pink-100 text-pink-700 border-pink-200",
+    };
+    return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      <Header />
+
+      <main className="flex-1">
+        {/* 프로필 헤더 */}
+        <section className="border-b border-border bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-900 dark:to-slate-800 py-10">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:gap-8">
+              <Avatar className="h-24 w-24 ring-4 ring-primary/20 flex-shrink-0">
+                <AvatarImage
+                  src={currentUser?.avatar || "/placeholder.svg"}
+                  alt={currentUser?.name || ""}
+                />
+                <AvatarFallback className="bg-blue-600 text-white text-2xl font-bold">
+                  {currentUser?.initials || ""}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1 mt-4 sm:mt-0">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                  <div>
+                    <h1 className="text-3xl font-bold text-foreground">
+                      {currentUser?.name || ""}
+                    </h1>
+                    <p className="text-muted-foreground mt-1">
+                      {currentUser?.email || ""}
+                    </p>
+                  </div>
+                  <Badge className="bg-blue-600 text-white w-fit">
+                    {currentUser?.level || ""}
+                  </Badge>
+                </div>
+
+                <p className="text-muted-foreground mb-4">{currentUser.bio}</p>
+
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                    <p className="text-2xl font-bold text-foreground">
+                      {myStudies.length}
+                    </p>
+                    <p className="text-xs text-muted-foreground">내 스터디</p>
+                  </div>
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                    <p className="text-2xl font-bold text-foreground">
+                      {myPosts.length}
+                    </p>
+                    <p className="text-xs text-muted-foreground">모집글</p>
+                  </div>
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                    <p className="text-2xl font-bold text-foreground">
+                      {currentUser.points}
+                    </p>
+                    <p className="text-xs text-muted-foreground">포인트</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <Button className="bg-blue-600 hover:bg-blue-700 gap-2">
+                    <Edit className="w-4 h-4" />
+                    프로필 수정
+                  </Button>
+                  <Button variant="outline" className="gap-2 bg-transparent">
+                    <Lock className="w-4 h-4" />
+                    비밀번호 변경
+                  </Button>
+                  <Button variant="outline" className="gap-2 bg-transparent">
+                    <LogOut className="w-4 h-4" />
+                    로그아웃
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 탭 컨텐츠 */}
+        <section className="py-8 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            <Tabs defaultValue="info" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-auto lg:inline-flex">
+                <TabsTrigger value="info" className="gap-2">
+                  <User className="w-4 h-4 hidden sm:inline" />내 정보
+                </TabsTrigger>
+                <TabsTrigger value="chats" className="gap-2">
+                  <MessageSquare className="w-4 h-4 hidden sm:inline" />
+                  채팅 ({chatRooms.length})
+                </TabsTrigger>
+                <TabsTrigger value="posts" className="gap-2">
+                  <FileText className="w-4 h-4 hidden sm:inline" />
+                  작성한 글 ({myPosts.length})
+                </TabsTrigger>
+                <TabsTrigger value="studies" className="gap-2">
+                  <BookOpen className="w-4 h-4 hidden sm:inline" />내 스터디 (
+                  {myStudies.length})
+                </TabsTrigger>
+              </TabsList>
+
+              {/* 내 정보 탭 */}
+              <MyInfoTab currentUser={currentUser} />
+
+              <MyChatTab chatRooms={chatRooms} />
+              <MyPostTab
+                myPosts={myPosts}
+                getStatusColor={getStatusColor}
+                getCategoryColor={getCategoryColor}
+              />
+              <MyStudiesTab
+                myStudies={myStudies}
+                getStatusColor={getStatusColor}
+                getCategoryColor={getCategoryColor}
+              />
+            </Tabs>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

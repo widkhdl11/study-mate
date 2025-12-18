@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { login, signup, logout } from "@/actions/authAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
-import { SignupFormValues } from "@/lib/zod/schemas/authSchema";
 
 /**
  * 로그인 훅
