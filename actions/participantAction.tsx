@@ -20,7 +20,6 @@ export async function getParticipant(studyId: number) {
 export async function applyParticipant(studyId: number) {
   const supabase = await createClient();
 
-  console.log("applyParticipant");
   const { data: user, error: userError } = await supabase.auth.getUser();
   const userId = user?.user?.id;
   if (!userId) {

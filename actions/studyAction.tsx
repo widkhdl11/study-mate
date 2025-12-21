@@ -61,7 +61,7 @@ export async function createStudy(
   redirect("/posts");
 }
 
-export async function getStudies(): Promise<ActionResponse | never> {
+export async function getMyStudies(): Promise<ActionResponse | never> {
   const supabase = await createClient();
 
   const { data: user, error: userError } = await supabase.auth.getUser();
@@ -87,6 +87,47 @@ export async function setStudyStatus(id: number, status: string) {
     .update({ status })
     .eq("id", id);
 
+  if (error) {
+    return { success: false, error: { message: error.message } };
+  }
+  return { success: true, data };
+}
+
+export async function getStudyById(id: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("studies")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) {
+    return { success: false, error: { message: error.message } };
+  }
+  return { success: true, data };
+}
+
+export async function getStudyDetail(id: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("studies")
+    .select(
+      `
+      *,
+      creator:creator_id (
+        id,
+        email,
+        avatar_url
+      )
+      participants:participants (
+        id,
+        user_id,
+        study_id,
+        status
+      )
+    `
+    )
+    .eq("id", Number(id))
+    .single();
   if (error) {
     return { success: false, error: { message: error.message } };
   }

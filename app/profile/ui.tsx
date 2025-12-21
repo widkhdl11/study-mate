@@ -23,9 +23,10 @@ import MyStudiesTab from "@/components/profile/info/my-studies-tab";
 import MyInfoTab from "@/components/profile/info/my-info-tab";
 import { useUser } from "@/hooks/useUser";
 import { convertUser } from "@/types/convertion/user";
-import { useGetAllPosts, useGetPost } from "@/hooks/usePost";
+import { useGetAllPosts, useGetMyPosts, useGetPost } from "@/hooks/usePost";
 import { PostsResponse } from "@/types/response/post";
-import { useGetStudies } from "@/hooks/useStudy";
+import { StudiesResponse } from "@/types/response/studies";
+import { useGetMyStudies } from "@/hooks/useStudy";
 
 export default function UserProfileUI() {
   // 임시 데이터 - 실제로는 DB에서 조회
@@ -126,11 +127,13 @@ export default function UserProfileUI() {
   // ];
   const { data: user } = useUser();
   const currentUser = convertUser(user || []);
-  const { data: posts } = useGetPost();
-  const { data: studies } = useGetStudies();
+  const { data: posts } = useGetMyPosts();
+  const { data: studies } = useGetMyStudies();
 
   const myPosts = posts?.success ? (posts.data as PostsResponse[]) : [];
-  const myStudies = studies?.success ? (studies.data as StudiesResponse[]) : [];
+  const myStudies = studies?.success
+    ? (studies.data as unknown as StudiesResponse[])
+    : [];
   const getStatusColor = (status: string) => {
     switch (status) {
       case "모집중":

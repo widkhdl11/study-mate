@@ -23,7 +23,7 @@ export default function MyStudiesTab({
         {myStudies.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {myStudies.map((study) => (
-              <Link key={study.id} href={`/user/info/studies/${study.id}`}>
+              <Link key={study.id} href={`/studies/${study.id}`}>
                 <Card className="group overflow-hidden hover:shadow-md transition-all h-full cursor-pointer p-6 space-y-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">

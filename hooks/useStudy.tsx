@@ -1,6 +1,11 @@
 "use client";
 
-import { createStudy, getStudies, setStudyStatus } from "@/actions/studyAction";
+import {
+  createStudy,
+  getMyStudies,
+  getStudyById,
+  setStudyStatus,
+} from "@/actions/studyAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { StudyFormValues } from "@/lib/zod/schemas/studySchema";
 import { createClient } from "@/utils/supabase/client";
@@ -32,12 +37,12 @@ export function useCreateStudy() {
   });
 }
 
-export function useGetStudies() {
+export function useGetMyStudies() {
   return useQuery({
     queryKey: queryKeys.myStudies,
     queryFn: async () => {
-      const response = await getStudies();
-      return response.success ? response.data : [];
+      const response = await getMyStudies();
+      return response;
     },
   });
 }
@@ -60,6 +65,24 @@ export function useSetStudyStatus({
     },
     onError: (error: any) => {
       toast.error(error.message);
+    },
+  });
+}
+
+export function useGetStudy({ id }: { id: string }) {
+  return useQuery({
+    queryKey: queryKeys.study(Number(id)),
+    queryFn: async () => {
+      return await getStudyById(id);
+    },
+  });
+}
+
+export function useGetStudyDetail({ id }: { id: string }) {
+  return useQuery({
+    queryKey: queryKeys.studyDetail(Number(id)),
+    queryFn: async () => {
+      return await getStudyDetail(id);
     },
   });
 }

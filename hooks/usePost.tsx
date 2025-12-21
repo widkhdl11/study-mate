@@ -43,7 +43,7 @@ export function useGetMyPosts() {
       return await getMyposts();
     },
   });
-  return query.data;
+  return query;
 }
 
 export function useGetPost(id: number) {

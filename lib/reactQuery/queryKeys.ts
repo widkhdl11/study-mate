@@ -7,7 +7,7 @@ export const queryKeys = {
   studies: ["studies"],
   myStudies: ["myStudies"],
   study: (id: number) => ["studies", id],
-
+  studyDetail: (id: number) => ["studies", "detail", id],
   // 게시글
   posts: ["posts"],
   post: (id: number) => ["posts", id],
