@@ -198,3 +198,24 @@ export const getSubRegion = (region: string) => {
     label: subregion.label,
   }));
 };
+
+
+export const getRegionCodeByValue = (value: string): number => {
+  for (const region of Object.values(STUDY_REGIONS)) {
+    if (region.value === value) return region.code;
+    for (const subregion of Object.values(region.subcategories)) {
+      if (subregion.value === value) return subregion.code;
+    }
+  }
+  return 0;
+};
+
+export const getRegionPath = (code: number): string[] => {
+  for (const region of Object.values(STUDY_REGIONS)) {
+    if (region.code === code) return [region.label];
+    for (const subregion of Object.values(region.subcategories)) {
+      if (subregion.code === code) return [region.label, subregion.label];
+    }
+  }
+  return [];
+};

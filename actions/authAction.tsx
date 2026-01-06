@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { loginSchema, signupSchema } from "@/lib/zod/schemas/authSchema";
-import type { ActionResponse } from "@/types/response/auth";
 import { createClientAdmin } from "@/utils/supabase/client-admin";
+import { ActionResponse } from "@/types/response/action";
 
 /**
  * 로그인 서버 액션

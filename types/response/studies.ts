@@ -7,4 +7,33 @@ export type StudiesResponse = {
   max_participants: number;
   current_participants: number;
   status: string;
+  created_at: string;
+  updated_at: string;
+  participants: {
+    id: number;
+    user_id: string;
+    username: string;
+    user_email: string;
+    study_id: number;
+    status: string;
+    role: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+  posts: {
+    id: number;
+    title: string;
+    content: string;
+    image_url: string;
+    created_at: string;
+    updated_at: string;
+    likes_count: number;
+    views_count: number;
+  }[];
+  creator: {
+    id: number;
+    username: string;
+    email: string;
+    avatar_url: string;
+  };
 };

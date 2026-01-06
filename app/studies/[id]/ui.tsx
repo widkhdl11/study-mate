@@ -24,122 +24,32 @@ import {
   UserCheck,
   UserX,
 } from "lucide-react";
-import { useGetStudy } from "@/hooks/useStudy";
+import { useGetStudyDetail } from "@/hooks/useStudy";
+import {
+  useAcceptParticipant,
+  useRejectParticipant,
+  useRemoveParticipant,
+} from "@/hooks/useParticipant";
 import { StudiesResponse } from "@/types/response/studies";
+import { statusConversion } from "@/types/convertion/participants";
+import { getCategoryLabelByCode, getCategoryPath } from "@/lib/constants/study-category";
+import { getRegionPath } from "@/lib/constants/region";
+import { studyStatusConversion } from "@/types/convertion/study";
+import { formatDate } from "date-fns";
 
-export default async function UserStudyDetailUI({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = await params;
-
-  // 임시 데이터 - 실제로는 DB에서 조회
-  //   const study = {
-  //     id: id,
-  //     title: "React 심화 스터디",
-  //     description:
-  //       "React와 Next.js를 깊이 있게 학습하는 스터디 그룹입니다. 함께 성장하고 싶은 분들을 환영합니다. 매주 새로운 주제를 정해 발표하고 토론하는 방식으로 진행합니다.",
-  //     category: "프론트엔드",
-  //     location: "온라인",
-  //     participants: 5,
-  //     maxParticipants: 10,
-  //     meetingDate: "2024.01.15",
-  //     meetingTime: "19:00",
-  //     status: "모집중",
-  //     createdAt: "2024.01.01",
-  //     host: {
-  //       name: "박준희",
-  //       initials: "PJ",
-  //       avatar: "/placeholder.svg?height=48&width=48",
-  //       email: "junhee@example.com",
-  //     },
-  //   };
-
-  //   // 스터디 멤버 목록
-  //   const members = [
-  //     {
-  //       id: 1,
-  //       name: "박준희",
-  //       initials: "PJ",
-  //       role: "호스트",
-  //       status: "참여중",
-  //       joinedAt: "2024.01.01",
-  //     },
-  //     {
-  //       id: 2,
-  //       name: "김민수",
-  //       initials: "KM",
-  //       role: "멤버",
-  //       status: "참여중",
-  //       joinedAt: "2024.01.05",
-  //     },
-  //     {
-  //       id: 3,
-  //       name: "이지영",
-  //       initials: "LJ",
-  //       role: "멤버",
-  //       status: "참여중",
-  //       joinedAt: "2024.01.08",
-  //     },
-  //     {
-  //       id: 4,
-  //       name: "정대호",
-  //       initials: "JD",
-  //       role: "멤버",
-  //       status: "수락 대기중",
-  //       joinedAt: "2024.01.12",
-  //     },
-  //     {
-  //       id: 5,
-  //       name: "최수진",
-  //       initials: "CS",
-  //       role: "멤버",
-  //       status: "수락 대기중",
-  //       joinedAt: "2024.01.14",
-  //     },
-  //   ];
-
-  //   // 해당 스터디의 모집글 목록
-  //   const studyPosts = [
-  //     {
-  //       id: 1,
-  //       title: "React & Next.js 심화 스터디 모집중!",
-  //       content:
-  //         "React와 Next.js를 깊이 있게 학습하고 싶은 분들과 함께할 수 있는 스터디입니다.",
-  //       image: "/frontend-study-meeting.jpg",
-  //       status: "모집중",
-  //       likes: 24,
-  //       views: 156,
-  //       createdAt: "3일 전",
-  //     },
-  //     {
-  //       id: 2,
-  //       title: "React Hooks 기초부터 시작해요",
-  //       content: "Hooks의 기초 개념부터 심화 패턴까지 함께 학습합니다.",
-  //       image: "/coding-workspace.png",
-  //       status: "마감",
-  //       likes: 18,
-  //       views: 98,
-  //       createdAt: "1주일 전",
-  //     },
-  //     {
-  //       id: 3,
-  //       title: "TypeScript + React 완벽 가이드",
-  //       content: "타입스크립트와 리액트를 함께 사용하는 방법을 배웁니다.",
-  //       image: "/abstract-data-flow.png",
-  //       status: "모집중",
-  //       likes: 31,
-  //       views: 187,
-  //       createdAt: "2주일 전",
-  //     },
-  //   ];
-
+export default function UserStudyDetailUI({ id }: { id: string }) {
   const { data: studyData } = useGetStudyDetail({ id });
+  const acceptParticipant = useAcceptParticipant(Number(id));
+  const rejectParticipant = useRejectParticipant(Number(id));
+  const removeParticipant = useRemoveParticipant(Number(id));
+  
   const study = studyData?.data as StudiesResponse | undefined;
   if (!study) {
     return <div>스터디를 찾을 수 없습니다.</div>;
   }
+
+  const categoryPath = getCategoryPath(Number(study.study_category));
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "모집중":
@@ -155,16 +65,16 @@ export default async function UserStudyDetailUI({
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
-      프론트엔드: "bg-blue-100 text-blue-700 border-blue-200",
-      백엔드: "bg-purple-100 text-purple-700 border-purple-200",
-      AI: "bg-amber-100 text-amber-700 border-amber-200",
-      모바일: "bg-green-100 text-green-700 border-green-200",
-      디자인: "bg-pink-100 text-pink-700 border-pink-200",
-    };
-    return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
-  };
+  // const getCategoryColor = (category: string) => {
+  //   const colors: { [key: string]: string } = {
+  //     프론트엔드: "bg-blue-100 text-blue-700 border-blue-200",
+  //     백엔드: "bg-purple-100 text-purple-700 border-purple-200",
+  //     AI: "bg-amber-100 text-amber-700 border-amber-200",
+  //     모바일: "bg-green-100 text-green-700 border-green-200",
+  //     디자인: "bg-pink-100 text-pink-700 border-pink-200",
+  //   };
+  //   return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
+  // };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -190,34 +100,41 @@ export default async function UserStudyDetailUI({
                     {study?.title}
                   </h1>
                   <Badge className={getStatusColor(study.status)}>
-                    {study.status}
+                    {studyStatusConversion(study.status)}
                   </Badge>
                 </div>
 
                 {/* 카테고리 및 위치 */}
                 <div className="flex items-center gap-3">
-                  <Badge
-                    variant="outline"
-                    className={getCategoryColor(study.study_category)}
-                  >
-                    {study.study_category}
-                  </Badge>
+                  {categoryPath.map((category,i) => (
+                    <Badge
+                      variant="outline"
+                      key={i}
+                      className="bg-blue-100 text-blue-700 border-blue-200"
+                    >
+                      {category}
+                    </Badge>
+                  ))}
+                 
                   <span className="text-sm text-muted-foreground flex items-center gap-1">
-                    <MapPin className="w-4 h-4" /> {study.region}
+                    <MapPin className="w-4 h-4" /> 
+                    {getRegionPath(Number(study.region)).map((region) => (
+                      <span key={region}>{region}</span>
+                    ))}
                   </span>
                 </div>
 
                 {/* 모임 정보 */}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
+                  {/* <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" /> {study.meetingDate}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" /> {study.meetingTime}
-                  </span>
+                  </span> */}
                   <span className="flex items-center gap-1">
-                    <Users className="w-4 h-4" /> {study.participants}/
-                    {study.maxParticipants}명
+                    <Users className="w-4 h-4" /> {study.current_participants}/
+                    {study.max_participants}명
                   </span>
                 </div>
               </div>
@@ -242,7 +159,7 @@ export default async function UserStudyDetailUI({
               <div className="flex justify-between mb-2 text-sm">
                 <span className="text-muted-foreground">참여 인원</span>
                 <span className="font-semibold text-foreground">
-                  {study.participants}/{study.maxParticipants}명
+                  {study.current_participants}/{study.max_participants}명
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
@@ -250,7 +167,7 @@ export default async function UserStudyDetailUI({
                   className="bg-blue-600 h-2 rounded-full transition-all"
                   style={{
                     width: `${
-                      (study.participants / study.maxParticipants) * 100
+                      (study.current_participants / study.max_participants) * 100
                     }%`,
                   }}
                 />
@@ -270,11 +187,11 @@ export default async function UserStudyDetailUI({
                 </TabsTrigger>
                 <TabsTrigger value="members" className="gap-2">
                   <Users className="w-4 h-4 hidden sm:inline" />
-                  멤버 ({members.length})
+                  멤버 ({study.participants?.length ?? 0})
                 </TabsTrigger>
                 <TabsTrigger value="posts" className="gap-2">
                   <MessageSquare className="w-4 h-4 hidden sm:inline" />
-                  모집글 ({studyPosts.length})
+                  모집글 ({study.posts?.length ?? 0})
                 </TabsTrigger>
               </TabsList>
 
@@ -296,19 +213,19 @@ export default async function UserStudyDetailUI({
                   <div className="flex items-center gap-4">
                     <Avatar className="h-14 w-14">
                       <AvatarImage
-                        src={study.host.avatar || "/placeholder.svg"}
-                        alt={study.host.name}
+                        src={study.creator.avatar_url || "/placeholder.svg"}
+                        alt={study.creator.email}
                       />
                       <AvatarFallback className="bg-blue-600 text-white text-lg">
-                        {study.host.initials}
+                        {study.creator.email}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="font-semibold text-foreground text-lg">
-                        {study.host.name}
+                        {study.creator.username}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {study.host.email}
+                        {study.creator.email}
                       </p>
                     </div>
                   </div>
@@ -318,30 +235,30 @@ export default async function UserStudyDetailUI({
                   <h2 className="text-xl font-bold text-foreground mb-4">
                     스터디 정보
                   </h2>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center p-4 bg-muted/50 rounded-lg">
-                      <p className="text-2xl font-bold text-foreground">
-                        {study.participants}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div className="text-center p-4 bg-muted/50 rounded-lg flex flex-col h-24">
+                      <p className="text-2xl font-bold text-foreground flex-1 flex items-center justify-center">
+                        {study.participants?.length ?? 0}
                       </p>
-                      <p className="text-sm text-muted-foreground">현재 멤버</p>
+                      <p className="text-sm text-muted-foreground mt-2 flex-shrink-0">현재 멤버</p>
                     </div>
-                    <div className="text-center p-4 bg-muted/50 rounded-lg">
-                      <p className="text-2xl font-bold text-foreground">
-                        {study.maxParticipants}
+                    <div className="text-center p-4 bg-muted/50 rounded-lg flex flex-col h-24">
+                      <p className="text-2xl font-bold text-foreground flex-1 flex items-center justify-center">
+                        {study.max_participants}
                       </p>
-                      <p className="text-sm text-muted-foreground">최대 인원</p>
+                      <p className="text-sm text-muted-foreground mt-2 flex-shrink-0">최대 인원</p>
                     </div>
-                    <div className="text-center p-4 bg-muted/50 rounded-lg">
-                      <p className="text-2xl font-bold text-foreground">
-                        {studyPosts.length}
+                    <div className="text-center p-4 bg-muted/50 rounded-lg flex flex-col h-24">
+                      <p className="text-2xl font-bold text-foreground flex-1 flex items-center justify-center">
+                        {study.posts?.length ?? 0}
                       </p>
-                      <p className="text-sm text-muted-foreground">모집글</p>
+                      <p className="text-sm text-muted-foreground mt-2 flex-shrink-0">모집글</p>
                     </div>
-                    <div className="text-center p-4 bg-muted/50 rounded-lg">
-                      <p className="text-2xl font-bold text-foreground">
-                        {study.createdAt}
+                    <div className="text-center p-4 bg-muted/50 rounded-lg flex flex-col h-24">
+                      <p className="text-2xs font-bold text-foreground flex-1 flex items-center justify-center">
+                        {formatDate(new Date(study.created_at), "yyyy년 MM월 dd일")}
                       </p>
-                      <p className="text-sm text-muted-foreground">생성일</p>
+                      <p className="text-sm text-muted-foreground mt-2 flex-shrink-0">생성일</p>
                     </div>
                   </div>
                 </Card>
@@ -355,13 +272,13 @@ export default async function UserStudyDetailUI({
                       멤버 관리
                     </h2>
                     <Badge variant="outline">
-                      {members.filter((m) => m.status === "참여중").length}/
-                      {study.maxParticipants}명 참여중
+                      {study.participants?.filter((m) => m.status === "참여중").length ?? 0}/
+                      {study.max_participants}명 참여중
                     </Badge>
                   </div>
 
                   <div className="space-y-4">
-                    {members.map((member) => (
+                    {study.participants?.map((member) => (
                       <div
                         key={member.id}
                         className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
@@ -369,36 +286,51 @@ export default async function UserStudyDetailUI({
                         <div className="flex items-center gap-4">
                           <Avatar className="h-10 w-10">
                             <AvatarFallback className="bg-blue-600 text-white">
-                              {member.initials}
+                              {member.user_email}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <div className="flex items-center gap-2">
                               <p className="font-semibold text-foreground">
-                                {member.name}
+                                {member.username}
                               </p>
-                              {member.role === "호스트" && (
+                              {member.role === "host" && (
                                 <Badge className="bg-blue-600 text-white text-xs">
                                   호스트
                                 </Badge>
                               )}
+                              {member.role === "common" && (
+                                <Badge className="bg-green-600 text-white text-xs">
+                                  멤버
+                                </Badge>
+                              )}
                             </div>
                             <p className="text-sm text-muted-foreground">
-                              가입일: {member.joinedAt}
+                              가입일: {member.created_at}
                             </p>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-3">
                           <Badge className={getStatusColor(member.status)}>
-                            {member.status}
+                            {statusConversion(member.status)}
                           </Badge>
 
-                          {member.status === "수락 대기중" && (
+                          {member.status === "pending" && (
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
                                 className="bg-green-600 hover:bg-green-700 gap-1"
+                                onClick={() => {
+                                  if (
+                                    window.confirm(
+                                      `${member.username}님의 참여 신청을 수락하시겠습니까?`
+                                    )
+                                  ) {
+                                    acceptParticipant.mutate(member.id);
+                                  }
+                                }}
+                                disabled={acceptParticipant.isPending}
                               >
                                 <UserCheck className="w-3 h-3" />
                                 수락
@@ -407,6 +339,16 @@ export default async function UserStudyDetailUI({
                                 size="sm"
                                 variant="destructive"
                                 className="gap-1"
+                                onClick={() => {
+                                  if (
+                                    window.confirm(
+                                      `${member.username}님의 참여 신청을 거절하시겠습니까?`
+                                    )
+                                  ) {
+                                    rejectParticipant.mutate(member.id);
+                                  }
+                                }}
+                                disabled={rejectParticipant.isPending}
                               >
                                 <UserX className="w-3 h-3" />
                                 거절
@@ -414,12 +356,22 @@ export default async function UserStudyDetailUI({
                             </div>
                           )}
 
-                          {member.status === "참여중" &&
-                            member.role !== "호스트" && (
+                          {member.status === "accepted" &&
+                            member.user_id !== study.creator.id.toString() && (
                               <Button
                                 size="sm"
                                 variant="outline"
                                 className="text-red-600 hover:text-red-700 bg-transparent"
+                                onClick={() => {
+                                  if (
+                                    window.confirm(
+                                      `${member.username}님을 스터디에서 강퇴하시겠습니까?`
+                                    )
+                                  ) {
+                                    removeParticipant.mutate(member.id);
+                                  }
+                                }}
+                                disabled={removeParticipant.isPending}
                               >
                                 <Trash2 className="w-3 h-3" />
                               </Button>
@@ -445,7 +397,7 @@ export default async function UserStudyDetailUI({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {studyPosts.map((post) => (
+                  {study.posts?.map((post) => (
                     <Card
                       key={post.id}
                       className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer p-0 gap-0"
@@ -453,13 +405,13 @@ export default async function UserStudyDetailUI({
                       <Link href={`/posts/${post.id}`}>
                         <div className="relative w-full h-40 bg-muted">
                           <img
-                            src={post.image || "/placeholder.svg"}
+                            src={post.image_url || "/placeholder.svg"}
                             alt={post.title}
                             className="w-full h-full object-cover"
                           />
                           <div className="absolute top-3 right-3">
-                            <Badge className={getStatusColor(post.status)}>
-                              {post.status}
+                            <Badge className={getStatusColor(study.status)}>
+                              {studyStatusConversion(study.status)}
                             </Badge>
                           </div>
                         </div>
@@ -471,13 +423,13 @@ export default async function UserStudyDetailUI({
                             {post.content}
                           </p>
                           <div className="flex items-center justify-between text-sm text-muted-foreground">
-                            <span>{post.createdAt}</span>
+                            <span>{post.created_at}</span>
                             <div className="flex items-center gap-3">
                               <span className="flex items-center gap-1">
-                                <ThumbsUp className="w-3 h-3" /> {post.likes}
+                                <ThumbsUp className="w-3 h-3" /> {post.likes_count}
                               </span>
                               <span className="flex items-center gap-1">
-                                <Eye className="w-3 h-3" /> {post.views}
+                                <Eye className="w-3 h-3" /> {post.views_count}
                               </span>
                             </div>
                           </div>

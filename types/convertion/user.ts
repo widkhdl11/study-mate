@@ -1,9 +1,10 @@
 "use client";
 
 export const convertUser = (user: any) => {
+  console.log("user : ", user);
   return {
-    id: user.user_id,
-    name: user.name,
+    id: user.id,
+    username: user.username,
     email: user.email,
     avatar: user.avatar,
     joinedDate: new Date(user.created_at).toLocaleDateString(),

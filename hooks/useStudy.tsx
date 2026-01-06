@@ -1,9 +1,11 @@
 "use client";
 
+import { studyAddParticipant } from "@/actions/participantAction";
 import {
   createStudy,
   getMyStudies,
   getStudyById,
+  getStudyDetail,
   setStudyStatus,
 } from "@/actions/studyAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
@@ -15,9 +17,18 @@ import { toast } from "sonner";
 export function useCreateStudy() {
   return useMutation({
     mutationFn: async (formData: FormData) => {
-      return await createStudy(formData);
+      const create_study_response = await createStudy(formData);
+      // const add_participant_response = await studyAddParticipant(formData.get("id") as string);
+      // console.log("add_participant_response 실행");
+      // if (!add_participant_response || !add_participant_response.success) {
+      //   console.log("add_participant_response 실패");
+      //   return { success: false, error: { message: add_participant_response.error?.message } };
+      // }
+      // console.log("add_participant_response 성공");
+      return create_study_response;
     },
     onSuccess: (response) => {
+      console.log("response : ", response);
       if (!response || response.success) {
         return;
       }

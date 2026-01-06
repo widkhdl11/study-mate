@@ -28,7 +28,7 @@ export default function SignupUI() {
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      user_id: "",
+      username: "",
       email: "",
       password: "",
       passwordConfirm: "",
@@ -111,7 +111,7 @@ export default function SignupUI() {
               {/* 사용자명 필드 */}
               <FormField
                 control={form.control}
-                name="user_id"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>아이디</FormLabel>

@@ -2,7 +2,7 @@
 export const queryKeys = {
   // 인증
   user: ["user"],
-
+  myProfile: ["myProfile"],
   // 스터디
   studies: ["studies"],
   myStudies: ["myStudies"],

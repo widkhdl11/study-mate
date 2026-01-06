@@ -27,14 +27,16 @@ import {
 } from "@/components/ui/form";
 import postSchema from "@/lib/zod/schemas/postSchema";
 import { PostFormValues } from "@/lib/zod/schemas/postSchema";
-import { useGetStudies } from "@/hooks/useStudy";
+import { useGetMyStudies } from "@/hooks/useStudy";
 import { useCreatePost } from "@/hooks/usePost";
 import { Input } from "@/components/ui/input";
+import { StudiesResponse } from "@/types/response/studies";
 
 export default function PostCreateUI() {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: userStudies } = useGetStudies();
+  const { data: userStudies } = useGetMyStudies();
+  const myStudies = userStudies?.success && userStudies?.data ? (userStudies.data as unknown as StudiesResponse[]) : [];
   const postMutation = useCreatePost();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -162,7 +164,7 @@ export default function PostCreateUI() {
                     {/* <FormDescription>
                       모집글을 작성할 스터디를 선택해주세요
                     </FormDescription> */}
-                    {userStudies && userStudies?.length > 0 ? (
+                    {userStudies?.success && userStudies?.data && userStudies?.data?.length > 0 ? (
                       <Select
                         onValueChange={field.onChange}
                         disabled={isLoading}
@@ -171,8 +173,8 @@ export default function PostCreateUI() {
                           <SelectValue placeholder="스터디를 선택해주세요" />
                         </SelectTrigger>
                         <SelectContent>
-                          {userStudies?.map((study) => (
-                            <SelectItem key={study.id} value={study.id}>
+                          {myStudies?.map((study) => (
+                            <SelectItem key={study.id} value={study.id.toString()}>
                               {study.title}
                             </SelectItem>
                           ))}

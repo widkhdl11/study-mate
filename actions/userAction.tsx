@@ -9,12 +9,31 @@ export async function getUser() {
     throw new Error("사용자 정보를 찾을 수 없습니다.");
   }
   const id = user.user.id;
+  console.log("id : ", id);
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", id)
     .single();
 
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+export async function getMyProfile() {
+  const supabase = await createClient();
+  const { data: user, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    throw new Error("사용자 정보를 찾을 수 없습니다.");
+  }
+  const id = user.user.id;
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", id)
+    .single();
   if (error) {
     throw new Error(error.message);
   }

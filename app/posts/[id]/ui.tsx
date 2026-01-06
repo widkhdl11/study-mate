@@ -16,25 +16,23 @@ import {
   useCheckParticipantStatus,
   useParticipant, // ← 이거 추가 (useQuery 버전)
 } from "@/hooks/useParticipant";
-import { useSetStudyStatus } from "@/hooks/useStudy";
+import { getRegionPath } from "@/lib/constants/region";
+import { getCategoryPath } from "@/lib/constants/study-category";
 
 export default function PostDetailUI({ id }: { id: number }) {
   const { data, isLoading, error } = useGetPost(id);
   const post = data?.data;
 
+
   // ✅ 1. 모든 Hook을 컴포넌트 최상단으로 이동
   const studyId = post?.study?.id || 0;
 
-  // 참여 상태 조회 (useQuery)
-  const { data: participantData } = useParticipant(studyId);
-  const participantStatus = participantData?.data?.status || "";
-
-  // Mutations
+// ✅ useQuery 버전 사용 (자동으로 계속 최신 상태 유지)
+  const { data: participantData } = useParticipant(studyId);  
   const applyMutation = useApplyParticipant(studyId);
-  const setStudyStatusMutation = useSetStudyStatus({
-    id: studyId,
-    status: "recruiting",
-  });
+  
+  const participantStatus = participantData?.data?.status || "";
+ 
 
   // 이미지 URL 생성 함수
   const getImage = (path: string) => {
@@ -76,7 +74,7 @@ export default function PostDetailUI({ id }: { id: number }) {
     if (!participantStatus) return "모집중";
 
     if (participantStatus === "accepted") {
-      return "모집 완료";
+      return "참여중";
     }
     if (participantStatus === "pending") {
       return "수락 대기중";
@@ -145,10 +143,10 @@ export default function PostDetailUI({ id }: { id: number }) {
             수락 대기중
           </Button>
         );
-      case "모집 완료":
+      case "참여중":
         return (
           <div className="flex gap-3">
-            <Badge className="flex-1 py-3 text-center bg-success text-white text-base justify-center">
+            <Badge className="flex-1  text-center bg-success text-white text-base justify-center">
               참여중
             </Badge>
             <Button variant="outline" className="flex-1 bg-transparent">
@@ -202,16 +200,16 @@ export default function PostDetailUI({ id }: { id: number }) {
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
-                      src={post.author.avatar_url || "/placeholder.svg"}
-                      alt={getDisplayName(post.author.email)}
+                      src={post.author?.avatar_url || "/placeholder.svg"}
+                      alt={post.author?.username || ""}
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground">
-                      {getInitials(post.author.email)}
+                      {getInitials(post.author?.email)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-semibold text-foreground">
-                      {getDisplayName(post.author.email)}
+                      {post.author?.username}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {formatDate(post.created_at!)}
@@ -257,9 +255,11 @@ export default function PostDetailUI({ id }: { id: number }) {
                 </h2>
 
                 {/* 카테고리 & 위치 배지 */}
-                <div className="flex gap-2 mb-4">
-                  <Badge variant="outline">{post.study.study_category}</Badge>
-                  <Badge variant="outline">{post.study.region}</Badge>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {getCategoryPath(Number(post.study.study_category)).map((category) => (
+                    <Badge variant="outline" key={category} className="text-xs font-normal">{category}</Badge>
+                  ))}
+                    <Badge variant="outline"  className="text-xs font-normal">{getRegionPath(Number(post.study.region)).join(" ")}</Badge>
                 </div>
 
                 {/* 참여 인원 진행률 */}
@@ -298,17 +298,17 @@ export default function PostDetailUI({ id }: { id: number }) {
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg mb-6">
                   <Avatar className="h-8 w-8">
                     <AvatarImage
-                      src={post.study.creator.avatar_url || "/placeholder.svg"}
-                      alt={getDisplayName(post.study.creator.email)}
+                      src={post.author?.avatar_url || "/placeholder.svg"}
+                      alt={post.author?.username}
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {getInitials(post.study.creator.email)}
+                      {getInitials(post.author?.email)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <p className="text-xs text-muted-foreground">호스트</p>
                     <p className="font-semibold text-foreground text-sm">
-                      {getDisplayName(post.study.creator.email)}
+                      {post.author?.username}
                     </p>
                   </div>
                 </div>

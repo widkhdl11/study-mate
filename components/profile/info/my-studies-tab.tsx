@@ -8,6 +8,9 @@ import { MapPin } from "lucide-react";
 import { Users } from "lucide-react";
 import { Calendar } from "lucide-react";
 import Link from "next/link";
+import { getCategoryPath } from "@/lib/constants/study-category";
+import { getRegionPath } from "@/lib/constants/region";
+import { studyStatusConversion } from "@/types/convertion/study";
 export default function MyStudiesTab({
   myStudies,
   getStatusColor,
@@ -17,36 +20,38 @@ export default function MyStudiesTab({
   getStatusColor: (status: string) => string;
   getCategoryColor: (category: string) => string;
 }) {
+  console.log("myStudies : ", myStudies);
   return (
     <>
       <TabsContent value="studies" className="space-y-4">
         {myStudies.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {myStudies.map((study) => (
-              <Link key={study.id} href={`/studies/${study.id}`}>
+              <Link key={study.studies.id} href={`/studies/${study.studies.id}`}>
                 <Card className="group overflow-hidden hover:shadow-md transition-all h-full cursor-pointer p-6 space-y-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
                       <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                        {study.title}
+                        {study.studies.title}
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                        {study.description}
+                        {study.studies.description}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={`text-xs font-normal ${getCategoryColor(
-                        study.category
-                      )}`}
-                    >
-                      {study.category}
-                    </Badge>
+                    {getCategoryPath(Number(study.studies.study_category)).map((category) => (
+                      <Badge
+                        variant="outline"
+                        key={category}
+                        className={`text-xs font-normal `}
+                      >
+                        {category}
+                      </Badge>
+                    ))}
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <MapPin className="w-3 h-3" /> {study.location}
+                      <MapPin className="w-3 h-3" /> {getRegionPath(Number(study.studies.region)).join(" ")}
                     </span>
                   </div>
 
@@ -55,12 +60,12 @@ export default function MyStudiesTab({
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Users className="w-3.5 h-3.5" />
                         <span className="text-xs">
-                          {study.participants}/{study.maxParticipants}명
+                          {study.studies.current_participants}/{study.studies.max_participants}명
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Calendar className="w-3.5 h-3.5" />
-                        <span className="text-xs">{study.meetingDate}</span>
+                        <span className="text-xs">{study.studies.meetingDate}</span>
                       </div>
                     </div>
                     <div className="w-full bg-muted/60 rounded-full h-1.5 overflow-hidden">
@@ -76,8 +81,8 @@ export default function MyStudiesTab({
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <Badge className={getStatusColor(study.status)}>
-                      {study.status}
+                    <Badge className={getStatusColor(study.studies.status)}>
+                      {studyStatusConversion(study.studies.status)}
                     </Badge>
                     <span className="text-xs text-muted-foreground">관리</span>
                   </div>

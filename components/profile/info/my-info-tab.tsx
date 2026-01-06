@@ -12,9 +12,9 @@ export default function MyInfoTab({ currentUser }: { currentUser: any }) {
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 bg-muted/50 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">이름</p>
+                <p className="text-sm text-muted-foreground mb-1">닉네임</p>
                 <p className="text-lg font-semibold text-foreground">
-                  {currentUser.name}
+                  {currentUser.username}
                 </p>
               </div>
               <div className="p-4 bg-muted/50 rounded-lg">

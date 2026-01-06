@@ -98,6 +98,7 @@ export async function getPostById(id: number) {
       author:author_id (
         id,
         email,
+        username,
         avatar_url
       ),
       study:study_id (
@@ -111,6 +112,7 @@ export async function getPostById(id: number) {
         description,
         creator:creator_id (
           id,
+          username,
           email,
           avatar_url
         )
@@ -123,10 +125,10 @@ export async function getPostById(id: number) {
   // .select("*")
   // .eq("id", id)
   // .single();
+  console.log("getPostById data : ", data);
   if (error) {
     throw new Error(error.message);
   }
-  console.log("getPostById data : ", data);
   return { success: true, data };
 }
 
@@ -158,7 +160,7 @@ export async function getAllPosts(): Promise<
       ),
       author:author_id (
         id,
-        user_id,
+        username,
         email,
         avatar_url
       )
@@ -170,6 +172,5 @@ export async function getAllPosts(): Promise<
   if (error) {
     throw new Error(error.message);
   }
-  console.log("getAllPosts data : ", data);
   return { success: true, data: data as unknown as PostsResponse[] };
 }

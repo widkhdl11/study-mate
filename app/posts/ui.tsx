@@ -21,202 +21,37 @@ import { useGetAllPosts } from "@/hooks/usePost";
 import { PostsResponse } from "@/types/response/post";
 import { getImageUrl } from "@/utils/supabase/storage";
 import {
+  getCategoryCodeByLabel,
+  getCategoryCodeByValue,
+  getCategoryPath,
   getDetailCategories,
   getMainCategories,
   getSubcategories,
 } from "@/lib/constants/study-category";
-import { getMainRegion, getSubRegion } from "@/lib/constants/region";
+import { getMainRegion, getRegionCodeByValue, getRegionPath, getSubRegion } from "@/lib/constants/region";
 import { STUDY_STATUS } from "@/lib/constants/study-status";
+import { getStudyStatusExistValue, studyStatusConversion } from "@/types/convertion/study";
 
 export default function PostsUI() {
-  // 임시 데이터 - 실제로는 DB에서 가져올 예정
-  // const allPosts = [
-  //   {
-  //     id: 1,
-  //     title: "2024 겨울 프론트엔드 심화 스터디",
-  //     content:
-  //       "React, Next.js 심화 과정을 함께 진행할 멤버를 모집합니다. 주 2회 오프라인 모임과 코드 리뷰를 진행합니다.",
-  //     image_url: ["/frontend-study-meeting.jpg"],
-  //     created_at: "2024-01-01",
-  //     likes_count: 24,
-  //     views_count: 156,
-  //     study: {
-  //       id: 1,
-  //       title: "Frontend Masters 2024",
-  //       description:
-  //         "React, Next.js 심화 과정을 함께 진행할 멤버를 모집합니다. 주 2회 오프라인 모임과 코드 리뷰를 진행합니다.",
-  //       study_category: "프론트엔드",
-  //       region: "서울 강남",
-  //       max_participants: 10,
-  //       current_participants: 3,
-  //       status: "모집중",
-  //     },
-  //     author: {
-  //       id: "1",
-  //       username: "김민준",
-  //       email: "kimminjun@gmail.com",
-  //       avatar_url: "/avatar.jpg",
-  //     },
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "Spring Boot 완전 정복 스터디",
-  //     content:
-  //       "자바 백엔드 개발자를 위한 Spring Boot 마스터 클래스입니다. 실무 위주의 프로젝트를 진행합니다.",
-  //     image_url: ["/backend-java-spring-boot.jpg"],
-  //     created_at: "2024-01-02",
-  //     likes_count: 42,
-  //     views_count: 298,
-  //     study: {
-  //       id: 2,
-  //       title: "Backend Academy",
-  //       description:
-  //         "자바 백엔드 개발자를 위한 Spring Boot 마스터 클래스입니다. 실무 위주의 프로젝트를 진행합니다.",
-  //       study_category: "백엔드",
-  //       region: "온라인",
-  //       max_participants: 8,
-  //       current_participants: 7,
-  //       status: "마감",
-  //     },
-  //   },
-  //   {
-  //     id: 3,
-  //     title: "AI/ML 기초부터 시작하기",
-  //     content:
-  //       "Python으로 배우는 머신러닝 입문 과정입니다. 기초 수학부터 딥러닝 모델 구현까지 함께 공부해요.",
-  //     image_url: ["/machine-learning-ai-python.jpg"],
-  //     created_at: "2024-01-03",
-  //     likes_count: 31,
-  //     views_count: 187,
-  //     study: {
-  //       id: 3,
-  //       title: "AI Study Group",
-  //       description:
-  //         "Python으로 배우는 머신러닝 입문 과정입니다. 기초 수학부터 딥러닝 모델 구현까지 함께 공부해요.",
-  //       study_category: "AI",
-  //       region: "서울 종로",
-  //       max_participants: 12,
-  //       current_participants: 5,
-  //       status: "모집중",
-  //     },
-  //     author: {
-  //       id: "3",
-  //       username: "박지은",
-  //       email: "parkji@gmail.com",
-  //       avatar_url: "/avatar.jpg",
-  //     },
-  //   },
-  //   {
-  //     id: 4,
-  //     title: "모바일 앱 개발 - React Native",
-  //     content:
-  //       "React Native로 크로스 플랫폼 모바일 앱을 개발합니다. 앱 스토어 배포까지 목표로 합니다.",
-  //     image: "/mobile-app-react-native-development.jpg",
-  //     studyTitle: "Mobile Dev Study",
-  //     category: "모바일",
-  //     location: "서울 강북",
-  //     participants: 4,
-  //     maxParticipants: 6,
-  //     status: "모집중",
-  //     meetingDate: "2024.01.25",
-  //     author: { name: "정대호", initials: "JD" },
-  //     likes: 18,
-  //     views: 102,
-  //     postedTime: "5일 전",
-  //   },
-  //   {
-  //     id: 5,
-  //     title: "UI/UX 디자인 기초 스터디",
-  //     content:
-  //       "Figma를 활용한 현대적인 UI/UX 디자인을 배웁니다. 디자인 시스템 구축부터 프로토타이핑까지.",
-  //     image: "/ui-ux-design-figma.jpg",
-  //     studyTitle: "Design Lab",
-  //     category: "디자인",
-  //     location: "온라인",
-  //     participants: 8,
-  //     maxParticipants: 10,
-  //     status: "수락 대기중",
-  //     meetingDate: "2024.01.18",
-  //     author: { name: "최민지", initials: "CM" },
-  //     likes: 36,
-  //     views: 214,
-  //     postedTime: "4일 전",
-  //   },
-  //   {
-  //     id: 6,
-  //     title: "TypeScript 완벽 가이드",
-  //     content:
-  //       "타입스크립트의 심화 개념과 실제 프로젝트 적용법을 배웁니다. 타입 안정성을 높이는 방법을 연구합니다.",
-  //     image: "/coding-workspace.png",
-  //     studyTitle: "TypeScript Masters",
-  //     category: "프론트엔드",
-  //     location: "서울 강남",
-  //     participants: 6,
-  //     maxParticipants: 8,
-  //     status: "모집중",
-  //     meetingDate: "2024.01.22",
-  //     author: { name: "홍길동", initials: "HG" },
-  //     likes: 28,
-  //     views: 165,
-  //     postedTime: "6일 전",
-  //   },
-  //   {
-  //     id: 7,
-  //     title: "데이터 분석 입문 - SQL 기초",
-  //     content:
-  //       "SQL을 활용한 데이터 분석의 기초를 배웁니다. 실제 데이터를 가지고 쿼리를 작성해보는 실습 위주 스터디입니다.",
-  //     image: "/abstract-data-flow.png",
-  //     studyTitle: "Data Analytics Club",
-  //     category: "데이터",
-  //     location: "온라인",
-  //     participants: 2,
-  //     maxParticipants: 15,
-  //     status: "모집중",
-  //     meetingDate: "2024.01.28",
-  //     author: { name: "이다빈", initials: "LD" },
-  //     likes: 15,
-  //     views: 78,
-  //     postedTime: "7일 전",
-  //   },
-  //   {
-  //     id: 8,
-  //     title: "DevOps & Kubernetes 실무",
-  //     content:
-  //       "쿠버네티스를 활용한 실무 DevOps 경험을 나눕니다. 인프라 구축부터 모니터링까지 다룹니다.",
-  //     image: "/server-rack.png",
-  //     studyTitle: "DevOps Team",
-  //     category: "백엔드",
-  //     location: "서울 강남",
-  //     participants: 5,
-  //     maxParticipants: 8,
-  //     status: "모집중",
-  //     meetingDate: "2024.01.30",
-  //     author: { name: "김준호", initials: "KJ" },
-  //     likes: 22,
-  //     views: 145,
-  //     postedTime: "5일 전",
-  //   },
-  // ];
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("전체 카테고리");
+
   const [selectedStatus, setSelectedStatus] = useState("전체 상태");
   const { data, isLoading, error } = useGetAllPosts();
   const allPosts = data?.success ? (data.data as PostsResponse[]) : [];
   const [mainCategoryValue, setMainCategoryValue] = useState("");
   const [subCategoryValue, setSubCategoryValue] = useState("");
-  const [studyCategoryValue, setStudyCategoryValue] = useState(0);
+  const [categoryValue, setCategoryValue] = useState("");
   const [mainRegionValue, setMainRegionValue] = useState("");
   const [regionValue, setRegionValue] = useState("");
   // 동적 옵션
   const mainCategories = getMainCategories();
-  const subcategories = mainCategoryValue
+  const subcategories = (mainCategoryValue !=="전체" && mainCategoryValue !== "")
     ? getSubcategories(mainCategoryValue)
     : [];
-  const detailCategories =
-    mainCategoryValue && subCategoryValue
-      ? getDetailCategories(mainCategoryValue, subCategoryValue)
-      : [];
+  const detailCategories = (mainCategoryValue !=="전체" && mainCategoryValue !== "") && subCategoryValue !=="전체" && subCategoryValue !== ""
+    ? getDetailCategories(mainCategoryValue, subCategoryValue)
+    : [];
 
   const mainRegions = getMainRegion();
   const regions = mainRegionValue ? getSubRegion(mainRegionValue) : [];
@@ -224,22 +59,51 @@ export default function PostsUI() {
   const statuses = Object.values(STUDY_STATUS).map((status) => status.label);
 
   const filteredPosts = allPosts.filter((post) => {
+
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.study?.description
-        .toLowerCase()
+      post.study?.description?.toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
-      post.study?.title.toLowerCase().includes(searchQuery.toLowerCase());
+      post.study?.title?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCategory =
-      selectedCategory === "전체 카테고리" ||
-      post.study?.study_category === selectedCategory;
-    const matchesLocation =
-      regionValue === "전체 지역" || post.study?.region === regionValue;
-    const matchesStatus =
-      selectedStatus === "전체 상태" || post.study?.status === selectedStatus;
+     // ✅ 카테고리 필터링 (계층 구조 고려)
+     let matchesCategory = true;
+     if (categoryValue && categoryValue !== "전체") {
+       // 소분류 선택됨
+       matchesCategory = Number(post.study?.study_category) === Number(categoryValue);
 
-    return matchesSearch && matchesCategory && matchesLocation && matchesStatus;
+     } else if (subCategoryValue && subCategoryValue !== "전체") {
+       // 중분류 선택됨 → 해당 중분류의 모든 소분류 포함
+       const postCategory = Number(post.study?.study_category);
+       const subCategoryNum = Number(getCategoryCodeByValue(subCategoryValue.trim()));
+       // 예: 중분류 101 선택 → 10101, 10102, 10103 모두 포함
+       matchesCategory = Math.floor(postCategory / 100) === Math.floor(subCategoryNum/100);
+     } else if (mainCategoryValue && mainCategoryValue !== "전체") {
+       // 대분류 선택됨 → 해당 대분류의 모든 중/소분류 포함
+       const postCategory = Number(post.study?.study_category);
+       const mainCategoryNum = Number(getCategoryCodeByValue(mainCategoryValue.trim()));
+       // 예: 대분류 100 선택 → 101, 102, 10101, 10102 모두 포함
+       matchesCategory = Math.floor(postCategory / 100) === Math.floor(mainCategoryNum/100) ||
+                        Math.floor(postCategory / 10000) === Math.floor(mainCategoryNum/100);
+     }
+     // ✅ 지역 필터링 (계층 구조 고려)
+     let matchesRegion = true;
+     if (regionValue && regionValue !== "전체") {
+       // 시/군/구 선택됨
+       matchesRegion = Number(post.study?.region) === Number(regionValue);
+      } else if (mainRegionValue) {
+        // 시/도 선택됨 → 해당 시/도의 모든 시/군/구 포함
+        const postRegion = Number(post.study?.region);
+        const mainRegionNum = Number(getRegionCodeByValue(mainRegionValue.trim()));
+        // 예: 서울(11) 선택 → 1101(강남), 1102(강북) 모두 포함
+        matchesRegion = Math.floor(postRegion / 100) === Math.floor(mainRegionNum/100);
+     }
+     // ✅ 상태 필터링
+     const matchesStatus =
+       selectedStatus === "전체 상태" || 
+       post.study?.status === getStudyStatusExistValue(selectedStatus.trim());
+
+     return matchesSearch && matchesCategory && matchesRegion && matchesStatus;
   });
 
   const getStatusColor = (status: string) => {
@@ -255,22 +119,22 @@ export default function PostsUI() {
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
-      프론트엔드:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800",
-      백엔드:
-        "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800",
-      AI: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800",
-      모바일:
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800",
-      디자인:
-        "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800",
-      데이터:
-        "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
-    };
-    return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
-  };
+  // const getCategoryColor = (category: string) => {
+  //   const colors: { [key: string]: string } = {
+  //     프론트엔드:
+  //       "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800",
+  //     백엔드:
+  //       "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800",
+  //     AI: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800",
+  //     모바일:
+  //       "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800",
+  //     디자인:
+  //       "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800",
+  //     데이터:
+  //       "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
+  //   };
+  //   return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
+  // };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -321,15 +185,15 @@ export default function PostsUI() {
                         onValueChange={(value) => {
                           setMainCategoryValue(value);
                           setSubCategoryValue("");
-                          setStudyCategoryValue(0);
+                          setCategoryValue("");
                         }}
                       >
                         <SelectTrigger className="w-full bg-background">
-                          <SelectValue placeholder="전체 카테고리" />
+                          <SelectValue placeholder="대분류 선택" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="전체 카테고리">
-                            전체 카테고리
+                          <SelectItem value="전체">
+                            전체
                           </SelectItem>
                           {mainCategories.map((category) => (
                             <SelectItem
@@ -349,13 +213,16 @@ export default function PostsUI() {
                       <Select
                         onValueChange={(value) => {
                           setSubCategoryValue(value);
-                          setStudyCategoryValue(0);
+                          setCategoryValue("");
                         }}
                       >
                         <SelectTrigger className="w-full bg-background">
-                          <SelectValue placeholder="전체 중분류" />
+                          <SelectValue placeholder="중분류 선택" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="전체">
+                            전체
+                          </SelectItem>
                           {subcategories.map((subcategory) => (
                             <SelectItem
                               key={subcategory.value}
@@ -374,13 +241,16 @@ export default function PostsUI() {
                       </label>
                       <Select
                         onValueChange={(value) => {
-                          setStudyCategoryValue(Number(value));
+                          setCategoryValue(value);
                         }}
                       >
                         <SelectTrigger className="w-full bg-background">
-                          <SelectValue placeholder="전체 소분류" />
+                          <SelectValue placeholder="소분류 선택" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="전체">
+                            전체
+                          </SelectItem>
                           {detailCategories.map((detailCategory) => (
                             <SelectItem
                               key={detailCategory.value}
@@ -429,6 +299,9 @@ export default function PostsUI() {
                           <SelectValue placeholder="전체 지역" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="전체">
+                            전체
+                          </SelectItem>
                           {regions.map((region) => (
                             <SelectItem key={region.value} value={region.value}>
                               {region.label}
@@ -460,17 +333,21 @@ export default function PostsUI() {
                       </Select>
                     </div>
 
-                    {(selectedCategory !== "전체 카테고리" ||
-                      mainRegionValue !== "전체 지역" ||
-                      regionValue !== "전체 지역" ||
+                    {(mainCategoryValue !== "전체" ||
+                    subCategoryValue !== "전체" ||
+                    categoryValue !== "전체" ||
+                      mainRegionValue !== "전체" ||
+                      regionValue !== "전체" ||
                       selectedStatus !== "전체 상태") && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          setSelectedCategory("전체 카테고리");
-                          setMainRegionValue("전체 지역");
-                          setRegionValue("전체 지역");
+                          setMainCategoryValue("전체");
+                          setSubCategoryValue("전체");
+                          setCategoryValue("전체");
+                          setMainRegionValue("전체");
+                          setRegionValue("전체");
                           setSelectedStatus("전체 상태");
                           setSearchQuery("");
                         }}
@@ -529,7 +406,7 @@ export default function PostsUI() {
                                   post.study?.status || ""
                                 )} border-0 shadow-sm`}
                               >
-                                {post.study?.status}
+                                { studyStatusConversion(post.study?.status || "")}
                               </Badge>
                             </div>
                           </div>
@@ -538,17 +415,17 @@ export default function PostsUI() {
                             {/* Post Title & Content */}
                             <div>
                               <div className="flex items-center gap-2 mb-2">
-                                <Badge
-                                  variant="outline"
-                                  className={`text-xs font-normal ${getCategoryColor(
-                                    post.study?.study_category || ""
-                                  )}`}
-                                >
-                                  {post.study?.study_category || ""}
-                                </Badge>
+                                
+                                  {getCategoryPath(Number(post.study?.study_category || 0)).map((category) => (
+                                    <Badge key={category} variant="outline" className={`text-xs font-normal`}>
+                                      {category}
+                                    </Badge>
+                                  ))}
                                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                                   <MapPin className="w-3 h-3" />{" "}
-                                  {post.study?.region || ""}
+                                  {getRegionPath(Number(post.study?.region || 0)).map((region) => (
+                                    <span key={region}>{region}</span>
+                                  ))}
                                 </span>
                               </div>
                               <h3 className="font-bold text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors mb-1">
@@ -616,7 +493,7 @@ export default function PostsUI() {
                                   </AvatarFallback>
                                 </Avatar>
                                 <span className="text-xs font-medium text-muted-foreground">
-                                  {post.author?.email || ""}
+                                  {post.author?.username || ""}
                                 </span>
                               </div>
 
@@ -650,7 +527,9 @@ export default function PostsUI() {
                       variant="outline"
                       onClick={() => {
                         setSearchQuery("");
-                        setSelectedCategory("전체 카테고리");
+                        setMainCategoryValue("전체");
+                        setSubCategoryValue("전체");
+                        setCategoryValue("전체");
                         setMainRegionValue("전체 지역");
                         setRegionValue("전체 지역");
                         setSelectedStatus("전체 상태");

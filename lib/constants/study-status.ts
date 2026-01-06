@@ -5,3 +5,4 @@ export const STUDY_STATUS = {
 } as const;
 
 export type StudyStatus = keyof typeof STUDY_STATUS;
+

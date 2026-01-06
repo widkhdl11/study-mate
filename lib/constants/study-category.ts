@@ -374,6 +374,7 @@ export const getCategoryLabelByCode = (code: number): string => {
 };
 // 라벨로 코드 찾기 (역방향)
 export const getCategoryCodeByLabel = (label: string): number | null => {
+  console.log("getCategoryCodeByLabel:", label);
   for (const mainCat of Object.values(STUDY_CATEGORIES)) {
     if (mainCat.label === label) return mainCat.code;
 
@@ -382,6 +383,23 @@ export const getCategoryCodeByLabel = (label: string): number | null => {
 
       const detail = subCat.details?.find(
         (d: { label: string }) => d.label === label
+      );
+      if (detail) return detail.code;
+    }
+  }
+  return null;
+};
+
+export const getCategoryCodeByValue = (value: string): number | null => {
+  console.log("getCategoryCodeByValue:", value);
+  for (const mainCat of Object.values(STUDY_CATEGORIES)) {
+    if (mainCat.value === value) return mainCat.code;
+
+    for (const subCat of Object.values(mainCat.subcategories)) {
+      if (subCat.value === value) return subCat.code;
+
+      const detail = subCat.details?.find(
+        (d: { value: string }) => d.value === value
       );
       if (detail) return detail.code;
     }
@@ -417,7 +435,6 @@ export const getSubcategories = (
   mainCategory: string
 ): { value: string; label: string }[] => {
   if (!mainCategory) return [];
-  console.log("getSubcategories", mainCategory);
   const category =
     STUDY_CATEGORIES[mainCategory as keyof typeof STUDY_CATEGORIES];
   return Object.values(category.subcategories).map((sub) => ({
@@ -430,7 +447,6 @@ export const getDetailCategories = (
   mainCategory: string,
   subcategory: string
 ): { value: string; label: string }[] => {
-  console.log("getDetailCategories", mainCategory, subcategory);
   const mainCat =
     STUDY_CATEGORIES[mainCategory as keyof typeof STUDY_CATEGORIES];
   const subCat = Object.values(mainCat.subcategories).find(
@@ -443,3 +459,5 @@ export const getDetailCategories = (
     })) || []
   );
 };
+
+

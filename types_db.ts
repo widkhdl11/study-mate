@@ -164,26 +164,35 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
+          role: string | null
           status: string | null
           study_id: number
           updated_at: string | null
+          user_email: string
           user_id: string
+          username: string | null
         }
         Insert: {
           created_at?: string | null
           id?: number
+          role?: string | null
           status?: string | null
           study_id: number
           updated_at?: string | null
+          user_email: string
           user_id: string
+          username?: string | null
         }
         Update: {
           created_at?: string | null
           id?: number
+          role?: string | null
           status?: string | null
           study_id?: number
           updated_at?: string | null
+          user_email?: string
           user_id?: string
+          username?: string | null
         }
         Relationships: [
           {
@@ -307,7 +316,7 @@ export type Database = {
           id: string
           points: number | null
           updated_at: string | null
-          user_id: string
+          username: string
         }
         Insert: {
           avatar_url?: string | null
@@ -318,7 +327,7 @@ export type Database = {
           id: string
           points?: number | null
           updated_at?: string | null
-          user_id: string
+          username: string
         }
         Update: {
           avatar_url?: string | null
@@ -329,7 +338,7 @@ export type Database = {
           id?: string
           points?: number | null
           updated_at?: string | null
-          user_id?: string
+          username?: string
         }
         Relationships: []
       }

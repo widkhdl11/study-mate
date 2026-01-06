@@ -12,7 +12,7 @@ export const loginSchema = z.object({
 // 회원가입 스키마
 export const signupSchema = z
   .object({
-    user_id: z
+    username: z
       .string()
       .min(1, "아이디를 입력해주세요")
       .min(3, "아이디는 3자 이상이어야 합니다")

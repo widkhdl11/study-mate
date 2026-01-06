@@ -69,10 +69,13 @@ export async function getMyStudies(): Promise<ActionResponse | never> {
     throw new Error("사용자 정보를 찾을 수 없습니다.");
   }
   const { data, error } = await supabase
-    .from("studies")
-    .select("*")
-    .eq("creator_id", user.user.id);
-
+    // .from("studies")
+    // .select("*")
+    // .eq("creator_id", user.user.id);
+    .from("participants")
+    .select("*, studies!participants_study_id_fkey(*)")
+    .eq("user_id", user.user.id);
+    
   if (error) {
     return { success: false, error: { message: error.message } };
   }
@@ -113,21 +116,37 @@ export async function getStudyDetail(id: string) {
     .select(
       `
       *,
-      creator:creator_id (
+      creator:profiles!studies_creator_id_fkey (
         id,
+        username,
         email,
         avatar_url
-      )
-      participants:participants (
+      ),
+      participants!participants_study_id_fkey (
         id,
         user_id,
+        username,
+        user_email,
         study_id,
+        role,
         status
+      ),
+      posts!posts_study_id_fkey (
+        id,
+        title,
+        study_id,
+        content,
+        image_url,
+        likes_count,
+        views_count,
+        created_at,
+        updated_at
       )
-    `
+      `
     )
-    .eq("id", Number(id))
+    .eq("id", id)
     .single();
+    console.log("getStudyDetal data : ", data);
   if (error) {
     return { success: false, error: { message: error.message } };
   }

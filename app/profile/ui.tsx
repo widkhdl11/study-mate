@@ -21,7 +21,7 @@ import MyChatTab from "@/components/profile/info/my-chat-tab";
 import MyPostTab from "@/components/profile/info/my-post-tab";
 import MyStudiesTab from "@/components/profile/info/my-studies-tab";
 import MyInfoTab from "@/components/profile/info/my-info-tab";
-import { useUser } from "@/hooks/useUser";
+import { useGetMyProfile, useUser } from "@/hooks/useUser";
 import { convertUser } from "@/types/convertion/user";
 import { useGetAllPosts, useGetMyPosts, useGetPost } from "@/hooks/usePost";
 import { PostsResponse } from "@/types/response/post";
@@ -72,60 +72,7 @@ export default function UserProfileUI() {
     },
   ];
 
-  // // 작성한 모집글
-  // const myPosts = [
-  //   {
-  //     id: 1,
-  //     title: "React 심화 스터디 - 3기 모집",
-  //     content: "React와 Next.js를 심화 학습할 멤버를 모집합니다.",
-  //     image: "/frontend-study-meeting.jpg",
-  //     category: "프론트엔드",
-  //     location: "온라인",
-  //     status: "모집중",
-  //     likes: 24,
-  //     views: 156,
-  //     postedTime: "3일 전",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "TypeScript 완벽 가이드",
-  //     content: "타입스크립트 심화 개념을 함께 학습하는 스터디입니다.",
-  //     image: "/coding-workspace.png",
-  //     category: "프론트엔드",
-  //     location: "서울 강남",
-  //     status: "모집중",
-  //     likes: 18,
-  //     views: 89,
-  //     postedTime: "1주일 전",
-  //   },
-  // ];
-
-  // 내 스터디
-  // const myStudies = [
-  //   {
-  //     id: 1,
-  //     title: "React 심화 스터디",
-  //     description: "React와 Next.js를 깊이 있게 학습합니다.",
-  //     category: "프론트엔드",
-  //     location: "온라인",
-  //     participants: 5,
-  //     maxParticipants: 10,
-  //     meetingDate: "2024.01.15",
-  //     status: "모집중",
-  //   },
-  //   {
-  //     id: 2,
-  //     title: "TypeScript 마스터즈",
-  //     description: "타입스크립트 심화 개념을 습득합니다.",
-  //     category: "프론트엔드",
-  //     location: "서울 강남",
-  //     participants: 8,
-  //     maxParticipants: 10,
-  //     meetingDate: "2024.01.22",
-  //     status: "모집중",
-  //   },
-  // ];
-  const { data: user } = useUser();
+  const { data: user } = useGetMyProfile();
   const currentUser = convertUser(user || []);
   const { data: posts } = useGetMyPosts();
   const { data: studies } = useGetMyStudies();
@@ -163,11 +110,12 @@ export default function UserProfileUI() {
         {/* 프로필 헤더 */}
         <section className="border-b border-border bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-900 dark:to-slate-800 py-10">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+              {currentUser.id}
             <div className="flex flex-col sm:flex-row sm:items-start sm:gap-8">
               <Avatar className="h-24 w-24 ring-4 ring-primary/20 flex-shrink-0">
                 <AvatarImage
                   src={currentUser?.avatar || "/placeholder.svg"}
-                  alt={currentUser?.name || ""}
+                  alt={currentUser?.username || ""}
                 />
                 <AvatarFallback className="bg-blue-600 text-white text-2xl font-bold">
                   {currentUser?.initials || ""}
@@ -178,7 +126,7 @@ export default function UserProfileUI() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                   <div>
                     <h1 className="text-3xl font-bold text-foreground">
-                      {currentUser?.name || ""}
+                      {currentUser?.username || ""}
                     </h1>
                     <p className="text-muted-foreground mt-1">
                       {currentUser?.email || ""}
