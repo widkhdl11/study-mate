@@ -7,11 +7,7 @@ export type PostsResponse = {
   likes_count: number;
   views_count: number;
   created_at: string;
-  image_url: Array<{
-    url: string;
-    name: string;
-    size: number;
-  }> | null;
+  image_url: string[] | null;
 
   // JOIN된 데이터
   study: {
@@ -23,11 +19,16 @@ export type PostsResponse = {
     max_participants: number;
     current_participants: number;
     status: string;
+    creator: {
+      id: number;
+      username: string;
+      email: string;
+      avatar_url: string;
+    };
   };
 
   author: {
-    id: string;
-    user_id: string;
+    id: number;
     email: string;
     username: string;
     avatar_url: string | null;

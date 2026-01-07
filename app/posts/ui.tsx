@@ -119,26 +119,9 @@ export default function PostsUI() {
     }
   };
 
-  // const getCategoryColor = (category: string) => {
-  //   const colors: { [key: string]: string } = {
-  //     프론트엔드:
-  //       "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800",
-  //     백엔드:
-  //       "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800",
-  //     AI: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 border-amber-200 dark:border-amber-800",
-  //     모바일:
-  //       "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800",
-  //     디자인:
-  //       "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 border-pink-200 dark:border-pink-800",
-  //     데이터:
-  //       "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800",
-  //   };
-  //   return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
-  // };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
 
       <main className="flex-1">
         {/* Header Section */}
@@ -394,8 +377,7 @@ export default function PostsUI() {
                           <div className="relative w-full h-48 bg-muted overflow-hidden">
                             <img
                               src={
-                                getImageUrl(post.image_url?.[0]?.url || "") ||
-                                "/placeholder.svg"
+                                getImageUrl(post.image_url?.[0] || "")
                               }
                               alt={post.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -556,7 +538,6 @@ export default function PostsUI() {
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 }

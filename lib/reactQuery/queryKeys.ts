@@ -12,6 +12,7 @@ export const queryKeys = {
   posts: ["posts"],
   post: (id: number) => ["posts", id],
   myPosts: ["myPosts"],
+  createMyStudies: ["createMyStudies"],
   // 좋아요
   likes: (postId: number) => ["likes", postId],
 

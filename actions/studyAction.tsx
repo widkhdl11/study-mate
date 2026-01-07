@@ -81,6 +81,24 @@ export async function getMyStudies(): Promise<ActionResponse | never> {
   }
 
   return { success: true, data };
+  
+}
+
+export async function getCreateMyStudies(): Promise<ActionResponse | never> {
+  const supabase = await createClient();
+
+  const { data: user, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    throw new Error("사용자 정보를 찾을 수 없습니다.");
+  }
+  const { data, error } = await supabase
+    .from("studies")
+    .select("*")
+    .eq("creator_id", user.user.id);
+    if (error) {
+      return { success: false, error: { message: error.message } };
+    }
+    return { success: true, data };
 }
 
 export async function setStudyStatus(id: number, status: string) {

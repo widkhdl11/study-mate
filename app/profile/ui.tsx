@@ -16,6 +16,7 @@ import {
   Edit,
   Lock,
   LogOut,
+  Settings,
 } from "lucide-react";
 import MyChatTab from "@/components/profile/info/my-chat-tab";
 import MyPostTab from "@/components/profile/info/my-post-tab";
@@ -27,6 +28,9 @@ import { useGetAllPosts, useGetMyPosts, useGetPost } from "@/hooks/usePost";
 import { PostsResponse } from "@/types/response/post";
 import { StudiesResponse } from "@/types/response/studies";
 import { useGetMyStudies } from "@/hooks/useStudy";
+import { useEffect, useState } from "react";
+import { useUpdateProfileImage } from "@/hooks/useProfile";
+import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage";
 
 export default function UserProfileUI() {
   // 임시 데이터 - 실제로는 DB에서 조회
@@ -77,7 +81,7 @@ export default function UserProfileUI() {
   const { data: posts } = useGetMyPosts();
   const { data: studies } = useGetMyStudies();
 
-  const myPosts = posts?.success ? (posts.data as PostsResponse[]) : [];
+  const myPosts = posts?.success ? (posts.data as unknown as PostsResponse[]) : [];
   const myStudies = studies?.success
     ? (studies.data as unknown as StudiesResponse[])
     : [];
@@ -101,18 +105,62 @@ export default function UserProfileUI() {
     };
     return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
   };
+  const [profileImage, setProfileImage] = useState(currentUser?.avatar_url || "/placeholder.svg")
 
+  const updateProfileImage = useUpdateProfileImage();
+  // 프로필 이미지 변경 핸들러
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // ✅ 미리보기: URL.createObjectURL (빠름!)
+    const previewUrl = URL.createObjectURL(file);
+    setProfileImage(previewUrl); 
+    updateProfileImage.mutate(file);
+  }
+  // 🧹 메모리 해제
+useEffect(() => {
+  return () => {
+    if (profileImage && profileImage.startsWith('blob:')) {
+      URL.revokeObjectURL(profileImage);
+    }
+  };
+}, [profileImage]);
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
 
       <main className="flex-1">
         {/* 프로필 헤더 */}
         <section className="border-b border-border bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-900 dark:to-slate-800 py-10">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-              {currentUser.id}
             <div className="flex flex-col sm:flex-row sm:items-start sm:gap-8">
-              <Avatar className="h-24 w-24 ring-4 ring-primary/20 flex-shrink-0">
+            <div className="relative flex-shrink-0">
+                <Avatar className="h-24 w-24 ring-4 ring-primary/20">
+                  <AvatarImage src={getProfileImageUrl(currentUser?.avatar_url || "") || "/placeholder.svg"} alt={currentUser.username || ""} />
+                  <AvatarFallback className="bg-blue-600 text-white text-2xl font-bold">
+                    {currentUser.initials}
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* 톱니바퀴 아이콘 버튼 */}
+                <label
+                  htmlFor="profile-image-upload"
+                  className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 cursor-pointer shadow-lg transition-all hover:scale-110"
+                  title="프로필 이미지 변경"
+                >
+                  <Settings className="w-4 h-4" />
+                </label>
+
+                {/* 숨겨진 파일 입력 */}
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="sr-only"
+                />
+              </div>
+              {/* <Avatar className="h-24 w-24 ring-4 ring-primary/20 flex-shrink-0">
                 <AvatarImage
                   src={currentUser?.avatar || "/placeholder.svg"}
                   alt={currentUser?.username || ""}
@@ -120,7 +168,7 @@ export default function UserProfileUI() {
                 <AvatarFallback className="bg-blue-600 text-white text-2xl font-bold">
                   {currentUser?.initials || ""}
                 </AvatarFallback>
-              </Avatar>
+              </Avatar> */}
 
               <div className="flex-1 mt-4 sm:mt-0">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
@@ -220,7 +268,6 @@ export default function UserProfileUI() {
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 }

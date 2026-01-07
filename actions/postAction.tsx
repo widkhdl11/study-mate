@@ -78,7 +78,31 @@ export async function getMyposts() {
   const id = user.user.id;
   const { data, error } = await supabase
     .from("posts")
-    .select("*")
+    .select(`
+      id,
+      title,
+      content,
+      image_url,
+      author_id,
+      likes_count,
+      views_count,
+      created_at,
+      study:study_id (
+        id,
+        title,
+        study_category,
+        region,
+        status,
+        max_participants,
+        current_participants,
+        description,
+        creator:creator_id (
+          id,
+          username,
+          email,
+          avatar_url
+        )
+      )`)
     .eq("author_id", id)
     .order("created_at", { ascending: false });
 

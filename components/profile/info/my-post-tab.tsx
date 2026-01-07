@@ -7,13 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import { ThumbsUp } from "lucide-react";
 import { Eye } from "lucide-react";
+import { getImageUrl } from "@/utils/supabase/storage";
+import { PostsResponse } from "@/types/response/post";
+import { getCategoryPath } from "@/lib/constants/study-category";
+import { getRegionPath } from "@/lib/constants/region";
+import { studyStatusConversion } from "@/types/convertion/study";
 
 export default function MyPostTab({
   myPosts,
   getStatusColor,
   getCategoryColor,
 }: {
-  myPosts: any[];
+  myPosts: PostsResponse[];
   getStatusColor: (status: string) => string;
   getCategoryColor: (category: string) => string;
 }) {
@@ -26,29 +31,30 @@ export default function MyPostTab({
               <Card className="group overflow-hidden hover:shadow-md transition-all h-full flex flex-col cursor-pointer p-0 gap-0">
                 <div className="relative w-full h-40 bg-muted overflow-hidden">
                   <img
-                    src={post.image || "/placeholder.svg"}
+                    src={getImageUrl(post.image_url) || "/placeholder.svg"}
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
                   <div className="absolute top-3 right-3">
-                    <Badge className={getStatusColor(post.status)}>
-                      {post.status}
+                    <Badge className={getStatusColor(post.study.status)}>
+                      {studyStatusConversion(post.study.status)}
                     </Badge>
                   </div>
                 </div>
                 <div className="p-4 flex-1 flex flex-col gap-3">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge
-                        variant="outline"
-                        className={`text-xs font-normal ${getCategoryColor(
-                          post.category
-                        )}`}
-                      >
-                        {post.category}
-                      </Badge>
+                      {getCategoryPath(Number(post.study.study_category)).map((category) => (
+                        <Badge
+                          variant="outline"
+                          className={`text-xs font-normal ${getCategoryColor(category)}`}
+                        >
+                          {category}
+                        </Badge>
+                      ))}
+                 
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <MapPin className="w-3 h-3" /> {post.location}
+                        <MapPin className="w-3 h-3" /> {getRegionPath(Number(post.study.region)).join(" ")}
                       </span>
                     </div>
                     <h3 className="font-bold text-foreground line-clamp-1">
@@ -59,13 +65,13 @@ export default function MyPostTab({
                     </p>
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto pt-2 border-t border-border">
-                    <span>{post.postedTime}</span>
+                    <span>{new Date(post.created_at).toLocaleDateString("ko-KR")}</span>
                     <div className="flex items-center gap-2">
                       <span className="flex items-center gap-1">
-                        <ThumbsUp className="w-3 h-3" /> {post.likes}
+                        <ThumbsUp className="w-3 h-3" /> {post.likes_count}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" /> {post.views}
+                        <Eye className="w-3 h-3" /> {post.views_count}
                       </span>
                     </div>
                   </div>

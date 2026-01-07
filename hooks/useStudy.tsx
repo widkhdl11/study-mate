@@ -3,6 +3,7 @@
 import { studyAddParticipant } from "@/actions/participantAction";
 import {
   createStudy,
+  getCreateMyStudies,
   getMyStudies,
   getStudyById,
   getStudyDetail,
@@ -58,6 +59,15 @@ export function useGetMyStudies() {
   });
 }
 
+export function useGetCreateMyStudies() {
+  return useQuery({
+    queryKey: queryKeys.createMyStudies,
+    queryFn: async () => {
+      const response = await getCreateMyStudies();
+      return response;
+    },
+  });
+}
 export function useSetStudyStatus({
   id,
   status,

@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/form";
 import postSchema from "@/lib/zod/schemas/postSchema";
 import { PostFormValues } from "@/lib/zod/schemas/postSchema";
-import { useGetMyStudies } from "@/hooks/useStudy";
+import { useGetCreateMyStudies, useGetMyStudies } from "@/hooks/useStudy";
 import { useCreatePost } from "@/hooks/usePost";
 import { Input } from "@/components/ui/input";
 import { StudiesResponse } from "@/types/response/studies";
@@ -35,7 +35,7 @@ import { StudiesResponse } from "@/types/response/studies";
 export default function PostCreateUI() {
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: userStudies } = useGetMyStudies();
+  const { data: userStudies } = useGetCreateMyStudies();
   const myStudies = userStudies?.success && userStudies?.data ? (userStudies.data as unknown as StudiesResponse[]) : [];
   const postMutation = useCreatePost();
   const formRef = useRef<HTMLFormElement>(null);

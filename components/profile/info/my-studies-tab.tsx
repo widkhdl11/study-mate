@@ -63,17 +63,17 @@ export default function MyStudiesTab({
                           {study.studies.current_participants}/{study.studies.max_participants}명
                         </span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                      {/* <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Calendar className="w-3.5 h-3.5" />
                         <span className="text-xs">{study.studies.meetingDate}</span>
-                      </div>
+                      </div> */}
                     </div>
                     <div className="w-full bg-muted/60 rounded-full h-1.5 overflow-hidden">
                       <div
                         className="h-full bg-primary rounded-full transition-all"
                         style={{
                           width: `${
-                            (study.participants / study.maxParticipants) * 100
+                            (study.studies.current_participants / study.studies.max_participants) * 100
                           }%`,
                         }}
                       />

@@ -17,6 +17,8 @@ import { Button } from "./ui/button";
 import { useLogout } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
+import { useUser } from "@/hooks/useUser";
+import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage";
 
 export function Header() {
   const logoutMutation = useLogout();
@@ -29,26 +31,7 @@ export function Header() {
   //   | null
   // >(null);
 
-  const { data: user, isLoading } = useQuery({
-    queryKey: queryKeys.user,
-    queryFn: async () => {
-      const supabase = await createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (user) {
-        return {
-          // ✅ 여기서 반환한 값이
-          ...user,
-          notifications: 3,
-          name: "정재원",
-          initials: user.email?.charAt(0),
-        };
-      }
-      return null;
-    },
-  });
+  const { data: user, isLoading } = useUser();
   // useEffect(() => {
   //   if (userData) {
   //     setUser({
@@ -113,9 +96,9 @@ export function Header() {
             {user && (
               <button className="relative p-2 text-foreground hover:bg-muted rounded-lg transition-colors">
                 🔔
-                {user.notifications > 0 && (
+                {user?.notifications > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-danger text-white text-xs">
-                    {user?.notifications}
+                    {user.notifications || 0}
                   </Badge>
                 )}
               </button>
@@ -126,13 +109,13 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" alt={user.name} />
+                      <AvatarImage src={getProfileImageUrl(user.avatar_url) || "/placeholder.svg"} alt={user.username} />
                       <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                         {user.initials}
                       </AvatarFallback>
                     </Avatar>
                     <span className="hidden sm:inline text-sm font-medium text-foreground">
-                      {user.name}
+                      {user.username}
                     </span>
                   </button>
                 </DropdownMenuTrigger>

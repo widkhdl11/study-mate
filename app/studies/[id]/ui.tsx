@@ -78,7 +78,6 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
 
       <main className="flex-1">
         {/* 스터디 헤더 섹션 */}
@@ -462,7 +461,6 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 }

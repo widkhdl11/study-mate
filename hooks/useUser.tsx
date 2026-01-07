@@ -2,6 +2,7 @@
 
 import { getMyProfile, getUser } from "@/actions/userAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
+import { convertUser } from "@/types/convertion/user";
 import { useQuery } from "@tanstack/react-query";
 
 export function useUser() {
@@ -9,7 +10,7 @@ export function useUser() {
     queryKey: queryKeys.user,
     queryFn: async () => {
       const user = await getUser();
-      return user;
+      return convertUser(user);
     },
   });
 }

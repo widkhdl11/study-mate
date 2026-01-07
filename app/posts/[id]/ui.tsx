@@ -18,6 +18,7 @@ import {
 } from "@/hooks/useParticipant";
 import { getRegionPath } from "@/lib/constants/region";
 import { getCategoryPath } from "@/lib/constants/study-category";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 export default function PostDetailUI({ id }: { id: number }) {
   const { data, isLoading, error } = useGetPost(id);
@@ -91,14 +92,12 @@ export default function PostDetailUI({ id }: { id: number }) {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-muted-foreground">게시글을 불러오는 중...</p>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -107,7 +106,6 @@ export default function PostDetailUI({ id }: { id: number }) {
   if (error || !post) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <Header />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-destructive mb-4">
@@ -116,7 +114,6 @@ export default function PostDetailUI({ id }: { id: number }) {
             <Button onClick={() => window.history.back()}>돌아가기</Button>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -170,22 +167,34 @@ export default function PostDetailUI({ id }: { id: number }) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header />
 
       <main className="flex-1">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* 포스트 이미지 */}
-          {post.image_url &&
-            Array.isArray(post.image_url) &&
-            post.image_url.length > 0 && (
-              <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg mb-8">
-                <img
-                  src={getImage((post.image_url as any)[0])}
-                  alt={post.title}
-                  className="object-cover"
-                />
-              </div>
-            )}
+          <div className="relative w-full mb-8">
+            <Carousel className="w-full">
+              <CarouselContent>
+                {post.image_url.map((image: string, index: number) => (
+                  <CarouselItem key={index}>
+                    <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
+                      <Image
+                        src={getImageUrl(image) || "/placeholder.svg"}
+                        alt={`${post.title} - 이미지 ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-4" />
+              <CarouselNext className="right-4" />
+            </Carousel>
+            {/* 이미지 카운터 */}
+            <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+              1 / {post.image_url.length}
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* 메인 콘텐츠 */}
@@ -369,7 +378,6 @@ export default function PostDetailUI({ id }: { id: number }) {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }
