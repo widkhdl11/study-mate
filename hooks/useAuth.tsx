@@ -11,6 +11,9 @@ import { queryKeys } from "@/lib/reactQuery/queryKeys";
  */
 
 export function useLogin() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  
   return useMutation({
     mutationFn: async (formData: FormData) => {
       return await login(formData);
@@ -34,6 +37,18 @@ export function useLogin() {
       }
       toast.error(error?.message ?? "로그인 중 오류가 발생했습니다");
     },
+    onSettled: async () => {
+      // 1. React Query 캐시 무효화
+      await queryClient.invalidateQueries({ queryKey: queryKeys.user });
+      
+      // 2. Next.js 서버 컴포넌트 재렌더링
+      router.refresh();
+      
+      // 3. 약간의 딜레이 후 다시 refetch
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: queryKeys.user });
+      }, 100);
+    }
   });
 }
 

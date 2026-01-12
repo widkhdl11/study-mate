@@ -149,7 +149,6 @@ export async function getPostById(id: number) {
   // .select("*")
   // .eq("id", id)
   // .single();
-  console.log("getPostById data : ", data);
   if (error) {
     throw new Error(error.message);
   }
@@ -197,4 +196,76 @@ export async function getAllPosts(): Promise<
     throw new Error(error.message);
   }
   return { success: true, data: data as unknown as PostsResponse[] };
+}
+
+export async function increaseViewCount(postId: number) {
+  const supabase = await createClient();
+  
+  const { error } = await supabase.rpc('increment_post_views', {
+    post_id: postId
+  });
+  
+  if (error) {
+    throw new Error(error.message);
+  }
+  return { success: true };
+}
+
+// ✅ 좋아요 토글 (RPC 사용)
+export async function toggleLike(postId: number) {
+  const supabase = await createClient();
+  
+  // 로그인 확인
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    return { 
+      success: false, 
+      error: { message: "로그인이 필요합니다" } 
+    };
+  }
+  
+  // RPC 함수 호출
+  const { data, error } = await supabase.rpc('toggle_post_like', {
+    p_post_id: postId,
+    p_user_id: user.id
+  });
+  
+  if (error) {
+    console.error("toggleLike error:", error);
+    return { 
+      success: false, 
+      error: { message: "좋아요 처리에 실패했습니다" } 
+    };
+  }
+  
+  // data[0] = { liked: true/false, new_count: 10 }
+  return { 
+    success: true, 
+    data: {
+      liked: data[0]?.liked,
+      newCount: data[0]?.new_count
+    }
+  };
+}
+
+export async function checkIsLiked(postId: number) {
+  const supabase = await createClient();
+  const { data: user, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    throw new Error("사용자 정보를 찾을 수 없습니다.");
+  }
+  const userId = user.user.id;
+    // 좋아요 확인
+    const { data, error } = await supabase
+    .from("likes")
+    .select("*")
+    .eq("post_id", postId)
+    .eq("user_id", userId)
+    .maybeSingle(); 
+  
+  if (error) {
+    return { success: false, data: false };
+  }
+  
+  return { success: true, data: !!data };
 }

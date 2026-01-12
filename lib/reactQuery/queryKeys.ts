@@ -14,7 +14,7 @@ export const queryKeys = {
   myPosts: ["myPosts"],
   createMyStudies: ["createMyStudies"],
   // 좋아요
-  likes: (postId: number) => ["likes", postId],
+  like: (postId: number) => ["like", postId],
 
   // 참여자
   // participants: (studyId: number) => ["participants", studyId],

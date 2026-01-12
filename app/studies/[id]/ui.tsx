@@ -36,17 +36,23 @@ import { getCategoryLabelByCode, getCategoryPath } from "@/lib/constants/study-c
 import { getRegionPath } from "@/lib/constants/region";
 import { studyStatusConversion } from "@/types/convertion/study";
 import { formatDate } from "date-fns";
+import { getProfileImageUrl } from "@/utils/supabase/storage";
+import { useEffect, useState } from "react";
+import { UserSession } from "@/types/userSesstion";
+import { useUser } from "@/hooks/useUser";
 
 export default function UserStudyDetailUI({ id }: { id: string }) {
   const { data: studyData } = useGetStudyDetail({ id });
   const acceptParticipant = useAcceptParticipant(Number(id));
   const rejectParticipant = useRejectParticipant(Number(id));
   const removeParticipant = useRemoveParticipant(Number(id));
-  
+  const { data:userData } = useUser();
+  const user = userData;
   const study = studyData?.data as StudiesResponse | undefined;
   if (!study) {
     return <div>스터디를 찾을 수 없습니다.</div>;
   }
+
 
   const categoryPath = getCategoryPath(Number(study.study_category));
 
@@ -271,7 +277,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                       멤버 관리
                     </h2>
                     <Badge variant="outline">
-                      {study.participants?.filter((m) => m.status === "참여중").length ?? 0}/
+                      {study.current_participants ?? 0}/
                       {study.max_participants}명 참여중
                     </Badge>
                   </div>
@@ -284,8 +290,12 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                       >
                         <div className="flex items-center gap-4">
                           <Avatar className="h-10 w-10">
-                            <AvatarFallback className="bg-blue-600 text-white">
-                              {member.user_email}
+                            <AvatarImage
+                              src={getProfileImageUrl(member?.avatar_url || "")}
+                              alt={member?.username || ""}
+                            />
+                            <AvatarFallback className="bg-blue-600 text-white text-lg">
+                              {member?.username}
                             </AvatarFallback>
                           </Avatar>
                           <div>
@@ -314,67 +324,122 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                           <Badge className={getStatusColor(member.status)}>
                             {statusConversion(member.status)}
                           </Badge>
-
-                          {member.status === "pending" && (
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                className="bg-green-600 hover:bg-green-700 gap-1"
-                                onClick={() => {
-                                  if (
-                                    window.confirm(
-                                      `${member.username}님의 참여 신청을 수락하시겠습니까?`
-                                    )
-                                  ) {
-                                    acceptParticipant.mutate(member.id);
-                                  }
-                                }}
-                                disabled={acceptParticipant.isPending}
-                              >
-                                <UserCheck className="w-3 h-3" />
-                                수락
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                className="gap-1"
-                                onClick={() => {
-                                  if (
-                                    window.confirm(
-                                      `${member.username}님의 참여 신청을 거절하시겠습니까?`
-                                    )
-                                  ) {
-                                    rejectParticipant.mutate(member.id);
-                                  }
-                                }}
-                                disabled={rejectParticipant.isPending}
-                              >
-                                <UserX className="w-3 h-3" />
-                                거절
-                              </Button>
-                            </div>
+                          
+                          {/* 본인이 호스트 */}
+                          {(user && user.id === study.creator.id) && (member.role === "host") && (
+                            <>
+                              {/* 신청자가 신청 대기 상태라면: 수락/거절 버튼 */}
+                              {member.status === "pending" && (
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    className="bg-green-600 hover:bg-green-700 gap-1"
+                                    onClick={() => {
+                                      if (
+                                        window.confirm(
+                                          `${member.username}님의 참여 신청을 수락하시겠습니까?`
+                                        )
+                                      ) {
+                                        acceptParticipant.mutate(member.id);
+                                      }
+                                    }}
+                                    disabled={acceptParticipant.isPending}
+                                  >
+                                    <UserCheck className="w-3 h-3" />
+                                    수락
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="gap-1"
+                                    onClick={() => {
+                                      if (
+                                        window.confirm(
+                                          `${member.username}님의 참여 신청을 거절하시겠습니까?`
+                                        )
+                                      ) {
+                                        rejectParticipant.mutate(member.id);
+                                      }
+                                    }}
+                                    disabled={rejectParticipant.isPending}
+                                  >
+                                    <UserX className="w-3 h-3" />
+                                    거절
+                                  </Button>
+                                </div>
+                              )}
+                              {/* 신청자가 신청 완료(수락)상태라면 강퇴 버튼, 단 호스트 자신 제외 */}
+                              {member.status === "accepted" &&
+                                member.user_id !== study.creator.id.toString() && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-red-600 hover:text-red-700 bg-transparent"
+                                    onClick={() => {
+                                      if (
+                                        window.confirm(
+                                          `${member.username}님을 스터디에서 강퇴하시겠습니까?`
+                                        )
+                                      ) {
+                                        removeParticipant.mutate(member.id);
+                                      }
+                                    }}
+                                    disabled={removeParticipant.isPending}
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                    강퇴
+                                  </Button>
+                              )}
+                            </>
                           )}
 
-                          {member.status === "accepted" &&
-                            member.user_id !== study.creator.id.toString() && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 hover:text-red-700 bg-transparent"
-                                onClick={() => {
-                                  if (
-                                    window.confirm(
-                                      `${member.username}님을 스터디에서 강퇴하시겠습니까?`
-                                    )
-                                  ) {
-                                    removeParticipant.mutate(member.id);
-                                  }
-                                }}
-                                disabled={removeParticipant.isPending}
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
-                            )}
+                          {/* 본인이 common */}
+                          {(user && user.id === member.user_id) && member.role === "common" && (
+                            <>
+                              {/* 신청자가 신청 대기 상태라면: 신청 취소 버튼 */}
+                              {member.status === "pending" && (
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="gap-1"
+                                  onClick={() => {
+                                    if (
+                                      window.confirm(
+                                        "참여 신청을 취소하시겠습니까?"
+                                      )
+                                    ) {
+                                      rejectParticipant.mutate(member.id);
+                                    }
+                                  }}
+                                  disabled={rejectParticipant.isPending}
+                                >
+                                  <UserX className="w-3 h-3" />
+                                  신청 취소
+                                </Button>
+                              )}
+                              {/* 신청자가 신청 완료(수락)상태라면: 탈퇴 버튼 */}
+                              {member.status === "accepted" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-red-600 hover:text-red-700 bg-transparent"
+                                  onClick={() => {
+                                    if (
+                                      window.confirm(
+                                        "스터디에서 탈퇴하시겠습니까?"
+                                      )
+                                    ) {
+                                      removeParticipant.mutate(member.id);
+                                    }
+                                  }}
+                                  disabled={removeParticipant.isPending}
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                  탈퇴
+                                </Button>
+                              )}
+                            </>
+                          )}
                         </div>
                       </div>
                     ))}

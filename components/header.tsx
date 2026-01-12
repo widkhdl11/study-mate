@@ -1,53 +1,42 @@
-"use client";
+"use client"
 
-import Link from "next/link";
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { createClient } from "@/utils/supabase/client";
-import { useEffect, useState } from "react";
-import { User } from "@supabase/supabase-js";
-import { Button } from "./ui/button";
-import { useLogout } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "@/lib/reactQuery/queryKeys";
-import { useUser } from "@/hooks/useUser";
-import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage";
+} from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { useLogout } from "@/hooks/useAuth"
+import { useUser } from "@/hooks/useUser"
+import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage"
 
 export function Header() {
+  const router = useRouter();
+  const { data: userData, isLoading } = useUser();
   const logoutMutation = useLogout();
-  // const [user, setUser] = useState<
-  //   | (User & {
-  //       notifications: number;
-  //       name: string;
-  //       initials: string | undefined;
-  //     })
-  //   | null
-  // >(null);
-
-  const { data: user, isLoading } = useUser();
-  // useEffect(() => {
-  //   if (userData) {
-  //     setUser({
-  //       ...userData,
-  //       notifications: 3,
-  //       name: "정재원",
-  //       initials: userData.email?.charAt(0),
-  //     });
-  //   }
-  // }, [userData]);
-
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
-  if (isLoading) {
-    return <div>Loading...</div>;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    if (userData) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, [userData]);
+  
+  const user = userData as unknown as any;
+  const handleCreateStudy = () => {
+    if (!isLoggedIn) {
+      router.push("/auth/login");
+      return;
+    }
+    router.push("/studies/create");
   }
 
   return (
@@ -67,18 +56,15 @@ export function Header() {
 
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="/posts"
-              className="text-foreground hover:text-accent transition-colors font-medium"
-            >
+            <Link href="/posts" className="text-foreground hover:text-accent transition-colors font-medium">
               모집글
             </Link>
-            <Link
-              href="/chats"
+            <button
+              onClick={handleCreateStudy}
               className="text-foreground hover:text-accent transition-colors font-medium"
             >
-              채팅
-            </Link>
+              스터디 만들기
+            </button>
           </nav>
 
           {/* Right Actions */}
@@ -92,56 +78,55 @@ export function Header() {
                 className="bg-muted text-foreground placeholder-muted-foreground outline-none ml-2 w-full text-sm"
               />
             </div>
-            {/* Notifications */}
-            {user && (
-              <button className="relative p-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-                🔔
-                {user?.notifications > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-danger text-white text-xs">
-                    {user.notifications || 0}
-                  </Badge>
-                )}
-              </button>
-            )}
-            {/* User Menu */}
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={getProfileImageUrl(user.avatar_url) || "/placeholder.svg"} alt={user.username} />
-                      <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                        {user.initials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="hidden sm:inline text-sm font-medium text-foreground">
-                      {user.username}
-                    </span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Link href="/profile" className="w-full">
-                      프로필
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer">
-                    <Link href="/profile" className="w-full">
-                      내 스터디
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer text-destructive focus:text-destructive"
-                    onClick={handleLogout}
-                    disabled={logoutMutation.isPending}
-                  >
-                    {logoutMutation.isPending ? "로그아웃 중..." : "로그아웃"}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+
+            {isLoggedIn && user ? (
+              <>
+                {/* Notifications */}
+                <button className="relative p-2 text-foreground hover:bg-muted rounded-lg transition-colors">
+                  🔔
+                  {user.notifications > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-danger text-white text-xs">
+                      {user.notifications}
+                    </Badge>
+                  )}
+                </button>
+
+                {/* User Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={ user.avatar_url ? getProfileImageUrl(user.avatar_url) : "/placeholder.svg"} alt={user.username} />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                          {user.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="hidden sm:inline text-sm font-medium text-foreground">{user.username}</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Link href="/profile" className="w-full">
+                        프로필
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Link href="/profile" className="w-full">
+                        내 스터디
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="cursor-pointer text-destructive focus:text-destructive"
+                      onClick={() => logoutMutation.mutate()}
+                    >
+                      로그아웃
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
-              <Button>
+              <Button asChild>
                 <Link href="/auth/login">로그인</Link>
               </Button>
             )}
@@ -149,7 +134,7 @@ export function Header() {
         </div>
       </div>
     </header>
-  );
+  )
 }
 
-export default Header;
+export default Header

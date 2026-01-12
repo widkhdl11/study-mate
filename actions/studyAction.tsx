@@ -147,7 +147,8 @@ export async function getStudyDetail(id: string) {
         user_email,
         study_id,
         role,
-        status
+        status,
+        avatar_url
       ),
       posts!posts_study_id_fkey (
         id,

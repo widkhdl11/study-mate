@@ -13,6 +13,7 @@ export type StudiesResponse = {
     id: number;
     user_id: string;
     username: string;
+    avatar_url: string;
     user_email: string;
     study_id: number;
     status: string;

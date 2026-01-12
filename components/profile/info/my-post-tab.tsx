@@ -24,7 +24,7 @@ export default function MyPostTab({
 }) {
   return (
     <TabsContent value="posts" className="space-y-4">
-      {myPosts.length > 0 ? (
+      {myPosts && myPosts?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {myPosts.map((post) => (
             <Link key={post.id} href={`/posts/${post.id}`}>

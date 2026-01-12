@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { loginSchema, signupSchema } from "@/lib/zod/schemas/authSchema";
-import { createClientAdmin } from "@/utils/supabase/client-admin";
 import { ActionResponse } from "@/types/response/action";
+import { createClientAdmin } from "@/utils/supabase/client-admin";
 
 /**
  * 로그인 서버 액션
@@ -54,7 +54,7 @@ export async function login(
   }
 
   // 4. 성공 시 캐시 갱신 후 리다이렉트
-  revalidatePath("/", "layout");
+  revalidatePath("/", "layout");  // ← 이거 추가!
   redirect("/");
 }
 
@@ -67,11 +67,11 @@ export async function signup(
   formData: FormData
 ): Promise<ActionResponse | never> {
   const supabase = await createClient();
-  const supabaseAdmin = createClientAdmin();
+  // const supabaseAdmin = createClientAdmin();
 
   // 1. FormData를 객체로 변환
   const rawData = {
-    user_id: formData.get("user_id") as string,
+    username: formData.get("username") as string,
     email: formData.get("email") as string,
     password: formData.get("password") as string,
     passwordConfirm: formData.get("passwordConfirm") as string,
@@ -91,7 +91,7 @@ export async function signup(
     };
   }
 
-  const { user_id, email, password } = parseResult.data;
+  const { username, email, password } = parseResult.data;
 
   // 3. Supabase 회원가입 (email, password만)
   const { data, error } = await supabase.auth.signUp({
@@ -118,7 +118,7 @@ export async function signup(
       const { error: profileError } = await supabase.from("profiles").insert({
         id: data.user.id,
         email: data.user.email,
-        user_id: user_id,
+        username: username,
       });
 
       if (profileError) {
@@ -126,20 +126,20 @@ export async function signup(
       }
     } catch (err: any) {
       await supabase.auth.signOut(); // 현재 세션 쿠키 초기화
-      const { error: adminError } = await supabaseAdmin.auth.admin.deleteUser(
-        data.user.id
-      );
+      // const { error: adminError } = await supabaseAdmin.auth.admin.deleteUser(
+      //   data.user.id
+      // );
 
-      if (adminError) {
-        throw new Error(
-          JSON.stringify({ message: "회원가입에 실패했습니다." })
-        );
-      }
-      throw new Error(JSON.stringify({ message: err.message }));
+      // if (adminError) {
+      //   throw new Error(
+      //     JSON.stringify({ message: "회원가입에 실패했습니다." })
+      //   );
+      // }
+      // throw new Error(JSON.stringify({ message: err.message }));
     }
   }
-  revalidatePath("/auth/login", "layout");
-  redirect("/auth/login");
+  revalidatePath("/", "layout");  // ← 이거 추가!
+  redirect("/");
 }
 export async function logout(): Promise<ActionResponse | never> {
   const supabase = await createClient();

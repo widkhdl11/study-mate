@@ -181,7 +181,12 @@ export default function PostCreateUI() {
                         </SelectContent>
                       </Select>
                     ) : (
-                      <p>스터디를 생성해주세요</p>
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="flex flex-col items-center justify-between h-full w-full">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">스터디가 없습니다</p>
+                        <Link href="/studies/create" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">스터디 만들기</Link>
+                        </div>
+                      </div>
                     )}
                     <FormMessage />
                   </FormItem>

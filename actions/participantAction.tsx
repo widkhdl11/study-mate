@@ -48,13 +48,21 @@ export async function getParticipant(studyId: number) {
 export async function applyParticipant(studyId: number) {
   const supabase = await createClient();
   
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  const userId = user?.user?.id;
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  const userId = userData?.user?.id;
   
   if (!userId) {
     return { success: false, error: { message: "로그인이 필요합니다" } };
   }
   
+  const { data: userProfile, error: userProfileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+  if (userProfileError) {
+    return { success: false, error: { message: userProfileError.message } };
+  }
   // ✅ 중복 신청 체크
   const { data: existing } = await supabase
     .from("participants")
@@ -73,13 +81,16 @@ export async function applyParticipant(studyId: number) {
     // rejected면 재신청 허용
   }
   
+  console.log("applyParticipant userData : ", userData);
   // 신청
   const { data, error } = await supabase
     .from("participants")
     .insert({ 
       study_id: studyId, 
       user_id: userId, 
-      status: "pending" 
+      status: "pending",
+      username: userProfile?.username,
+      user_email: userProfile?.email,
     })
     .select()
     .single();
@@ -108,9 +119,6 @@ export async function checkParticipantStatus(studyId: number) {
   if (error) {
     return { success: false, error: { message: error.message } };
   }
-  console.log("checkParticipantStatus data : ", data);
-  console.log("checkParticipantStatus data.username : ", data?.username);
-  console.log("checkParticipantStatus data.user_email : ", data?.user_email);
   return { success: true, data };
 }
 
@@ -128,6 +136,8 @@ export async function studyAddParticipant(studyId: string) {
     return { success: false, error: { message: "User not found" } };
   }
 
+  console.log("studyAddParticipant userData : ", userData);
+  
   const { data, error } = await supabase
     .from("participants")
     .insert({ study_id: studyId, user_id: userId, status: "accepted", role: "host", username: userData?.username, user_email: userData?.email });

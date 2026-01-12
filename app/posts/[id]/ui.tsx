@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
-import { useGetPost } from "@/hooks/usePost";
+import { useCheckIsLiked, useGetPost, useToggleLike,  } from "@/hooks/usePost";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import { getImageUrl } from "@/utils/supabase/storage";
@@ -19,6 +19,9 @@ import {
 import { getRegionPath } from "@/lib/constants/region";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { ThumbsUp } from "lucide-react";
+import { toast } from "sonner";
+import { useUser } from "@/hooks/useUser";
 
 export default function PostDetailUI({ id }: { id: number }) {
   const { data, isLoading, error } = useGetPost(id);
@@ -27,19 +30,13 @@ export default function PostDetailUI({ id }: { id: number }) {
 
   // ✅ 1. 모든 Hook을 컴포넌트 최상단으로 이동
   const studyId = post?.study?.id || 0;
+  const { data: isLikedData } = useCheckIsLiked(id);
+  const isLiked = isLikedData?.data || false;// ✅ useQuery 버전 사용 (자동으로 계속 최신 상태 유지)
 
-// ✅ useQuery 버전 사용 (자동으로 계속 최신 상태 유지)
   const { data: participantData } = useParticipant(studyId);  
   const applyMutation = useApplyParticipant(studyId);
-  
   const participantStatus = participantData?.data?.status || "";
- 
-
-  // 이미지 URL 생성 함수
-  const getImage = (path: string) => {
-    return getImageUrl(path);
-  };
-
+  const toggleLikeMutation = useToggleLike(id);
   // 날짜 포맷 함수
   const formatDate = (dateString: string) => {
     return formatDistanceToNow(new Date(dateString), {
@@ -48,10 +45,7 @@ export default function PostDetailUI({ id }: { id: number }) {
     });
   };
 
-  // 이메일에서 이름 추출 (임시)
-  const getDisplayName = (email: string) => {
-    return email.split("@")[0];
-  };
+  const { data: userData } = useUser();
 
   // 이니셜 생성
   const getInitials = (email: string) => {
@@ -87,6 +81,17 @@ export default function PostDetailUI({ id }: { id: number }) {
   };
 
   const status = getStatus();
+  
+  const handleLikeClick = () => {
+    if (!userData) {
+      toast.error("로그인이 필요합니다");
+      return;
+    }
+    toggleLikeMutation.mutate();
+  };
+  
+  if (isLoading) return <div>로딩 중...</div>;
+  if (!post) return <div>게시글을 찾을 수 없습니다</div>;
 
   // 로딩 상태
   if (isLoading) {
@@ -225,9 +230,18 @@ export default function PostDetailUI({ id }: { id: number }) {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                  <span>👍 {post.likes_count || 0}</span>
-                  <span>👁 {post.views_count || 0}</span>
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLikeClick}
+                    disabled={toggleLikeMutation.isPending}
+                    className={`gap-2 ${isLiked ? "bg-blue-50 border-blue-600 text-blue-600" : ""}`}
+                  >
+                    <ThumbsUp className={`h-4 w-4 ${isLiked ? "fill-blue-600" : ""}`} />
+                    <span className="font-semibold">{post.likes_count}</span>
+                  </Button>
+                  <span className="text-sm text-muted-foreground">👁 {post.views_count}</span>
                 </div>
               </div>
 

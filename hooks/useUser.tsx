@@ -10,7 +10,11 @@ export function useUser() {
     queryKey: queryKeys.user,
     queryFn: async () => {
       const user = await getUser();
-      return convertUser(user);
+      if (user) {
+        return convertUser(user);
+      }else {
+        return null;
+      }
     },
   });
 }
