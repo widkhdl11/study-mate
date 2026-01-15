@@ -19,9 +19,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Search, MapPin, Users, Calendar, ThumbsUp, Eye } from "lucide-react";
 import { useGetAllPosts } from "@/hooks/usePost";
 import { PostsResponse } from "@/types/response/post";
-import { getImageUrl } from "@/utils/supabase/storage";
+import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage";
 import {
-  getCategoryCodeByLabel,
   getCategoryCodeByValue,
   getCategoryPath,
   getDetailCategories,
@@ -41,9 +40,9 @@ export default function PostsUI() {
   const allPosts = data?.success ? (data.data as PostsResponse[]) : [];
   const [mainCategoryValue, setMainCategoryValue] = useState("");
   const [subCategoryValue, setSubCategoryValue] = useState("");
-  const [categoryValue, setCategoryValue] = useState("");
+  const [detailCategoryValue, setDetailCategoryValue] = useState("");
   const [mainRegionValue, setMainRegionValue] = useState("");
-  const [regionValue, setRegionValue] = useState("");
+  const [detailRegionValue, setDetailRegionValue] = useState("");
   // 동적 옵션
   const mainCategories = getMainCategories();
   const subcategories = (mainCategoryValue !=="전체" && mainCategoryValue !== "")
@@ -68,35 +67,39 @@ export default function PostsUI() {
 
      // ✅ 카테고리 필터링 (계층 구조 고려)
      let matchesCategory = true;
-     if (categoryValue && categoryValue !== "전체") {
+     if (detailCategoryValue && detailCategoryValue !== "전체") {
        // 소분류 선택됨
-       matchesCategory = Number(post.study?.study_category) === Number(categoryValue);
+       const postCategory = Number(post.study?.study_category);
+       const detailCategoryCode = Number(getCategoryCodeByValue(detailCategoryValue));
+       matchesCategory = Math.floor(postCategory) === Math.floor(detailCategoryCode);
 
      } else if (subCategoryValue && subCategoryValue !== "전체") {
        // 중분류 선택됨 → 해당 중분류의 모든 소분류 포함
        const postCategory = Number(post.study?.study_category);
-       const subCategoryNum = Number(getCategoryCodeByValue(subCategoryValue.trim()));
-       // 예: 중분류 101 선택 → 10101, 10102, 10103 모두 포함
-       matchesCategory = Math.floor(postCategory / 100) === Math.floor(subCategoryNum/100);
+       const subCategoryCode = Number(getCategoryCodeByValue(subCategoryValue));
+
+       matchesCategory = Math.floor(postCategory / 10) === Math.floor(subCategoryCode/10);
      } else if (mainCategoryValue && mainCategoryValue !== "전체") {
        // 대분류 선택됨 → 해당 대분류의 모든 중/소분류 포함
        const postCategory = Number(post.study?.study_category);
-       const mainCategoryNum = Number(getCategoryCodeByValue(mainCategoryValue.trim()));
+       const mainCategoryCode = Number(getCategoryCodeByValue(mainCategoryValue));
        // 예: 대분류 100 선택 → 101, 102, 10101, 10102 모두 포함
-       matchesCategory = Math.floor(postCategory / 100) === Math.floor(mainCategoryNum/100) ||
-                        Math.floor(postCategory / 10000) === Math.floor(mainCategoryNum/100);
+       matchesCategory = Math.floor(postCategory / 100) === Math.floor(mainCategoryCode/100);
      }
      // ✅ 지역 필터링 (계층 구조 고려)
      let matchesRegion = true;
-     if (regionValue && regionValue !== "전체") {
+     if (detailRegionValue && detailRegionValue !== "전체") {
        // 시/군/구 선택됨
-       matchesRegion = Number(post.study?.region) === Number(regionValue);
-      } else if (mainRegionValue) {
+       const postRegion = Number(post.study?.region);
+       const detailRegionCode = Number(getRegionCodeByValue(detailRegionValue));
+
+       matchesRegion = Math.floor(postRegion) === Math.floor(detailRegionCode);
+      } else if (mainRegionValue && mainRegionValue !== "전체") {
         // 시/도 선택됨 → 해당 시/도의 모든 시/군/구 포함
         const postRegion = Number(post.study?.region);
-        const mainRegionNum = Number(getRegionCodeByValue(mainRegionValue.trim()));
+        const mainRegionCode = Number(getRegionCodeByValue(mainRegionValue));
         // 예: 서울(11) 선택 → 1101(강남), 1102(강북) 모두 포함
-        matchesRegion = Math.floor(postRegion / 100) === Math.floor(mainRegionNum/100);
+        matchesRegion = Math.floor(postRegion/1000) === Math.floor(mainRegionCode/1000);
      }
      // ✅ 상태 필터링
      const matchesStatus =
@@ -165,10 +168,12 @@ export default function PostsUI() {
                         카테고리
                       </label>
                       <Select
+                        value={mainCategoryValue}
+
                         onValueChange={(value) => {
                           setMainCategoryValue(value);
                           setSubCategoryValue("");
-                          setCategoryValue("");
+                          setDetailCategoryValue("");
                         }}
                       >
                         <SelectTrigger className="w-full bg-background">
@@ -194,9 +199,10 @@ export default function PostsUI() {
                         중분류
                       </label>
                       <Select
+                        value={subCategoryValue}
                         onValueChange={(value) => {
                           setSubCategoryValue(value);
-                          setCategoryValue("");
+                          setDetailCategoryValue("");
                         }}
                       >
                         <SelectTrigger className="w-full bg-background">
@@ -223,8 +229,9 @@ export default function PostsUI() {
                         소분류
                       </label>
                       <Select
+                        value={detailCategoryValue}
                         onValueChange={(value) => {
-                          setCategoryValue(value);
+                          setDetailCategoryValue(value);
                         }}
                       >
                         <SelectTrigger className="w-full bg-background">
@@ -250,16 +257,17 @@ export default function PostsUI() {
                         지역 (시/도)
                       </label>
                       <Select
+                        value={mainRegionValue}
                         onValueChange={(value) => {
                           setMainRegionValue(value);
-                          setRegionValue("");
+                          setDetailRegionValue("");
                         }}
                       >
                         <SelectTrigger className="w-full bg-background">
                           <SelectValue placeholder="전체 지역" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="전체 지역">전체 지역</SelectItem>
+                          <SelectItem value="전체">전체 지역</SelectItem>
                           {mainRegions.map((region) => (
                             <SelectItem key={region.value} value={region.value}>
                               {region.label}
@@ -274,12 +282,13 @@ export default function PostsUI() {
                         지역 (시/군/구)
                       </label>
                       <Select
+                        value={detailRegionValue}
                         onValueChange={(value) => {
-                          setRegionValue(value);
+                          setDetailRegionValue(value);
                         }}
                       >
                         <SelectTrigger className="w-full bg-background">
-                          <SelectValue placeholder="전체 지역" />
+                          <SelectValue placeholder="전체" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="전체">
@@ -318,9 +327,9 @@ export default function PostsUI() {
 
                     {(mainCategoryValue !== "전체" ||
                     subCategoryValue !== "전체" ||
-                    categoryValue !== "전체" ||
+                    detailCategoryValue !== "전체" ||
                       mainRegionValue !== "전체" ||
-                      regionValue !== "전체" ||
+                      detailRegionValue !== "전체" ||
                       selectedStatus !== "전체 상태") && (
                       <Button
                         variant="outline"
@@ -328,9 +337,9 @@ export default function PostsUI() {
                         onClick={() => {
                           setMainCategoryValue("전체");
                           setSubCategoryValue("전체");
-                          setCategoryValue("전체");
+                          setDetailCategoryValue("전체");
                           setMainRegionValue("전체");
-                          setRegionValue("전체");
+                          setDetailRegionValue("전체");
                           setSelectedStatus("전체 상태");
                           setSearchQuery("");
                         }}
@@ -398,14 +407,14 @@ export default function PostsUI() {
                             <div>
                               <div className="flex items-center gap-2 mb-2">
                                 
-                                  {getCategoryPath(Number(post.study?.study_category || 0)).map((category) => (
+                                  {getCategoryPath(Number(post.study?.study_category || 0)).labels.map((category) => (
                                     <Badge key={category} variant="outline" className={`text-xs font-normal`}>
                                       {category}
-                                    </Badge>
+                                    </Badge>  
                                   ))}
                                 <span className="text-xs text-muted-foreground flex items-center gap-1">
                                   <MapPin className="w-3 h-3" />{" "}
-                                  {getRegionPath(Number(post.study?.region || 0)).map((region) => (
+                                  {getRegionPath(Number(post.study?.region || 0)).labels.map((region) => (
                                     <span key={region}>{region}</span>
                                   ))}
                                 </span>
@@ -452,10 +461,8 @@ export default function PostsUI() {
                                   className="h-full bg-primary rounded-full transition-all duration-500"
                                   style={{
                                     width: `${
-                                      (post.study?.current_participants ||
-                                        (0 /
-                                          (post.study?.max_participants || 0)) *
-                                          0) * 100
+                                      (post.study?.current_participants || 0) > 0 ? (post.study?.current_participants || 0) /
+                                        (post.study?.max_participants || 0) * 100 : 0
                                     }%`,
                                   }}
                                 />
@@ -467,7 +474,7 @@ export default function PostsUI() {
                               <div className="flex items-center gap-2">
                                 <Avatar className="h-6 w-6 ring-1 ring-border">
                                   <AvatarImage
-                                    src="/placeholder.svg"
+                                    src={getProfileImageUrl(post.author?.avatar_url) || "/placeholder.svg"}
                                     alt={post.author?.email || ""}
                                   />
                                   <AvatarFallback className="text-[10px] bg-secondary">
@@ -511,9 +518,9 @@ export default function PostsUI() {
                         setSearchQuery("");
                         setMainCategoryValue("전체");
                         setSubCategoryValue("전체");
-                        setCategoryValue("전체");
-                        setMainRegionValue("전체 지역");
-                        setRegionValue("전체 지역");
+                        setDetailCategoryValue("전체");
+                        setMainRegionValue("전체");
+                        setDetailRegionValue("전체");
                         setSelectedStatus("전체 상태");
                       }}
                     >

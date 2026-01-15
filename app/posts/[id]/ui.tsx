@@ -279,10 +279,10 @@ export default function PostDetailUI({ id }: { id: number }) {
 
                 {/* 카테고리 & 위치 배지 */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {getCategoryPath(Number(post.study.study_category)).map((category) => (
+                  {getCategoryPath(Number(post.study.study_category)).labels.map((category) => (
                     <Badge variant="outline" key={category} className="text-xs font-normal">{category}</Badge>
                   ))}
-                    <Badge variant="outline"  className="text-xs font-normal">{getRegionPath(Number(post.study.region)).join(" ")}</Badge>
+                    <Badge variant="outline"  className="text-xs font-normal">{getRegionPath(Number(post.study.region)).labels.join(" ")}</Badge>
                 </div>
 
                 {/* 참여 인원 진행률 */}

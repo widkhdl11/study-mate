@@ -7,9 +7,12 @@ export const studySchema = z.object({
     .max(50, "제목은 50자 이하여야 합니다"),
   mainCategory: z.string().min(1, "카테고리를 선택해주세요"),
   subCategory: z.string().min(1, "카테고리를 선택해주세요"),
+  detailCategory: z.string().min(1, "카테고리를 선택해주세요"),
   studyCategory: z.coerce.number<number>().min(1, "카테고리를 선택해주세요"),
   mainRegion: z.string().min(1, "지역을 선택해주세요"),
+  detailRegion: z.string().min(1, "지역을 선택해주세요"),
   region: z.coerce.number<number>().min(1, "지역을 선택해주세요"),
+  // region: z.coerce.number<number>().min(1, "지역을 선택해주세요"),
   // region: z.string().min(1, "지역을 선택해주세요"),
   maxParticipants: z.coerce
     .number<number>()
@@ -23,3 +26,5 @@ export const studySchema = z.object({
     .min(1, "설명을 입력해주세요"),
 });
 export type StudyFormValues = z.infer<typeof studySchema>;
+
+

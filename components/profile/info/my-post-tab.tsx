@@ -44,8 +44,9 @@ export default function MyPostTab({
                 <div className="p-4 flex-1 flex flex-col gap-3">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      {getCategoryPath(Number(post.study.study_category)).map((category) => (
+                      {getCategoryPath(Number(post.study.study_category)).labels.map((category) => (
                         <Badge
+                          key={category}
                           variant="outline"
                           className={`text-xs font-normal ${getCategoryColor(category)}`}
                         >
@@ -54,7 +55,7 @@ export default function MyPostTab({
                       ))}
                  
                       <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <MapPin className="w-3 h-3" /> {getRegionPath(Number(post.study.region)).join(" ")}
+                        <MapPin className="w-3 h-3" /> {getRegionPath(Number(post.study.region)).labels.join(" ")}
                       </span>
                     </div>
                     <h3 className="font-bold text-foreground line-clamp-1">

@@ -3,12 +3,15 @@
 import { studyAddParticipant } from "@/actions/participantAction";
 import {
   createStudy,
+  deleteStudy,
   getCreateMyStudies,
   getMyStudies,
   getStudyById,
   getStudyDetail,
   setStudyStatus,
+  updateStudy,
 } from "@/actions/studyAction";
+import { queryClient } from "@/config/ReactQueryClientProvider";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { StudyFormValues } from "@/lib/zod/schemas/studySchema";
 import { createClient } from "@/utils/supabase/client";
@@ -104,6 +107,46 @@ export function useGetStudyDetail({ id }: { id: string }) {
     queryKey: queryKeys.studyDetail(Number(id)),
     queryFn: async () => {
       return await getStudyDetail(id);
+    },
+  });
+}
+
+// 스터디 삭제
+export function useDeleteStudy({ id }: { id: string }) {
+  return useMutation({
+    mutationFn: async () => {
+      return await deleteStudy(id);
+    },
+    onSuccess: (response) => {
+      if (response?.success) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.studyDetail(Number(id)),
+        });
+        toast.success("스터디를 삭제했습니다");
+      } else {
+        toast.error(response?.error?.message || "스터디 삭제에 실패했습니다");
+        return;
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+
+export function useUpdateStudy({ id }: { id: string }) {
+  return useMutation({
+    mutationFn: async (formData: FormData) => {
+      return await updateStudy(id, formData);
+    },
+    onSuccess: (response) => {
+      if (!response || response.success) {
+        return;
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
     },
   });
 }

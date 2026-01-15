@@ -24,7 +24,7 @@ import {
   UserCheck,
   UserX,
 } from "lucide-react";
-import { useGetStudyDetail } from "@/hooks/useStudy";
+import { useDeleteStudy, useGetStudyDetail } from "@/hooks/useStudy";
 import {
   useAcceptParticipant,
   useRejectParticipant,
@@ -46,6 +46,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
   const acceptParticipant = useAcceptParticipant(Number(id));
   const rejectParticipant = useRejectParticipant(Number(id));
   const removeParticipant = useRemoveParticipant(Number(id));
+  const deleteStudy = useDeleteStudy({ id });
   const { data:userData } = useUser();
   const user = userData;
   const study = studyData?.data as StudiesResponse | undefined;
@@ -111,7 +112,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
 
                 {/* 카테고리 및 위치 */}
                 <div className="flex items-center gap-3">
-                  {categoryPath.map((category,i) => (
+                  {categoryPath.labels.map((category,i) => (
                     <Badge
                       variant="outline"
                       key={i}
@@ -123,9 +124,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                  
                   <span className="text-sm text-muted-foreground flex items-center gap-1">
                     <MapPin className="w-4 h-4" /> 
-                    {getRegionPath(Number(study.region)).map((region) => (
-                      <span key={region}>{region}</span>
-                    ))}
+                    {getRegionPath(Number(study.region)).labels.join(" ")}
                   </span>
                 </div>
 
@@ -154,7 +153,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                 </Link>
                 <Button variant="outline" className="gap-2 bg-transparent">
                   <Settings className="w-4 h-4" />
-                  스터디 설정
+                  <Link href={`/studies/${study.id}/edit`}>스터디 수정</Link>
                 </Button>
               </div>
             </div>
@@ -326,7 +325,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                           </Badge>
                           
                           {/* 본인이 호스트 */}
-                          {(user && user.id === study.creator.id) && (member.role === "host") && (
+                          {(user && user.id === study.creator.id) && (
                             <>
                               {/* 신청자가 신청 대기 상태라면: 수락/거절 버튼 */}
                               {member.status === "pending" && (
@@ -394,7 +393,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                           )}
 
                           {/* 본인이 common */}
-                          {(user && user.id === member.user_id) && member.role === "common" && (
+                          {(user && user.id === member.user_id)  && (
                             <>
                               {/* 신청자가 신청 대기 상태라면: 신청 취소 버튼 */}
                               {member.status === "pending" && (
@@ -419,24 +418,47 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                               )}
                               {/* 신청자가 신청 완료(수락)상태라면: 탈퇴 버튼 */}
                               {member.status === "accepted" && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="text-red-600 hover:text-red-700 bg-transparent"
-                                  onClick={() => {
-                                    if (
-                                      window.confirm(
-                                        "스터디에서 탈퇴하시겠습니까?"
-                                      )
-                                    ) {
-                                      removeParticipant.mutate(member.id);
-                                    }
-                                  }}
-                                  disabled={removeParticipant.isPending}
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                  탈퇴
-                                </Button>
+                                user && user.id === study.creator.id.toString() ? (
+                                  // 생성자 본인: "스터디 삭제" 버튼
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="gap-1"
+                                    onClick={() => {
+                                      if (
+                                        window.confirm(
+                                          "스터디를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+                                        )
+                                      ) {
+                                        deleteStudy.mutate();
+                                      }
+                                    }}
+                                    disabled={deleteStudy.isPending}
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                    스터디 삭제
+                                  </Button>
+                                ) : (
+                                  // 일반 멤버: 기존 "탈퇴" 버튼
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-red-600 hover:text-red-700 bg-transparent"
+                                    onClick={() => {
+                                      if (
+                                        window.confirm(
+                                          "스터디에서 탈퇴하시겠습니까?"
+                                        )
+                                      ) {
+                                        removeParticipant.mutate(member.id);
+                                      }
+                                    }}
+                                    disabled={removeParticipant.isPending}
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                    탈퇴
+                                  </Button>
+                                )
                               )}
                             </>
                           )}

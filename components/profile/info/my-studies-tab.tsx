@@ -41,7 +41,7 @@ export default function MyStudiesTab({
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    {getCategoryPath(Number(study.studies.study_category)).map((category) => (
+                    {getCategoryPath(Number(study.studies.study_category)).labels.map((category) => (
                       <Badge
                         variant="outline"
                         key={category}
@@ -51,7 +51,7 @@ export default function MyStudiesTab({
                       </Badge>
                     ))}
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <MapPin className="w-3 h-3" /> {getRegionPath(Number(study.studies.region)).join(" ")}
+                      <MapPin className="w-3 h-3" /> {getRegionPath(Number(study.studies.region)).labels.join(" ")}
                     </span>
                   </div>
 
@@ -92,7 +92,7 @@ export default function MyStudiesTab({
           </div>
         ) : (
           <Card className="p-12 text-center">
-            <p className="text-muted-foreground">만든 스터디가 없습니다.</p>
+            <p className="text-muted-foreground">참여중인 스터디가 없습니다.</p>
             <Link href="/studies/create">
               <Button className="mt-4 bg-blue-600 hover:bg-blue-700">
                 스터디 만들기

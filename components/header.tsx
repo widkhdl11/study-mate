@@ -96,9 +96,9 @@ export function Header() {
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={ user.avatar_url ? getProfileImageUrl(user.avatar_url) : "/placeholder.svg"} alt={user.username} />
+                        <AvatarImage src={ getProfileImageUrl(user.avatar_url) || "/placeholder.svg"} alt={user.username} />
                         <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                          {user.initials}
+                          {user.email?.[0]}
                         </AvatarFallback>
                       </Avatar>
                       <span className="hidden sm:inline text-sm font-medium text-foreground">{user.username}</span>

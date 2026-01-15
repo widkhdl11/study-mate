@@ -2,8 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import * as z from "zod";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,49 +26,143 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
-import { useCreateStudy } from "@/hooks/useStudy";
+import { studySchema } from "@/lib/zod/schemas/studySchema";
 import {
   getCategoryCodeByValue,
+  getCategoryPath,
   getDetailCategories,
   getMainCategories,
   getSubcategories,
-  STUDY_CATEGORIES,
 } from "@/lib/constants/study-category";
-import { getMainRegion, getRegionCodeByValue, getSubRegion } from "@/lib/constants/region";
-import { toast } from "sonner";
+import {
+  getMainRegion,
+  getRegionCodeByValue,
+  getRegionPath,
+  getSubRegion,
+} from "@/lib/constants/region";
+import { useUpdateStudy } from "@/hooks/useStudy";
 
-export default function StudyCreateUI() {
-  const formRef = useRef<HTMLFormElement>(null);
+type StudyFormValues = z.infer<typeof studySchema>;
+
+interface StudyEditUIProps {
+  studyId: string;
+  initialData: {
+    title: string;
+    mainCategory: string;
+    subCategory: string;
+    detailCategory: string;
+    studyCategory: number;
+    mainRegion: string;
+    detailRegion: string;
+    region: number;
+    maxParticipants: number;
+    description: string;
+  };
+}
+
+export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
+  const updateStudyMutation = useUpdateStudy({ id: studyId });
+  // 카테고리 상태
+  const [mainCategoryValue, setMainCategoryValue] = useState(
+    initialData.mainCategory
+  );
+  const [subCategoryValue, setSubCategoryValue] = useState(
+    initialData.subCategory
+  );
+  const [detailCategoryValue, setDetailCategoryValue] = useState(
+    initialData.detailCategory
+  );
+  const [studyCategoryValue, setStudyCategoryValue] = useState(0);
+
+  // 지역 상태
+  const [mainRegionValue, setMainRegionValue] = useState(
+    initialData.mainRegion
+  );
+  const [detailRegionValue, setDetailRegionValue] = useState(
+    initialData.detailRegion
+  );
+  const [regionValue, setRegionValue] = useState(0);
 
   const form = useForm<StudyFormValues>({
     resolver: zodResolver(studySchema),
-    defaultValues: {
-      title: "",
-      mainCategory: "",
-      subCategory: "",
-      detailCategory: "",
-      studyCategory: 0,
-      mainRegion: "",
-      detailRegion: "",
-      region: 0,
-      maxParticipants: 1,
-      description: "",
-    },
+    defaultValues: initialData,  // ✅ 바로 사용 가능!
   });
-  const createStudyMutation = useCreateStudy();
-  // 1. 상태 정의
-  const [mainCategoryValue, setMainCategoryValue] = useState("");
-  const [subCategoryValue, setSubCategoryValue] = useState("");
-  const [detailCategoryValue, setDetailCategoryValue] = useState("");
-  const [studyCategoryValue, setStudyCategoryValue] = useState(0);
-  // 지역 상태
-  const [mainRegionValue, setMainRegionValue] = useState("");
-  const [detailRegionValue, setDetailRegionValue] = useState("");
-  const [regionValue, setRegionValue] = useState(0);
 
-  // 2. 동적 옵션 생성
+  useEffect(() => {
+    if (initialData && initialData.studyCategory) {
+
+      const categoryPath = getCategoryPath(Number(initialData.studyCategory));
+      if (categoryPath.values.length >= 3) {
+        const [main, sub, detail] = categoryPath.values;
+
+        // ✅ useState 업데이트
+        setMainCategoryValue(main);
+        setSubCategoryValue(sub);
+        setDetailCategoryValue(detail);
+        setStudyCategoryValue(initialData.studyCategory);
+
+        // ✅ form.setValue로 React Hook Form 업데이트
+        form.setValue("mainCategory", main);
+        form.setValue("subCategory", sub);
+        form.setValue("detailCategory", detail);
+        form.setValue("studyCategory", initialData.studyCategory);
+
+     
+      }
+    }
+  }, [initialData, form]);
+
+  // ✅ 초기값 로드 (지역)
+  useEffect(() => {
+    if (initialData && initialData.region !== undefined) {
+      console.log("초기 region:", initialData.region);
+
+      if (initialData.region === 0) {
+        // 온라인
+        setMainRegionValue("ONLINE");
+        setRegionValue(0);
+        form.setValue("mainRegion", "ONLINE");
+        form.setValue("region", 0);
+        console.log("✅ 온라인으로 설정");
+      } else {
+        const regionPath = getRegionPath(Number(initialData.region));
+        console.log("regionPath:", regionPath);
+
+        if (regionPath.values.length >= 2) {
+          const [main, detail] = regionPath.values;
+
+          // ✅ useState 업데이트
+          setMainRegionValue(main);
+          setDetailRegionValue(detail);
+          setRegionValue(initialData.region);
+
+          // ✅ form.setValue로 React Hook Form 업데이트
+          form.setValue("mainRegion", main);
+          form.setValue("detailRegion", detail);
+          form.setValue("region", initialData.region);
+
+          console.log("✅ 지역 초기값 설정 완료:", {
+            main,
+            detail,
+          });
+        } else if (regionPath.values.length === 1) {
+          // 시/도만 있는 경우 (세종 등)
+          const [main] = regionPath.values;
+          setMainRegionValue(main);
+          setDetailRegionValue("");
+          setRegionValue(initialData.region);
+          form.setValue("mainRegion", main);
+          form.setValue("detailRegion", "");
+          form.setValue("region", initialData.region);
+        }
+      }
+    }
+  }, [initialData, form]);
+
+  // 동적 옵션
   const mainCategories = getMainCategories();
   const subcategories = mainCategoryValue
     ? getSubcategories(mainCategoryValue)
@@ -76,36 +172,24 @@ export default function StudyCreateUI() {
       ? getDetailCategories(mainCategoryValue, subCategoryValue)
       : [];
 
-  // 동적 옵션
   const mainRegions = getMainRegion();
   const detailRegions = mainRegionValue ? getSubRegion(mainRegionValue) : [];
 
   async function onSubmit(values: StudyFormValues) {
+    console.log("✅ 수정 제출:", values);
     if (!formRef.current) {
+      console.log("formRef.current is null");
       return;
     }
     form.clearErrors();
     setIsLoading(true);
     try {
       const formData = new FormData(formRef.current);
-      
-      if(mainCategoryValue && subCategoryValue && detailCategoryValue) {
-        const studyCategory = getCategoryCodeByValue(detailCategoryValue);
-        formData.set("studyCategory", studyCategory?.toString() || "");
-      }else{
-        toast.error("카테고리를 모두 선택해주세요");
-        setIsLoading(false);
-        return;
-      }
-      if(mainRegionValue && detailRegionValue) {
-        const regionCode = getRegionCodeByValue(detailRegionValue);
-        formData.set("region", regionCode?.toString() || "");
-      }else{
-        toast.error("지역을 모두 선택해주세요");
-        setIsLoading(false);
-        return;
-      }
-      createStudyMutation.mutate(formData);
+    
+      updateStudyMutation.mutate(formData);
+      // router.push(`/profile/studies/${studyId}`);
+    } catch (error) {
+      console.error("스터디 수정 오류:", error);
     } finally {
       setIsLoading(false);
     }
@@ -129,18 +213,14 @@ export default function StudyCreateUI() {
           </p>
         </div>
 
-        {/* 스터디 생성 폼 카드 */}
+        {/* 스터디 수정 폼 카드 */}
         <Card className="p-6 md:p-8">
           <h2 className="mb-6 text-2xl font-semibold text-slate-900 dark:text-white">
-            스터디 만들기
+            스터디 수정하기
           </h2>
 
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              ref={formRef}
-              className="space-y-5"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5" ref={formRef}>
               {/* 제목 */}
               <FormField
                 control={form.control}
@@ -152,7 +232,6 @@ export default function StudyCreateUI() {
                       <Input
                         placeholder="스터디 제목을 입력해주세요"
                         disabled={isLoading}
-                        type="text"
                         {...field}
                       />
                     </FormControl>
@@ -175,15 +254,20 @@ export default function StudyCreateUI() {
                         setMainCategoryValue(value);
                         setSubCategoryValue("");
                         setDetailCategoryValue("");
-                        // ✅ 하위 선택 초기화 시 계산값도 초기화
                         setStudyCategoryValue(0);
                         form.setValue("studyCategory", 0);
                       }}
+                      disabled={isLoading}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="대분류 선택" />
-                      </SelectTrigger>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="대분류 선택" />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
+                        <SelectItem value="전체">
+                          전체
+                        </SelectItem>
                         {mainCategories.map((cat) => (
                           <SelectItem key={cat.value} value={cat.value}>
                             {cat.label}
@@ -210,15 +294,20 @@ export default function StudyCreateUI() {
                         field.onChange(value);
                         setSubCategoryValue(value);
                         setDetailCategoryValue("");
-                        // ✅ 하위 선택 초기화 시 계산값도 초기화
                         setStudyCategoryValue(0);
                         form.setValue("studyCategory", 0);
                       }}
+                      disabled={isLoading}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="중분류 선택" />
-                      </SelectTrigger>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="중분류 선택" />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
+                        <SelectItem value="전체">
+                          전체
+                        </SelectItem>
                         {subcategories.map((sub) => (
                           <SelectItem key={sub.value} value={sub.value}>
                             {sub.label}
@@ -231,7 +320,7 @@ export default function StudyCreateUI() {
                 )}
               />
 
-              {/* 소분류 - 여기서 studyCategory 계산! */}
+              {/* 소분류 */}
               <FormField
                 control={form.control}
                 name="detailCategory"
@@ -244,8 +333,8 @@ export default function StudyCreateUI() {
                       onValueChange={(value) => {
                         field.onChange(value);
                         setDetailCategoryValue(value);
-                        
-                        // ✅ 소분류 선택 시 즉시 계산!
+
+                        // ✅ 소분류 선택 시 즉시 계산
                         const code = getCategoryCodeByValue(value);
                         if (code) {
                           console.log("✅ studyCategory 계산:", code);
@@ -257,10 +346,15 @@ export default function StudyCreateUI() {
                       }}
                       disabled={isLoading}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="소분류 선택" />
-                      </SelectTrigger>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="소분류 선택" />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
+                        <SelectItem value="전체">
+                          전체
+                        </SelectItem>
                         {detailCategories.map((detail) => (
                           <SelectItem key={detail.value} value={detail.value}>
                             {detail.label}
@@ -286,8 +380,7 @@ export default function StudyCreateUI() {
                         field.onChange(value);
                         setMainRegionValue(value);
                         setDetailRegionValue("");
-                        
-                        // ✅ 온라인 선택 시 즉시 region = 0
+
                         if (value === "ONLINE") {
                           console.log("✅ region 계산: 0 (온라인)");
                           setRegionValue(0);
@@ -295,15 +388,17 @@ export default function StudyCreateUI() {
                             shouldValidate: true,
                           });
                         } else {
-                          // 오프라인 선택 시 초기화
                           setRegionValue(0);
                           form.setValue("region", 0);
                         }
                       }}
+                      disabled={isLoading}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="시/도 선택" />
-                      </SelectTrigger>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="시/도 선택" />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
                         {mainRegions.map((region) => (
                           <SelectItem key={region.value} value={region.value}>
@@ -317,10 +412,8 @@ export default function StudyCreateUI() {
                 )}
               />
 
-              {/* 시/군/구 - 여기서 region 계산! */}
-              {mainRegionValue &&
-                mainRegionValue !== "ONLINE" &&
-                detailRegions.length > 0 && (
+              {/* 시/군/구 */}
+       
                   <FormField
                     control={form.control}
                     name="detailRegion"
@@ -333,8 +426,8 @@ export default function StudyCreateUI() {
                           onValueChange={(value) => {
                             field.onChange(value);
                             setDetailRegionValue(value);
-                            
-                            // ✅ 상세 지역 선택 시 즉시 계산!
+
+                            // ✅ 상세 지역 선택 시 즉시 계산
                             const code = getRegionCodeByValue(value);
                             if (code !== null && code !== undefined) {
                               console.log("✅ region 계산:", code);
@@ -344,10 +437,13 @@ export default function StudyCreateUI() {
                               });
                             }
                           }}
+                          disabled={isLoading}
                         >
-                          <SelectTrigger>
-                            <SelectValue placeholder="시/군/구 선택" />
-                          </SelectTrigger>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="시/군/구 선택" />
+                            </SelectTrigger>
+                          </FormControl>
                           <SelectContent>
                             {detailRegions.map((sub) => (
                               <SelectItem key={sub.value} value={sub.value}>
@@ -360,7 +456,6 @@ export default function StudyCreateUI() {
                       </FormItem>
                     )}
                   />
-                )}
 
               {/* 최대 인원 */}
               <FormField
@@ -393,7 +488,7 @@ export default function StudyCreateUI() {
                     <FormLabel>설명</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="스터디에 대해 설명해주세요."
+                        placeholder="스터디에 대해 설명해주세요 (최소 10자)"
                         disabled={isLoading}
                         rows={5}
                         {...field}
@@ -411,9 +506,9 @@ export default function StudyCreateUI() {
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                   disabled={isLoading}
                 >
-                  {isLoading ? "만드는 중..." : "스터디 만들기"}
+                  {isLoading ? "저장 중..." : "수정 완료"}
                 </Button>
-                <Link href="/" className="flex-1">
+                <Link href={`/profile/studies/${studyId}`} className="flex-1">
                   <Button
                     type="button"
                     variant="outline"
@@ -424,9 +519,8 @@ export default function StudyCreateUI() {
                   </Button>
                 </Link>
               </div>
-
-              {/* ✅ Hidden inputs - 실시간으로 계산된 값 바인딩 */}
-              <input
+ {/* ✅ Hidden inputs - 실시간으로 계산된 값 바인딩 */}
+ <input
                 type="hidden"
                 name="mainCategory"
                 value={mainCategoryValue}

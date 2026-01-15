@@ -1,3 +1,12 @@
+// lib/constants/categories.ts
+
+// ==================== 타입 정의 ====================
+type CategoryItem = {
+  code: number;
+  label: string;
+  value: string;
+};
+
 // ==================== 카테고리 코드 체계 ====================
 // 대분류: 100, 200, 300...
 // 중분류: 110, 120, 130...
@@ -15,12 +24,12 @@ export const STUDY_CATEGORIES = {
         label: "프론트엔드",
         value: "FRONTEND",
         details: [
-          { code: 111, label: "React" },
-          { code: 112, label: "Vue" },
-          { code: 113, label: "Angular" },
-          { code: 114, label: "Svelte" },
-          { code: 115, label: "Next.js" },
-          { code: 116, label: "TypeScript" },
+          { code: 111, label: "React", value: "REACT" },
+          { code: 112, label: "Vue", value: "VUE" },
+          { code: 113, label: "Angular", value: "ANGULAR" },
+          { code: 114, label: "Svelte", value: "SVELTE" },
+          { code: 115, label: "Next.js", value: "NEXTJS" },
+          { code: 116, label: "TypeScript", value: "TYPESCRIPT" },
         ],
       },
       BACKEND: {
@@ -28,12 +37,12 @@ export const STUDY_CATEGORIES = {
         label: "백엔드",
         value: "BACKEND",
         details: [
-          { code: 121, label: "Spring" },
-          { code: 122, label: "Node.js" },
-          { code: 123, label: "Django" },
-          { code: 124, label: "FastAPI" },
-          { code: 125, label: "NestJS" },
-          { code: 126, label: "Express" },
+          { code: 121, label: "Spring", value: "SPRING" },
+          { code: 122, label: "Node.js", value: "NODEJS" },
+          { code: 123, label: "Django", value: "DJANGO" },
+          { code: 124, label: "FastAPI", value: "FASTAPI" },
+          { code: 125, label: "NestJS", value: "NESTJS" },
+          { code: 126, label: "Express", value: "EXPRESS" },
         ],
       },
       MOBILE: {
@@ -41,12 +50,12 @@ export const STUDY_CATEGORIES = {
         label: "모바일",
         value: "MOBILE",
         details: [
-          { code: 131, label: "iOS" },
-          { code: 132, label: "Android" },
-          { code: 133, label: "React Native" },
-          { code: 134, label: "Flutter" },
-          { code: 135, label: "Swift" },
-          { code: 136, label: "Kotlin" },
+          { code: 131, label: "iOS", value: "IOS" },
+          { code: 132, label: "Android", value: "ANDROID" },
+          { code: 133, label: "React Native", value: "REACT_NATIVE" },
+          { code: 134, label: "Flutter", value: "FLUTTER" },
+          { code: 135, label: "Swift", value: "SWIFT" },
+          { code: 136, label: "Kotlin", value: "KOTLIN" },
         ],
       },
       AI_ML: {
@@ -54,11 +63,11 @@ export const STUDY_CATEGORIES = {
         label: "AI/머신러닝",
         value: "AI_ML",
         details: [
-          { code: 141, label: "Python" },
-          { code: 142, label: "TensorFlow" },
-          { code: 143, label: "PyTorch" },
-          { code: 144, label: "딥러닝" },
-          { code: 145, label: "데이터 분석" },
+          { code: 141, label: "Python", value: "PYTHON" },
+          { code: 142, label: "TensorFlow", value: "TENSORFLOW" },
+          { code: 143, label: "PyTorch", value: "PYTORCH" },
+          { code: 144, label: "딥러닝", value: "DEEP_LEARNING" },
+          { code: 145, label: "데이터 분석", value: "DATA_ANALYSIS" },
         ],
       },
       DEVOPS: {
@@ -66,11 +75,11 @@ export const STUDY_CATEGORIES = {
         label: "DevOps/인프라",
         value: "DEVOPS",
         details: [
-          { code: 151, label: "AWS" },
-          { code: 152, label: "Docker" },
-          { code: 153, label: "Kubernetes" },
-          { code: 154, label: "CI/CD" },
-          { code: 155, label: "Linux" },
+          { code: 151, label: "AWS", value: "AWS" },
+          { code: 152, label: "Docker", value: "DOCKER" },
+          { code: 153, label: "Kubernetes", value: "KUBERNETES" },
+          { code: 154, label: "CI/CD", value: "CICD" },
+          { code: 155, label: "Linux", value: "LINUX" },
         ],
       },
       DATABASE: {
@@ -78,11 +87,11 @@ export const STUDY_CATEGORIES = {
         label: "데이터베이스",
         value: "DATABASE",
         details: [
-          { code: 161, label: "MySQL" },
-          { code: 162, label: "PostgreSQL" },
-          { code: 163, label: "MongoDB" },
-          { code: 164, label: "Redis" },
-          { code: 165, label: "SQL" },
+          { code: 161, label: "MySQL", value: "MYSQL" },
+          { code: 162, label: "PostgreSQL", value: "POSTGRESQL" },
+          { code: 163, label: "MongoDB", value: "MONGODB" },
+          { code: 164, label: "Redis", value: "REDIS" },
+          { code: 165, label: "SQL", value: "SQL" },
         ],
       },
       SECURITY: {
@@ -90,10 +99,10 @@ export const STUDY_CATEGORIES = {
         label: "보안",
         value: "SECURITY",
         details: [
-          { code: 171, label: "네트워크 보안" },
-          { code: 172, label: "웹 해킹" },
-          { code: 173, label: "시스템 보안" },
-          { code: 174, label: "암호학" },
+          { code: 171, label: "네트워크 보안", value: "NETWORK_SECURITY" },
+          { code: 172, label: "웹 해킹", value: "WEB_HACKING" },
+          { code: 173, label: "시스템 보안", value: "SYSTEM_SECURITY" },
+          { code: 174, label: "암호학", value: "CRYPTOGRAPHY" },
         ],
       },
       GAME: {
@@ -101,11 +110,11 @@ export const STUDY_CATEGORIES = {
         label: "게임 개발",
         value: "GAME",
         details: [
-          { code: 181, label: "Unity" },
-          { code: 182, label: "Unreal" },
-          { code: 183, label: "C++" },
-          { code: 184, label: "C#" },
-          { code: 185, label: "게임 기획" },
+          { code: 181, label: "Unity", value: "UNITY" },
+          { code: 182, label: "Unreal", value: "UNREAL" },
+          { code: 183, label: "C++", value: "CPP" },
+          { code: 184, label: "C#", value: "CSHARP" },
+          { code: 185, label: "게임 기획", value: "GAME_DESIGN" },
         ],
       },
     },
@@ -122,11 +131,11 @@ export const STUDY_CATEGORIES = {
         label: "UI/UX",
         value: "UI_UX",
         details: [
-          { code: 211, label: "Figma" },
-          { code: 212, label: "Adobe XD" },
-          { code: 213, label: "Sketch" },
-          { code: 214, label: "프로토타이핑" },
-          { code: 215, label: "사용성 테스트" },
+          { code: 211, label: "Figma", value: "FIGMA" },
+          { code: 212, label: "Adobe XD", value: "ADOBE_XD" },
+          { code: 213, label: "Sketch", value: "SKETCH" },
+          { code: 214, label: "프로토타이핑", value: "PROTOTYPING" },
+          { code: 215, label: "사용성 테스트", value: "USABILITY_TEST" },
         ],
       },
       GRAPHIC: {
@@ -134,10 +143,10 @@ export const STUDY_CATEGORIES = {
         label: "그래픽 디자인",
         value: "GRAPHIC",
         details: [
-          { code: 221, label: "Photoshop" },
-          { code: 222, label: "Illustrator" },
-          { code: 223, label: "브랜딩" },
-          { code: 224, label: "타이포그래피" },
+          { code: 221, label: "Photoshop", value: "PHOTOSHOP" },
+          { code: 222, label: "Illustrator", value: "ILLUSTRATOR" },
+          { code: 223, label: "브랜딩", value: "BRANDING" },
+          { code: 224, label: "타이포그래피", value: "TYPOGRAPHY" },
         ],
       },
       VIDEO: {
@@ -145,10 +154,10 @@ export const STUDY_CATEGORIES = {
         label: "영상/모션",
         value: "VIDEO",
         details: [
-          { code: 231, label: "Premiere Pro" },
-          { code: 232, label: "After Effects" },
-          { code: 233, label: "Final Cut" },
-          { code: 234, label: "DaVinci" },
+          { code: 231, label: "Premiere Pro", value: "PREMIERE_PRO" },
+          { code: 232, label: "After Effects", value: "AFTER_EFFECTS" },
+          { code: 233, label: "Final Cut", value: "FINAL_CUT" },
+          { code: 234, label: "DaVinci", value: "DAVINCI" },
         ],
       },
       THREE_D: {
@@ -156,10 +165,10 @@ export const STUDY_CATEGORIES = {
         label: "3D/모델링",
         value: "THREE_D",
         details: [
-          { code: 241, label: "Blender" },
-          { code: 242, label: "Maya" },
-          { code: 243, label: "3ds Max" },
-          { code: 244, label: "Cinema 4D" },
+          { code: 241, label: "Blender", value: "BLENDER" },
+          { code: 242, label: "Maya", value: "MAYA" },
+          { code: 243, label: "3ds Max", value: "3DS_MAX" },
+          { code: 244, label: "Cinema 4D", value: "CINEMA_4D" },
         ],
       },
     },
@@ -176,11 +185,11 @@ export const STUDY_CATEGORIES = {
         label: "영어",
         value: "ENGLISH",
         details: [
-          { code: 311, label: "토익" },
-          { code: 312, label: "토스" },
-          { code: 313, label: "오픽" },
-          { code: 314, label: "회화" },
-          { code: 315, label: "비즈니스 영어" },
+          { code: 311, label: "토익", value: "TOEIC" },
+          { code: 312, label: "토스", value: "TOSS" },
+          { code: 313, label: "오픽", value: "OPIC" },
+          { code: 314, label: "회화", value: "CONVERSATION" },
+          { code: 315, label: "비즈니스 영어", value: "BUSINESS_ENGLISH" },
         ],
       },
       JAPANESE: {
@@ -188,10 +197,10 @@ export const STUDY_CATEGORIES = {
         label: "일본어",
         value: "JAPANESE",
         details: [
-          { code: 321, label: "JLPT" },
-          { code: 322, label: "JPT" },
-          { code: 323, label: "회화" },
-          { code: 324, label: "비즈니스 일본어" },
+          { code: 321, label: "JLPT", value: "JLPT" },
+          { code: 322, label: "JPT", value: "JPT" },
+          { code: 323, label: "회화", value: "CONVERSATION" },
+          { code: 324, label: "비즈니스 일본어", value: "BUSINESS_JAPANESE" },
         ],
       },
       CHINESE: {
@@ -199,9 +208,9 @@ export const STUDY_CATEGORIES = {
         label: "중국어",
         value: "CHINESE",
         details: [
-          { code: 331, label: "HSK" },
-          { code: 332, label: "TSC" },
-          { code: 333, label: "회화" },
+          { code: 331, label: "HSK", value: "HSK" },
+          { code: 332, label: "TSC", value: "TSC" },
+          { code: 333, label: "회화", value: "CONVERSATION" },
         ],
       },
     },
@@ -218,9 +227,9 @@ export const STUDY_CATEGORIES = {
         label: "창업/스타트업",
         value: "STARTUP",
         details: [
-          { code: 411, label: "사업 계획" },
-          { code: 412, label: "IR 피칭" },
-          { code: 413, label: "투자 유치" },
+          { code: 411, label: "사업 계획", value: "BUSINESS_PLAN" },
+          { code: 412, label: "IR 피칭", value: "IR_PITCHING" },
+          { code: 413, label: "투자 유치", value: "INVESTMENT" },
         ],
       },
       MARKETING: {
@@ -228,9 +237,9 @@ export const STUDY_CATEGORIES = {
         label: "마케팅",
         value: "MARKETING",
         details: [
-          { code: 421, label: "디지털 마케팅" },
-          { code: 422, label: "SNS 마케팅" },
-          { code: 423, label: "콘텐츠 마케팅" },
+          { code: 421, label: "디지털 마케팅", value: "DIGITAL_MARKETING" },
+          { code: 422, label: "SNS 마케팅", value: "SNS_MARKETING" },
+          { code: 423, label: "콘텐츠 마케팅", value: "CONTENT_MARKETING" },
         ],
       },
       FINANCE: {
@@ -238,9 +247,9 @@ export const STUDY_CATEGORIES = {
         label: "재무/회계",
         value: "FINANCE",
         details: [
-          { code: 431, label: "재무제표" },
-          { code: 432, label: "투자" },
-          { code: 433, label: "주식" },
+          { code: 431, label: "재무제표", value: "FINANCIAL_STATEMENT" },
+          { code: 432, label: "투자", value: "INVESTMENT" },
+          { code: 433, label: "주식", value: "STOCK" },
         ],
       },
     },
@@ -257,9 +266,9 @@ export const STUDY_CATEGORIES = {
         label: "IT 자격증",
         value: "IT_CERT",
         details: [
-          { code: 511, label: "정보처리기사" },
-          { code: 512, label: "네트워크관리사" },
-          { code: 513, label: "AWS" },
+          { code: 511, label: "정보처리기사", value: "CRAFTSMAN_INFO_PROCESSING" },
+          { code: 512, label: "네트워크관리사", value: "NETWORK_ADMIN" },
+          { code: 513, label: "AWS", value: "AWS_CERT" },
         ],
       },
       PUBLIC_SERVANT: {
@@ -267,9 +276,9 @@ export const STUDY_CATEGORIES = {
         label: "공무원",
         value: "PUBLIC_SERVANT",
         details: [
-          { code: 521, label: "국가직" },
-          { code: 522, label: "지방직" },
-          { code: 523, label: "서울시" },
+          { code: 521, label: "국가직", value: "NATIONAL" },
+          { code: 522, label: "지방직", value: "LOCAL" },
+          { code: 523, label: "서울시", value: "SEOUL" },
         ],
       },
     },
@@ -286,9 +295,9 @@ export const STUDY_CATEGORIES = {
         label: "대학 입시",
         value: "UNIVERSITY",
         details: [
-          { code: 611, label: "수능" },
-          { code: 612, label: "논술" },
-          { code: 613, label: "면접" },
+          { code: 611, label: "수능", value: "CSAT" },
+          { code: 612, label: "논술", value: "ESSAY" },
+          { code: 613, label: "면접", value: "INTERVIEW" },
         ],
       },
       MATH: {
@@ -296,9 +305,9 @@ export const STUDY_CATEGORIES = {
         label: "수학",
         value: "MATH",
         details: [
-          { code: 621, label: "미적분" },
-          { code: 622, label: "선형대수" },
-          { code: 623, label: "확률과 통계" },
+          { code: 621, label: "미적분", value: "CALCULUS" },
+          { code: 622, label: "선형대수", value: "LINEAR_ALGEBRA" },
+          { code: 623, label: "확률과 통계", value: "PROBABILITY_STATISTICS" },
         ],
       },
     },
@@ -315,9 +324,9 @@ export const STUDY_CATEGORIES = {
         label: "운동/스포츠",
         value: "SPORTS",
         details: [
-          { code: 711, label: "러닝" },
-          { code: 712, label: "헬스" },
-          { code: 713, label: "요가" },
+          { code: 711, label: "러닝", value: "RUNNING" },
+          { code: 712, label: "헬스", value: "FITNESS" },
+          { code: 713, label: "요가", value: "YOGA" },
         ],
       },
       MUSIC: {
@@ -325,9 +334,9 @@ export const STUDY_CATEGORIES = {
         label: "음악",
         value: "MUSIC",
         details: [
-          { code: 721, label: "기타" },
-          { code: 722, label: "피아노" },
-          { code: 723, label: "보컬" },
+          { code: 721, label: "기타", value: "GUITAR" },
+          { code: 722, label: "피아노", value: "PIANO" },
+          { code: 723, label: "보컬", value: "VOCAL" },
         ],
       },
     },
@@ -344,120 +353,168 @@ export const STUDY_CATEGORIES = {
         label: "생산성/습관",
         value: "PRODUCTIVITY",
         details: [
-          { code: 811, label: "시간 관리" },
-          { code: 812, label: "습관 만들기" },
-          { code: 813, label: "노션" },
+          { code: 811, label: "시간 관리", value: "TIME_MANAGEMENT" },
+          { code: 812, label: "습관 만들기", value: "HABIT_BUILDING" },
+          { code: 813, label: "노션", value: "NOTION" },
         ],
       },
     },
   },
 } as const;
 
-// 코드로 라벨 찾기
-export const getCategoryLabelByCode = (code: number): string => {
-  // 대분류 체크
+// ==================== 유틸리티 함수 ====================
+
+// ===== 1. 코드로 찾기 =====
+export const getCategoryByCode = (code: number): CategoryItem | null => {
   for (const mainCat of Object.values(STUDY_CATEGORIES)) {
-    if (mainCat.code === code) return mainCat.label;
-
-    // 중분류 체크
-    for (const subCat of Object.values(mainCat.subcategories)) {
-      if (subCat.code === code) return subCat.label;
-
-      // 소분류 체크
-      const detail = subCat.details?.find(
-        (d: { code: number }) => d.code === code
-      );
-      if (detail) return detail.label;
+    if (mainCat.code === code) {
+      return { code: mainCat.code, label: mainCat.label, value: mainCat.value };
     }
-  }
-  return "";
-};
-// 라벨로 코드 찾기 (역방향)
-export const getCategoryCodeByLabel = (label: string): number | null => {
-  console.log("getCategoryCodeByLabel:", label);
-  for (const mainCat of Object.values(STUDY_CATEGORIES)) {
-    if (mainCat.label === label) return mainCat.code;
 
     for (const subCat of Object.values(mainCat.subcategories)) {
-      if (subCat.label === label) return subCat.code;
+      if (subCat.code === code) {
+        return { code: subCat.code, label: subCat.label, value: subCat.value };
+      }
 
-      const detail = subCat.details?.find(
-        (d: { label: string }) => d.label === label
-      );
-      if (detail) return detail.code;
+      const detail = subCat.details?.find((d: { code: number }) => d.code === code);
+      if (detail) {
+        return { code: detail.code, label: detail.label, value: detail.value };
+      }
     }
   }
   return null;
 };
 
-export const getCategoryCodeByValue = (value: string): number | null => {
-  console.log("getCategoryCodeByValue:", value);
+// ===== 2. Value로 찾기 =====
+export const getCategoryByValue = (value: string): CategoryItem | null => {
   for (const mainCat of Object.values(STUDY_CATEGORIES)) {
-    if (mainCat.value === value) return mainCat.code;
+    if (mainCat.value === value) {
+      return { code: mainCat.code, label: mainCat.label, value: mainCat.value };
+    }
 
     for (const subCat of Object.values(mainCat.subcategories)) {
-      if (subCat.value === value) return subCat.code;
+      if (subCat.value === value) {
+        return { code: subCat.code, label: subCat.label, value: subCat.value };
+      }
 
-      const detail = subCat.details?.find(
-        (d: { value: string }) => d.value === value
-      );
-      if (detail) return detail.code;
+      const detail = subCat.details?.find((d: { value: string }) => d.value === value);
+      if (detail) {
+        return { code: detail.code, label: detail.label, value: detail.value };
+      }
     }
   }
   return null;
 };
 
-// 전체 경로 얻기 (계층 구조)
-export const getCategoryPath = (code: number): string[] => {
+// ===== 3. Label로 찾기 =====
+export const getCategoryByLabel = (label: string): CategoryItem | null => {
   for (const mainCat of Object.values(STUDY_CATEGORIES)) {
-    if (mainCat.code === code) return [mainCat.label];
+    if (mainCat.label === label) {
+      return { code: mainCat.code, label: mainCat.label, value: mainCat.value };
+    }
 
     for (const subCat of Object.values(mainCat.subcategories)) {
-      if (subCat.code === code) return [mainCat.label, subCat.label];
+      if (subCat.label === label) {
+        return { code: subCat.code, label: subCat.label, value: subCat.value };
+      }
 
-      const detail = subCat.details?.find(
-        (d: { code: number }) => d.code === code
-      );
-      if (detail) return [mainCat.label, subCat.label, detail.label];
+      const detail = subCat.details?.find((d: { label: string }) => d.label === label);
+      if (detail) {
+        return { code: detail.code, label: detail.label, value: detail.value };
+      }
     }
   }
-  return [];
+  return null;
 };
 
-export const getMainCategories = (): { value: string; label: string }[] => {
+// ===== 4. 경로 얻기 =====
+export const getCategoryPath = (code: number): {
+  codes: number[];
+  labels: string[];
+  values: string[];
+} => {
+  for (const mainCat of Object.values(STUDY_CATEGORIES)) {
+    if (mainCat.code === code) {
+      return {
+        codes: [mainCat.code],
+        labels: [mainCat.label],
+        values: [mainCat.value],
+      };
+    }
+
+    for (const subCat of Object.values(mainCat.subcategories)) {
+      if (subCat.code === code) {
+        return {
+          codes: [mainCat.code, subCat.code],
+          labels: [mainCat.label, subCat.label],
+          values: [mainCat.value, subCat.value],
+        };
+      }
+
+      const detail = subCat.details?.find((d: { code: number }) => d.code === code);
+      if (detail) {
+        return {
+          codes: [mainCat.code, subCat.code, detail.code],
+          labels: [mainCat.label, subCat.label, detail.label],
+          values: [mainCat.value, subCat.value, detail.value],
+        };
+      }
+    }
+  }
+  return { codes: [], labels: [], values: [] };
+};
+
+// ===== 5. 계층별 목록 ===== (계충 출력용)
+export const getMainCategories = (): CategoryItem[] => {
   return Object.values(STUDY_CATEGORIES).map((cat) => ({
-    value: cat.value,
+    code: cat.code,
     label: cat.label,
+    value: cat.value,
   }));
 };
 
-export const getSubcategories = (
-  mainCategory: string
-): { value: string; label: string }[] => {
-  if (!mainCategory) return [];
-  const category =
-    STUDY_CATEGORIES[mainCategory as keyof typeof STUDY_CATEGORIES];
-  return Object.values(category.subcategories).map((sub) => ({
-    value: sub.value,
+export const getSubcategories = (mainValue: string): CategoryItem[] => {
+  const mainCat = Object.values(STUDY_CATEGORIES).find(
+    (cat) => cat.value === mainValue
+  );
+  if (!mainCat) return [];
+
+  return Object.values(mainCat.subcategories).map((sub) => ({
+    code: sub.code,
     label: sub.label,
+    value: sub.value,
   }));
 };
 
 export const getDetailCategories = (
-  mainCategory: string,
-  subcategory: string
-): { value: string; label: string }[] => {
-  const mainCat =
-    STUDY_CATEGORIES[mainCategory as keyof typeof STUDY_CATEGORIES];
+  mainValue: string,
+  subValue: string
+): CategoryItem[] => {
+  const mainCat = Object.values(STUDY_CATEGORIES).find(
+    (cat) => cat.value === mainValue
+  );
+  if (!mainCat) return [];
+
   const subCat = Object.values(mainCat.subcategories).find(
-    (sub) => sub.value === subcategory
+    (sub) => sub.value === subValue
   );
-  return (
-    subCat?.details?.map((detail: { code: number; label: string }) => ({
-      value: detail.code.toString(),
-      label: detail.label,
-    })) || []
-  );
+  if (!subCat) return [];
+
+  return subCat.details || [];
 };
 
+// ===== 6. 레거시 호환 함수 (기존 코드 유지용) =====
+export const getCategoryLabelByCode = (code: number): string => {
+  return getCategoryByCode(code)?.label || "";
+};
 
+export const getCategoryCodeByLabel = (label: string): number | null => {
+  return getCategoryByLabel(label)?.code || null;
+};
+
+export const getCategoryCodeByValue = (value: string): number | null => {
+  return getCategoryByValue(value)?.code || null;
+};
+
+// ===== 7. 타입 내보내기 =====
+export type { CategoryItem };

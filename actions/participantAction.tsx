@@ -83,15 +83,22 @@ export async function applyParticipant(studyId: number) {
   
   console.log("applyParticipant userData : ", userData);
   // 신청
+  // UPSERT: 있으면 UPDATE, 없으면 INSERT
   const { data, error } = await supabase
-    .from("participants")
-    .insert({ 
-      study_id: studyId, 
-      user_id: userId, 
-      status: "pending",
-      username: userProfile?.username,
-      user_email: userProfile?.email,
-    })
+    .from('participants')
+    .upsert(
+      { 
+        study_id: studyId, 
+        user_id: userId, 
+        status: "pending",
+        username: userProfile?.username,
+        user_email: userProfile?.email,
+      },
+      { 
+        onConflict: 'study_id,user_id',
+        ignoreDuplicates: false  // false = 중복 시 업데이트
+      }
+    )
     .select()
     .single();
 
@@ -114,6 +121,7 @@ export async function checkParticipantStatus(studyId: number) {
     .select("*")
     .eq("study_id", studyId)
     .eq("user_id", userId)
+    .in("status", ["accepted", "pending"])
     .single();
 
   if (error) {
