@@ -30,9 +30,10 @@ import { StudiesResponse } from "@/types/response/studies";
 import { useGetMyStudies } from "@/hooks/useStudy";
 import { useEffect, useState } from "react";
 import { useUpdateProfileImage } from "@/hooks/useProfile";
-import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage";
+import { getProfileImageUrl } from "@/utils/supabase/storage";
+import { ProfileResponse } from "@/types/response/profile";
 
-export default function UserProfileUI() {
+export default function UserProfileUI({ user, posts, studies }: { user: ProfileResponse, posts: PostsResponse[], studies: StudiesResponse[] }) {
   // 임시 데이터 - 실제로는 DB에서 조회
   // const currentUser = {
   //   id: "user-1",
@@ -76,15 +77,12 @@ export default function UserProfileUI() {
     },
   ];
 
-  const { data: user } = useGetMyProfile();
+  // const { data: user } = useGetMyProfile();
+  // const { data: posts } = useGetMyPosts();
+  // const { data: studies } = useGetMyStudies();
+  const myPosts = posts || [];
+  const myStudies = studies || [];
   const currentUser = convertUser(user || []);
-  const { data: posts } = useGetMyPosts();
-  const { data: studies } = useGetMyStudies();
-
-  const myPosts = posts?.success ? (posts.data as unknown as PostsResponse[]) : [];
-  const myStudies = studies?.success
-    ? (studies.data as unknown as StudiesResponse[])
-    : [];
   const getStatusColor = (status: string) => {
     switch (status) {
       case "모집중":

@@ -3,11 +3,13 @@
 import {
   checkIsLiked,
   createPost,
+  deletePost,
   getAllPosts,
-  getMyposts,
+  getMyPosts,
   getPostById,
   increaseViewCount,
   toggleLike,
+  updatePost,
 } from "@/actions/postAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +17,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useUser } from "./useUser";
+import { getUser } from "@/actions/userAction";
 
 export function useCreatePost() {
   return useMutation({
@@ -45,7 +48,7 @@ export function useGetMyPosts() {
   const query = useQuery({
     queryKey: queryKeys.myPosts,
     queryFn: async () => {
-      return await getMyposts();
+      return await getMyPosts();
     },
   });
   return query;
@@ -135,7 +138,6 @@ export function useGetPost(id: number) {
       if (isRedirect) {
         return;
       }
-      console.log("useGetPost error : ", error);
       toast.error(error.message || "게시글을 불러오는데 실패했습니다.");
     }
   }, [query.error]);
@@ -257,6 +259,47 @@ export function useToggleLike(postId: number) {
         queryClient.setQueryData(queryKeys.post(postId), context.previousPost);
       }
       toast.error("좋아요 처리 중 오류가 발생했습니다");
+    },
+  });
+}
+
+// 게시글 삭제
+export function useDeletePost() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (postId: number) => {
+      return await deletePost(postId);
+    },
+    onSuccess: (response) => {
+      if (response?.success) {
+        toast.success("게시글을 삭제했습니다");
+        queryClient.invalidateQueries({ queryKey: queryKeys.myPosts });
+        queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+      } else {
+        toast.error(response?.error?.message || "게시글 삭제에 실패했습니다");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "게시글 삭제 중 오류가 발생했습니다");
+    },
+  });
+}
+
+export function useUpdatePost() {
+  return useMutation({
+    mutationFn: async ({ postId, formData }: { postId: number, formData: FormData }) => {
+      return await updatePost(postId, formData);
+    },
+    onSuccess: (response) => {
+      if (response?.success) {
+        toast.success("게시글을 수정했습니다");
+     
+      } else {
+        toast.error(response?.error?.message || "게시글 수정에 실패했습니다");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "게시글 수정 중 오류가 발생했습니다");
     },
   });
 }

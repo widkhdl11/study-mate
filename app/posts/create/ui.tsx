@@ -221,7 +221,7 @@ export default function PostCreateUI() {
               <FormField
                 control={form.control}
                 name="images"
-                render={() => (
+                render={( {field} ) => (
                   <FormItem>
                     <FormLabel>이미지</FormLabel>
                     <FormDescription>
@@ -295,7 +295,7 @@ export default function PostCreateUI() {
                 <Button
                   type="submit"
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={isLoading}
+                  disabled={isLoading || postMutation.isPending}
                 >
                   {isLoading ? "작성 중..." : "모집글 작성"}
                 </Button>
@@ -304,7 +304,7 @@ export default function PostCreateUI() {
                     type="button"
                     variant="outline"
                     className="w-full bg-transparent"
-                    disabled={isLoading}
+                    disabled={isLoading || postMutation.isPending}
                   >
                     취소
                   </Button>

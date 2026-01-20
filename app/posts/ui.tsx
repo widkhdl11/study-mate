@@ -386,7 +386,7 @@ export default function PostsUI() {
                           <div className="relative w-full h-48 bg-muted overflow-hidden">
                             <img
                               src={
-                                getImageUrl(post.image_url?.[0] || "")
+                                getImageUrl(post.image_url?.[0]?.url || "/placeholder.svg")
                               }
                               alt={post.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

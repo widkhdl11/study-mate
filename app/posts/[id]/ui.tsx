@@ -179,11 +179,11 @@ export default function PostDetailUI({ id }: { id: number }) {
           <div className="relative w-full mb-8">
             <Carousel className="w-full">
               <CarouselContent>
-                {post.image_url.map((image: string, index: number) => (
+                {post.image_url.map((image: { url: string }, index: number) => (
                   <CarouselItem key={index}>
                     <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
                       <Image
-                        src={getImageUrl(image) || "/placeholder.svg"}
+                        src={getImageUrl(image.url) || "/placeholder.svg"}
                         alt={`${post.title} - 이미지 ${index + 1}`}
                         fill
                         className="object-cover"

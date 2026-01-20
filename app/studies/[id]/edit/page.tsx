@@ -2,7 +2,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { StudyEditUI } from "./ui";
-import { getMyStudyById } from "@/actions/studyAction";
+import { getMyStudyByIdSSR } from "@/actions/studyAction";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
 
@@ -12,7 +12,7 @@ interface PageProps {
 
 export default async function StudyEditPage({ params }: PageProps) {
   const { id } = await params;
-  const study = await getMyStudyById(id);
+  const study = await getMyStudyByIdSSR(id);
 
   // ✅ 서버에서 미리 계산
   const categoryPath = getCategoryPath(Number(study.study_category));

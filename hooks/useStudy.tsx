@@ -16,6 +16,7 @@ import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { StudyFormValues } from "@/lib/zod/schemas/studySchema";
 import { createClient } from "@/utils/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export function useCreateStudy() {
@@ -136,12 +137,14 @@ export function useDeleteStudy({ id }: { id: string }) {
 
 
 export function useUpdateStudy({ id }: { id: string }) {
+  const router = useRouter();
   return useMutation({
     mutationFn: async (formData: FormData) => {
       return await updateStudy(id, formData);
     },
     onSuccess: (response) => {
       if (!response || response.success) {
+        router.push(`/studies/${id}`);
         return;
       }
     },

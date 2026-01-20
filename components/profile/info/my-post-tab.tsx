@@ -4,14 +4,22 @@ import { TabsContent } from "@/components/ui/tabs";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin } from "lucide-react";
-import { ThumbsUp } from "lucide-react";
-import { Eye } from "lucide-react";
+import { Edit, MapPin, MoreVertical, Trash2 } from "lucide-react";
+import { ThumbsUp, Eye } from "lucide-react";
 import { getImageUrl } from "@/utils/supabase/storage";
 import { PostsResponse } from "@/types/response/post";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
 import { studyStatusConversion } from "@/types/convertion/study";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useDeletePost } from "@/hooks/usePost";
+import { useRouter } from "next/navigation";
 
 export default function MyPostTab({
   myPosts,
@@ -22,51 +30,117 @@ export default function MyPostTab({
   getStatusColor: (status: string) => string;
   getCategoryColor: (category: string) => string;
 }) {
+  const deleteMutation = useDeletePost();
+  const router = useRouter();
+
+  const handleDelete = (postId: number, e: React.MouseEvent) => {
+    e.preventDefault();      // ✅ Link 기본 동작 막기
+    e.stopPropagation();     // ✅ 이벤트 전파 막기
+
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+    console.log("handleDelete: ", postId);
+    deleteMutation.mutate(postId);
+  };
+
+  const handleUpdate = (postId: number, e: React.MouseEvent) => {
+    e.preventDefault();      // ✅ Link 기본 동작 막기
+    e.stopPropagation();     // ✅ 이벤트 전파 막기
+
+    console.log("handleUpdate: ", postId);
+    router.push(`/posts/${postId}/edit`);
+  };
+
   return (
     <TabsContent value="posts" className="space-y-4">
       {myPosts && myPosts?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {myPosts.map((post) => (
-            <Link key={post.id} href={`/posts/${post.id}`}>
-              <Card className="group overflow-hidden hover:shadow-md transition-all h-full flex flex-col cursor-pointer p-0 gap-0">
-                <div className="relative w-full h-40 bg-muted overflow-hidden">
-                  <img
-                    src={getImageUrl(post.image_url) || "/placeholder.svg"}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  />
-                  <div className="absolute top-3 right-3">
-                    <Badge className={getStatusColor(post.study.status)}>
-                      {studyStatusConversion(post.study.status)}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="p-4 flex-1 flex flex-col gap-3">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      {getCategoryPath(Number(post.study.study_category)).labels.map((category) => (
-                        <Badge
-                          key={category}
-                          variant="outline"
-                          className={`text-xs font-normal ${getCategoryColor(category)}`}
-                        >
-                          {category}
-                        </Badge>
-                      ))}
-                 
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <MapPin className="w-3 h-3" /> {getRegionPath(Number(post.study.region)).labels.join(" ")}
-                      </span>
+            <div key={post.id} className="relative">  {/* ✅ Link를 Card 밖으로 */}
+              <Card className="group overflow-hidden hover:shadow-md transition-all h-full flex flex-col p-0 gap-0">
+                <Link href={`/posts/${post.id}`}>  {/* ✅ Link를 이미지에만 */}
+                  <div className="relative w-full h-40 bg-muted overflow-hidden cursor-pointer">
+                    <img
+                      src={getImageUrl(post.image_url?.[0]?.url || "/placeholder.svg")}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                    <div className="absolute top-3 right-3">
+                      <Badge className={getStatusColor(post.study.status)}>
+                        {studyStatusConversion(post.study.status)}
+                      </Badge>
                     </div>
-                    <h3 className="font-bold text-foreground line-clamp-1">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                      {post.content}
-                    </p>
                   </div>
+                </Link>
+
+                <div className="p-4 flex-1 flex flex-col gap-3 relative">
+                  {/* 우측 상단 ... 버튼 */}
+                  <div className="absolute top-2 right-2 z-10">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 hover:bg-muted"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={(e) => handleUpdate(post.id, e)}
+                        >
+                          <Edit className="mr-2 h-4 w-4" />
+                          수정
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => handleDelete(post.id, e)}
+                          className="text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          삭제
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+
+                  <Link href={`/posts/${post.id}`}>  {/* ✅ Link를 제목/내용에 */}
+                    <div className="cursor-pointer">
+                      <div className="flex items-center gap-2 mb-2">
+                        {getCategoryPath(
+                          Number(post.study.study_category)
+                        ).labels.map((category) => (
+                          <Badge
+                            key={category}
+                            variant="outline"
+                            className={`text-xs font-normal ${getCategoryColor(
+                              category
+                            )}`}
+                          >
+                            {category}
+                          </Badge>
+                        ))}
+
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />{" "}
+                          {getRegionPath(Number(post.study.region)).labels.join(
+                            " "
+                          )}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-foreground line-clamp-1 hover:text-primary transition-colors">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                        {post.content}
+                      </p>
+                    </div>
+                  </Link>
+
                   <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto pt-2 border-t border-border">
-                    <span>{new Date(post.created_at).toLocaleDateString("ko-KR")}</span>
+                    <span>
+                      {new Date(post.created_at).toLocaleDateString("ko-KR")}
+                    </span>
                     <div className="flex items-center gap-2">
                       <span className="flex items-center gap-1">
                         <ThumbsUp className="w-3 h-3" /> {post.likes_count}
@@ -78,7 +152,7 @@ export default function MyPostTab({
                   </div>
                 </div>
               </Card>
-            </Link>
+            </div>
           ))}
         </div>
       ) : (

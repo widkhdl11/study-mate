@@ -20,7 +20,6 @@ export default function MyStudiesTab({
   getStatusColor: (status: string) => string;
   getCategoryColor: (category: string) => string;
 }) {
-  console.log("myStudies : ", myStudies);
   return (
     <>
       <TabsContent value="studies" className="space-y-4">

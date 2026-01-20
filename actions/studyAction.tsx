@@ -76,7 +76,8 @@ export async function getMyStudies(): Promise<ActionResponse | never> {
     // .eq("creator_id", user.user.id);
     .from("participants")
     .select("*, studies!participants_study_id_fkey(*)")
-    .eq("user_id", user.user.id);
+    .eq("user_id", user.user.id)
+    .order("created_at", { ascending: false });
     
   if (error) {
     return { success: false, error: { message: error.message } };
@@ -304,7 +305,7 @@ export async function updateStudy(id: string, formData: FormData) {
 
 // ================ssr===============
 
-export async function getMyStudyById(id: string) {
+export async function getMyStudyByIdSSR(id: string) {
   const supabase = await createClient();
   const { data: user, error: userError } = await supabase.auth.getUser();
   if (userError) {
@@ -322,4 +323,23 @@ export async function getMyStudyById(id: string) {
 }
 return study;
 
+}
+
+
+export async function getMyStudiesSSR() {
+  const supabase = await createClient();
+  const { data: user, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    throw new Error("사용자 정보를 찾을 수 없습니다.");
+  }
+  const id = user.user.id;
+  const { data, error } = await supabase
+    .from("participants")
+    .select("*, studies!participants_study_id_fkey(*)")
+    .eq("user_id", user.user.id)
+    .order("created_at", { ascending: false });
+  if (error) {
+    notFound();
+  }
+  return data;
 }

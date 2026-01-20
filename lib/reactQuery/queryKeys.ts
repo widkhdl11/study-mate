@@ -25,3 +25,16 @@ export const queryKeys = {
   chat: (id: number) => ["chats", id],
   chatMessages: (chatId: number) => ["chatMessages", chatId],
 };
+
+// export const queryKeys = {
+//   posts: {
+//     all: ["posts"],
+//     myPosts: ["posts", "my"],
+//     detail: (id: number) => ["posts", id],
+//   },
+//   studies: {
+//     all: ["studies"],
+//     myStudies: ["studies", "my"],
+//     detail: (id: number) => ["studies", id],
+//   },
+// } as const;
