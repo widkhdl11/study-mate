@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { ArrowLeft, Menu, Send, ImageIcon as ImageIconComponent, Smile } from "lucide-react"
 import { ChatParticipant, ChatRoom } from "@/types/response/chat"
 import { useUser } from "@/hooks/useUser"
-import { getProfileImageUrl } from "@/utils/supabase/storage"
+import { getProfileImageUrl } from "@/lib/supabase/storage"
 import { useGetChatMessages, useSendMessage } from "@/hooks/useChat"
 import { ChatMessage } from "@/hooks/use-realtime-chat"
 import { useChatScroll } from "@/hooks/use-chat-scroll"

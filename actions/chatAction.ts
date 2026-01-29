@@ -1,7 +1,7 @@
 'use server';
 
-import {createClient} from "@/utils/supabase/server";
-import {getUser} from "./userAction";
+import {createClient} from "@/lib/supabase/server";
+import {getUser} from "./profileAction";
 import { notFound } from "next/navigation";
 
 

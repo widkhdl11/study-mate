@@ -14,7 +14,7 @@ import {
 import { queryClient } from "@/config/ReactQueryClientProvider";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { StudyFormValues } from "@/lib/zod/schemas/studySchema";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

@@ -1,6 +1,6 @@
 'use client'
 
-import { updateMyProfile, updateProfileImage } from "@/actions/userAction"
+import { updateMyProfile, updateProfileImage } from "@/actions/profileAction"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"

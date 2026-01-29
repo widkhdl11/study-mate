@@ -1,7 +1,7 @@
 "use server";
 
 import profileEditSchema from "@/lib/zod/schemas/profileSchema";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
 export async function getUser() {

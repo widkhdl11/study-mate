@@ -1,8 +1,8 @@
 "use client";
 
-import { getMyProfile, getUser } from "@/actions/userAction";
+import { getMyProfile, getUser } from "@/actions/profileAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
-import { convertUser } from "@/types/convertion/user";
+import { convertUser } from "@/types/conversion/user";
 import { useQuery } from "@tanstack/react-query";
 
 export function useUser() {

@@ -1,7 +1,7 @@
 "use server";
 
 import { StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import type { ActionResponse } from "@/types/response/action";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";

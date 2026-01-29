@@ -1,7 +1,7 @@
 import { getNotifications, readNotification } from "@/actions/notificationActions";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { NotificationResponse } from "@/types/response/notification";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useUser } from "./useUser";

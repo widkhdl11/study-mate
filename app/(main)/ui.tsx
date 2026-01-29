@@ -8,7 +8,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { BookOpen, Sparkles, Target, Users } from "lucide-react";
 import { useGetAllPosts } from "@/hooks/usePost";
 import { PostsResponse } from "@/types/response/post";
-import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage";
+import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
 
 export default function HomeUI() {
   const { data } = useGetAllPosts();

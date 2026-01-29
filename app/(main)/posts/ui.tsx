@@ -19,7 +19,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Search, MapPin, Users, Calendar, ThumbsUp, Eye } from "lucide-react";
 import { useGetAllPosts } from "@/hooks/usePost";
 import { PostsResponse } from "@/types/response/post";
-import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage";
+import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
 import {
   getCategoryCodeByValue,
   getCategoryPath,
@@ -29,7 +29,7 @@ import {
 } from "@/lib/constants/study-category";
 import { getMainRegion, getRegionCodeByValue, getRegionPath, getSubRegion } from "@/lib/constants/region";
 import { STUDY_STATUS } from "@/lib/constants/study-status";
-import { getStudyStatusExistValue, studyStatusConversion } from "@/types/convertion/study";
+import { getStudyStatusExistValue, studyStatusConversion } from "@/types/conversion/study";
 
 export default function PostsUI() {
 

@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useCheckIsLiked, useGetPost, useToggleLike,  } from "@/hooks/usePost";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
-import { getImageUrl } from "@/utils/supabase/storage";
+import { getImageUrl } from "@/lib/supabase/storage";
 import {
   useApplyParticipant,
   useCheckParticipantStatus,

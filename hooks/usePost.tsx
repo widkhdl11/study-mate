@@ -17,7 +17,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import Cookies from "js-cookie";
 import { useUser } from "./useUser";
-import { getUser } from "@/actions/userAction";
+import { getUser } from "@/actions/profileAction";
 
 export function useCreatePost() {
   return useMutation({

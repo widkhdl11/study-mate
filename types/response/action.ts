@@ -1,13 +1,9 @@
-// 서버 액션 응답 타입
+
+export interface ActionError {
+  message: string;
+  field?: string;
+}
+
 export type ActionResponse<T = void> =
-  | {
-      success: true;
-      data?: T[] | T | undefined;
-    }
-  | {
-      success: false;
-      error: {
-        message: string;
-        field?: string; // 특정 필드 에러인 경우
-      };
-    };
+  | { success: true; data?: T }
+  | { success: false; error: ActionError };

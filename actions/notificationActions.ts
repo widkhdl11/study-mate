@@ -2,7 +2,7 @@
 
 import { ActionResponse } from "@/types/response/action";
 import { NotificationInsert, NotificationResponse } from "@/types/response/notification";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 
 

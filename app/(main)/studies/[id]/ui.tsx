@@ -31,14 +31,14 @@ import {
   useRemoveParticipant,
 } from "@/hooks/useParticipant";
 import { StudiesResponse } from "@/types/response/studies";
-import { statusConversion } from "@/types/convertion/participants";
+import { statusConversion } from "@/types/conversion/participants";
 import { getCategoryLabelByCode, getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
-import { studyStatusConversion } from "@/types/convertion/study";
+import { studyStatusConversion } from "@/types/conversion/study";
 import { formatDate } from "date-fns";
-import { getProfileImageUrl } from "@/utils/supabase/storage";
+import { getProfileImageUrl } from "@/lib/supabase/storage";
 import { useEffect, useState } from "react";
-import { UserSession } from "@/types/userSesstion";
+import { UserSession } from "@/types/userSession";
 import { useUser } from "@/hooks/useUser";
 
 export default function UserStudyDetailUI({ id }: { id: string }) {

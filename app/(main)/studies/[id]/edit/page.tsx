@@ -1,6 +1,6 @@
 // app/studies/[id]/edit/page.tsx
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { StudyEditUI } from "./ui";
 import { getMyStudyByIdSSR } from "@/actions/studyAction";
 import { getCategoryPath } from "@/lib/constants/study-category";

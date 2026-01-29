@@ -2,10 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { loginSchema, signupSchema } from "@/lib/zod/schemas/authSchema";
 import { ActionResponse } from "@/types/response/action";
-import { createClientAdmin } from "@/utils/supabase/client-admin";
+import { createClientAdmin } from "@/lib/supabase/client-admin";
 
 /**
  * 로그인 서버 액션

@@ -6,11 +6,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Edit, MapPin, MoreVertical, Trash2 } from "lucide-react";
 import { ThumbsUp, Eye } from "lucide-react";
-import { getImageUrl } from "@/utils/supabase/storage";
+import { getImageUrl } from "@/lib/supabase/storage";
 import { PostsResponse } from "@/types/response/post";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
-import { studyStatusConversion } from "@/types/convertion/study";
+import { studyStatusConversion } from "@/types/conversion/study";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,

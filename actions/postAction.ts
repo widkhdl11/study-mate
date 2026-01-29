@@ -3,7 +3,7 @@
 import postSchema from "@/lib/zod/schemas/postSchema";
 import { ActionResponse } from "@/types/response/action";
 import { PostsResponse } from "@/types/response/post";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 export async function createPost(

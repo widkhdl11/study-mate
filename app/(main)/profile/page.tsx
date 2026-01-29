@@ -1,6 +1,6 @@
 import { getMyPostsSSR } from "@/actions/postAction";
 import { getMyStudiesSSR } from "@/actions/studyAction";
-import { getMyProfileSSR } from "@/actions/userAction";
+import { getMyProfileSSR } from "@/actions/profileAction";
 import UserProfileUI from "./ui";
 import { PostsResponse } from "@/types/response/post";
 import { StudiesResponse } from "@/types/response/studies";
