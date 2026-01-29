@@ -44,9 +44,7 @@ export default function RootLayout({
     <QueryClientProvider client={queryClient}>
       <html lang="ko">
         <body className={`font-sans antialiased`}>
-          <Header />
           {children}
-          <Footer />
           <Toaster />
         </body>
       </html>

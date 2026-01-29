@@ -23,7 +23,15 @@ export const queryKeys = {
   // 채팅
   chats: ["chats"],
   chat: (id: number) => ["chats", id],
+    // chatMessages: (chatId: number) => ["chat-messages", chatId] as const,
   chatMessages: (chatId: number) => ["chatMessages", chatId],
+
+  notifications: ["notifications"],
+
+
+  
+  aiRecommendedStudies: ["ai-recommended-studies"] as const,
+
 };
 
 // export const queryKeys = {

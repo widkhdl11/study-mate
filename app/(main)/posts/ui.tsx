@@ -379,7 +379,7 @@ export default function PostsUI() {
                 {/* Posts Grid */}
                 {filteredPosts.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {filteredPosts.map((post) => (
+                    {filteredPosts.map((post :any) => (
                       <Link key={post.id} href={`/posts/${post.id}`}>
                         <Card className="group overflow-hidden hover:shadow-md transition-all duration-300 h-full flex flex-col cursor-pointer border-border/60 hover:border-primary/50 p-0 gap-0">
                           {/* Thumbnail Image */}

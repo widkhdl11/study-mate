@@ -95,26 +95,39 @@ export type Database = {
       chats: {
         Row: {
           created_at: string | null
+          creator_id: string | null
           id: number
           is_group: boolean
+          name: string | null
           study_id: number | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          creator_id?: string | null
           id?: number
           is_group?: boolean
+          name?: string | null
           study_id?: number | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          creator_id?: string | null
           id?: number
           is_group?: boolean
+          name?: string | null
           study_id?: number | null
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "chats_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "chats_study_id_fkey"
             columns: ["study_id"]
@@ -160,8 +173,63 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: number
+          is_read: boolean | null
+          reference_id: number | null
+          reference_type: string | null
+          sender_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: number
+          is_read?: boolean | null
+          reference_id?: number | null
+          reference_type?: string | null
+          sender_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: number
+          is_read?: boolean | null
+          reference_id?: number | null
+          reference_type?: string | null
+          sender_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participants: {
         Row: {
+          avatar_url: string | null
           created_at: string | null
           id: number
           role: string | null
@@ -173,6 +241,7 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string | null
           id?: number
           role?: string | null
@@ -184,6 +253,7 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string | null
           id?: number
           role?: string | null
@@ -309,6 +379,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           birth_date: string | null
           created_at: string | null
           email: string
@@ -320,6 +391,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           birth_date?: string | null
           created_at?: string | null
           email: string
@@ -331,6 +403,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           birth_date?: string | null
           created_at?: string | null
           email?: string
@@ -397,7 +470,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_post_views: { Args: { post_id: number }; Returns: undefined }
+      toggle_post_like: {
+        Args: { p_post_id: number; p_user_id: string }
+        Returns: {
+          liked: boolean
+          new_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

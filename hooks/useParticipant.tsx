@@ -18,13 +18,14 @@ export function useParticipant(studyId: number) {
     queryFn: async () => {
       return await checkParticipantStatus(studyId);
     },
-    enabled: studyId > 0,  // studyId가 있을 때만 실행
+    enabled: studyId > 0, // studyId가 있을 때만 실행
   });
 }
 
+// 참가 신청
 export function useApplyParticipant(studyId: number) {
-  const queryClient = useQueryClient();  // ← 추가!
-  
+  const queryClient = useQueryClient(); // ← 추가!
+
   return useMutation({
     mutationFn: async () => {
       return await applyParticipant(studyId);
@@ -32,15 +33,15 @@ export function useApplyParticipant(studyId: number) {
     onSuccess: (response) => {
       if (response?.success) {
         // ✅ 캐시 무효화 - 참여 상태 다시 조회
-        queryClient.invalidateQueries({ 
-          queryKey: queryKeys.participant(studyId) 
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.participant(studyId),
         });
-        
+
         // ✅ 스터디 정보도 다시 조회 (current_participants 업데이트)
-        queryClient.invalidateQueries({ 
-          queryKey: queryKeys.post(studyId) 
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.post(studyId),
         });
-        
+
         toast.success("참여 신청이 완료되었습니다!");
       } else {
         toast.error(response?.error?.message || "신청에 실패했습니다");

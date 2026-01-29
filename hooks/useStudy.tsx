@@ -1,6 +1,6 @@
 "use client";
 
-import { studyAddParticipant } from "@/actions/participantAction";
+// import { studyAddParticipant } from "@/actions/participantAction";
 import {
   createStudy,
   deleteStudy,

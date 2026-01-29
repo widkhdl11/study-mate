@@ -17,7 +17,6 @@ export default async function UserProfilePage() {
   const posts = postsData as unknown as PostsResponse[] || [];
   const studies = studiesData as unknown as StudiesResponse[] || [];
 
-  console.log("posts page: ", posts);
   return (
     <div>
       <UserProfileUI user={profile} posts={posts} studies={studies} />

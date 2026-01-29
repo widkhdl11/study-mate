@@ -32,50 +32,13 @@ import { useEffect, useState } from "react";
 import { useUpdateProfileImage } from "@/hooks/useProfile";
 import { getProfileImageUrl } from "@/utils/supabase/storage";
 import { ProfileResponse } from "@/types/response/profile";
+import { useLogout } from "@/hooks/useAuth";
+import { useGetChats } from "@/hooks/useChat";
 
 export default function UserProfileUI({ user, posts, studies }: { user: ProfileResponse, posts: PostsResponse[], studies: StudiesResponse[] }) {
-  // 임시 데이터 - 실제로는 DB에서 조회
-  // const currentUser = {
-  //   id: "user-1",
-  //   name: "박준희",
-  //   email: "junhee@example.com",
-  //   avatar: "/user-profile-avatar.png",
-  //   initials: "PJ",
-  //   bio: "함께 성장하는 스터디 문화를 믿는 개발자",
-  //   birthDate: "1999.05.15",
-  //   gender: "남성",
-  //   joinedDate: "2024.01.01",
-  //   points: 1250,
-  //   level: "Gold",
-  // };
-
-  // 채팅방 목록
-  const chatRooms = [
-    {
-      id: 1,
-      name: "React 심화 스터디",
-      lastMessage: "다음 주 모임 시간을 정하겠습니다.",
-      lastMessageTime: "2시간 전",
-      unreadCount: 3,
-      avatar: "/study-chat.jpg",
-    },
-    {
-      id: 2,
-      name: "Spring Boot 완전 정복",
-      lastMessage: "프로젝트 진행 상황 공유합니다.",
-      lastMessageTime: "1일 전",
-      unreadCount: 0,
-      avatar: "/backend-study.jpg",
-    },
-    {
-      id: 3,
-      name: "TypeScript 마스터즈",
-      lastMessage: "타입 정의 방법에 대해 질문이 있습니다.",
-      lastMessageTime: "3일 전",
-      unreadCount: 1,
-      avatar: "/typescript-study.jpg",
-    },
-  ];
+ 
+  const {data: chatRooms} = useGetChats();
+  
 
   // const { data: user } = useGetMyProfile();
   // const { data: posts } = useGetMyPosts();
@@ -83,6 +46,7 @@ export default function UserProfileUI({ user, posts, studies }: { user: ProfileR
   const myPosts = posts || [];
   const myStudies = studies || [];
   const currentUser = convertUser(user || []);
+  const logoutMutation = useLogout();
   const getStatusColor = (status: string) => {
     switch (status) {
       case "모집중":
@@ -124,6 +88,9 @@ useEffect(() => {
     }
   };
 }, [profileImage]);
+  const getInitials = (username: string) => {
+    return username.split(" ").map((name) => name[0]).join("");
+  };
   return (
     <div className="min-h-screen flex flex-col bg-background">
 
@@ -135,15 +102,15 @@ useEffect(() => {
             <div className="relative flex-shrink-0">
                 <Avatar className="h-24 w-24 ring-4 ring-primary/20">
                   <AvatarImage src={getProfileImageUrl(currentUser?.avatar_url || "") || "/placeholder.svg"} alt={currentUser.username || ""} />
-                  <AvatarFallback className="bg-blue-600 text-white text-2xl font-bold">
-                    {currentUser.initials}
+                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
+                    {currentUser.email?.[0]}
                   </AvatarFallback>
                 </Avatar>
 
                 {/* 톱니바퀴 아이콘 버튼 */}
                 <label
                   htmlFor="profile-image-upload"
-                  className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-2 cursor-pointer shadow-lg transition-all hover:scale-110"
+                  className="absolute bottom-0 right-0 bg-gray-600 hover:bg-blue-700 text-white rounded-full p-2 cursor-pointer shadow-lg transition-all hover:scale-110"
                   title="프로필 이미지 변경"
                 >
                   <Settings className="w-4 h-4" />
@@ -207,15 +174,19 @@ useEffect(() => {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  <Button className="bg-blue-600 hover:bg-blue-700 gap-2">
+                  <Link href="/profile/edit">
+                    <Button className="bg-blue-600 hover:bg-blue-700 gap-2">
                     <Edit className="w-4 h-4" />
                     프로필 수정
                   </Button>
-                  <Button variant="outline" className="gap-2 bg-transparent">
-                    <Lock className="w-4 h-4" />
-                    비밀번호 변경
-                  </Button>
-                  <Button variant="outline" className="gap-2 bg-transparent">
+                  </Link>
+                  <Link href="/profile/password">
+                    <Button variant="outline" className="gap-2 bg-transparent">
+                      <Lock className="w-4 h-4" />
+                      비밀번호 변경
+                    </Button>
+                  </Link>
+                  <Button variant="outline" className="gap-2 bg-transparent" onClick={() => logoutMutation.mutate()} disabled={logoutMutation.isPending}>
                     <LogOut className="w-4 h-4" />
                     로그아웃
                   </Button>
@@ -235,7 +206,7 @@ useEffect(() => {
                 </TabsTrigger>
                 <TabsTrigger value="chats" className="gap-2">
                   <MessageSquare className="w-4 h-4 hidden sm:inline" />
-                  채팅 ({chatRooms.length})
+                  채팅 ({chatRooms?.length || 0})
                 </TabsTrigger>
                 <TabsTrigger value="posts" className="gap-2">
                   <FileText className="w-4 h-4 hidden sm:inline" />
@@ -250,7 +221,7 @@ useEffect(() => {
               {/* 내 정보 탭 */}
               <MyInfoTab currentUser={currentUser} />
 
-              <MyChatTab chatRooms={chatRooms} />
+              <MyChatTab chatRooms={chatRooms || []} />
               <MyPostTab
                 myPosts={myPosts}
                 getStatusColor={getStatusColor}

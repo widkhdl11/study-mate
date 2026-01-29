@@ -89,19 +89,20 @@ export function useSignup() {
  */
 export function useLogout() {
   const queryClient = useQueryClient();
-
+  const router = useRouter();
   return useMutation({
     mutationFn: async () => {
       return await logout();
     },
     onSuccess: (response) => {
-      console.log("response: ", response);
       queryClient.invalidateQueries({ queryKey: queryKeys.user });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
 
       // redirect가 발생하면 여기 도달하지 않음
       if (response && "success" in response) {
         if (response.success) {
           toast.success("로그아웃되었습니다");
+          router.push("/");
         } else {
           toast.error(response.error.message);
         }

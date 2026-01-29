@@ -174,7 +174,6 @@ export async function getStudyDetail(id: string) {
     data.participants.sort((a: any, b: any) => a.id - b.id);
   }
 
-  console.log("getStudyDetail data : ", data);
   if (error) {
     return { success: false, error: { message: error.message } };
   }

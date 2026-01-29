@@ -16,12 +16,17 @@ import { Button } from "@/components/ui/button"
 import { useLogout } from "@/hooks/useAuth"
 import { useUser } from "@/hooks/useUser"
 import { getImageUrl, getProfileImageUrl } from "@/utils/supabase/storage"
+import { useGetNotifications, useReadNotification } from "@/hooks/useNotification"
+import { formatTimeAgo } from "@/utils/formatTimeAgo"
+import { NotificationResponse } from "@/types/response/notification"
 
 export function Header() {
   const router = useRouter();
   const { data: userData, isLoading } = useUser();
   const logoutMutation = useLogout();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { data: notifications } = useGetNotifications();
+  const readNotificationMutation = useReadNotification();
   useEffect(() => {
     if (userData) {
       setIsLoggedIn(true);
@@ -81,15 +86,85 @@ export function Header() {
 
             {isLoggedIn && user ? (
               <>
-                {/* Notifications */}
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="relative p-2 text-foreground hover:bg-muted rounded-lg transition-colors">
+                      🔔
+                      {notifications && notifications?.filter((n: NotificationResponse) => !n.is_read).length > 0 && (
+                        <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-destructive text-destructive-foreground text-xs text-white">
+                          <span className="text-xs text-white">
+                            {notifications?.filter((n: NotificationResponse) => !n.is_read).length}
+                          </span>
+                        </Badge>
+                      )}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-80">
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+                      <span className="font-semibold text-sm text-foreground">알림</span>
+                      {notifications && notifications?.filter(n => !n.is_read).length > 0 && (
+                        <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                          모두 읽음
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications && notifications.length > 0 ? (
+                        notifications.map((notification) => (
+                          <DropdownMenuItem
+                            key={notification.id}
+                            className="cursor-pointer px-3 py-3 focus:bg-muted"
+                            asChild
+                          >
+                            <Link href={notification.reference_type === "study" ? `/studies/${notification.reference_id}` : "#"} className="flex flex-col gap-1"
+                            onClick={() => {
+                              readNotificationMutation.mutate(notification.id);
+                            }}>
+                              <div className="flex items-start gap-2">
+                                <span className="text-base">
+                                  {notification.type === "study_invite" && "📩"}
+                                  {notification.type === "comment" && "💬"}
+                                  {notification.type === "study_update" && "📅"}
+                                  {notification.type === "mention" && "🏷️"}
+                                  {notification.type === "system" && "🔔"}
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className={`text-sm font-medium ${!notification.is_read ? "text-foreground" : "text-muted-foreground"}`}>
+                                      {notification.title}
+                                    </span>
+                                    {!notification.is_read && (
+                                      <span className="w-2 h-2 rounded-full bg-destructive flex-shrink-0" />
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground line-clamp-2">
+                                    {notification.content}
+                                  </p>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatTimeAgo(notification.created_at)}
+                                  </span>
+                                </div>
+                              </div>
+                            </Link>
+                          </DropdownMenuItem>
+                        ))
+                      ) : (
+                        <div className="px-3 py-8 text-center text-muted-foreground text-sm">
+                          알림이 없습니다
+                        </div>
+                      )}
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {/* Notifications
                 <button className="relative p-2 text-foreground hover:bg-muted rounded-lg transition-colors">
                   🔔
-                  {user.notifications > 0 && (
+                  {notifications && notifications?.length > 0 && (
                     <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-danger text-white text-xs">
-                      {user.notifications}
+                      {notifications?.length}
                     </Badge>
                   )}
-                </button>
+                </button> */}
 
                 {/* User Menu */}
                 <DropdownMenu>

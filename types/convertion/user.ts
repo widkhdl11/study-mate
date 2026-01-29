@@ -1,7 +1,6 @@
 "use client";
 
 export const convertUser = (user: any) => {
-  console.log("user : ", user);
   return {
     id: user.id,
     username: user.username,
