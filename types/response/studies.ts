@@ -32,9 +32,31 @@ export type StudiesResponse = {
     views_count: number;
   }[];
   creator: {
-    id: number;
+    id: string;
     username: string;
     email: string;
     avatar_url: string;
   };
 };
+
+
+export type StudyWithAllCategoriesAndRegions = {
+  id: number;
+  title: string;
+  description: string;
+  study_category: string;
+  max_participants: number;
+  current_participants: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  mainCategory: string;
+  subCategory: string;
+  detailCategory: string;
+  studyCategory: number;
+  mainRegion: string;
+  detailRegion: string;
+  region: number;
+  maxParticipants: number;
+};
+

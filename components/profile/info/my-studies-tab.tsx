@@ -10,7 +10,7 @@ import { Calendar } from "lucide-react";
 import Link from "next/link";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
-import { studyStatusConversion } from "@/types/conversion/study";
+import { studyStatusConversion } from "@/utils/conversion/study";
 export default function MyStudiesTab({
   myStudies,
   getStatusColor,

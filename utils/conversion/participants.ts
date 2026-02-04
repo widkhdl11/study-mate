@@ -1,7 +1,7 @@
 'use client';
 
 
-export const roleConversion = (role: string) => {
+export const participantRoleConversion = (role: string) => {
   switch (role) {
     case "host":
       return "호스트";
@@ -10,7 +10,7 @@ export const roleConversion = (role: string) => {
   }
 };
 
-export const statusConversion = (status: string) => {
+export const participantStatusConversion = (status: string) => {
   switch (status) {
     case "pending":
       return "대기중";

@@ -23,43 +23,32 @@ import { useLogin } from "@/hooks/useAuth";
 
 export default function LoginUI() {
   const formRef = useRef<HTMLFormElement>(null);
-  const loginMutation = useLogin();
-
+  // const loginMutation = useLogin();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    mode: "onTouched", 
     defaultValues: {
       email: "",
       password: "",
     },
   });
-
+  // 훅에 콜백 전달
+    const loginMutation = useLogin((field, message) => {
+      form.setError(field as keyof LoginFormValues, {
+        type: "server",
+        message,
+      });
+    });
+  
+  
   async function onSubmit(values: LoginFormValues) {
     if (!formRef.current) {
       return;
     }
 
-    form.clearErrors();
-
     const formData = new FormData(formRef.current);
-
-    loginMutation.mutate(formData, {
-      onSuccess: (response) => {
-        if (!response || response.success) {
-          return;
-        } else {
-          const fieldName = response.error.field;
-          if (fieldName) {
-            form.setError(fieldName as keyof LoginFormValues, {
-              type: "server",
-              message: response.error.message,
-            });
-          }
-        }
-      },
-    });
+    loginMutation.mutate(formData);
   }
-
-  const isLoading = loginMutation.isPending;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4">
@@ -100,10 +89,12 @@ export default function LoginUI() {
                     <FormLabel>이메일</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="example@email.com"
-                        type="email"
-                        disabled={isLoading}
                         {...field}
+                        placeholder="example@email.com"
+                        
+                        type="email"
+                        
+                        disabled={loginMutation.isPending}
                       />
                     </FormControl>
                     <FormMessage />
@@ -120,10 +111,10 @@ export default function LoginUI() {
                     <FormLabel>비밀번호</FormLabel>
                     <FormControl>
                       <Input
+                        {...field}
                         placeholder="비밀번호를 입력해주세요"
                         type="password"
-                        disabled={isLoading}
-                        {...field}
+                        disabled={loginMutation.isPending}
                       />
                     </FormControl>
                     <FormMessage />
@@ -135,9 +126,9 @@ export default function LoginUI() {
               <Button
                 type="submit"
                 className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white"
-                disabled={isLoading}
+                disabled={loginMutation.isPending}
               >
-                {isLoading ? "로그인 중..." : "로그인"}
+                {loginMutation.isPending ? "로그인 중..." : "로그인"}
               </Button>
             </form>
           </Form>

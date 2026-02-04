@@ -2,7 +2,7 @@
 
 import { getMyProfile, getUser } from "@/actions/profileAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
-import { convertUser } from "@/types/conversion/user";
+import { convertUser } from "@/utils/conversion/user";
 import { useQuery } from "@tanstack/react-query";
 
 export function useUser() {

@@ -23,7 +23,7 @@ import MyPostTab from "@/components/profile/info/my-post-tab";
 import MyStudiesTab from "@/components/profile/info/my-studies-tab";
 import MyInfoTab from "@/components/profile/info/my-info-tab";
 import { useGetMyProfile, useUser } from "@/hooks/useUser";
-import { convertUser } from "@/types/conversion/user";
+import { convertUser } from "@/utils/conversion/user";
 import { useGetAllPosts, useGetMyPosts, useGetPost } from "@/hooks/usePost";
 import { PostsResponse } from "@/types/response/post";
 import { StudiesResponse } from "@/types/response/studies";
@@ -34,15 +34,15 @@ import { getProfileImageUrl } from "@/lib/supabase/storage";
 import { ProfileResponse } from "@/types/response/profile";
 import { useLogout } from "@/hooks/useAuth";
 import { useGetChats } from "@/hooks/useChat";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function UserProfileUI({ user, posts, studies }: { user: ProfileResponse, posts: PostsResponse[], studies: StudiesResponse[] }) {
  
   const {data: chatRooms} = useGetChats();
-  
-
-  // const { data: user } = useGetMyProfile();
-  // const { data: posts } = useGetMyPosts();
-  // const { data: studies } = useGetMyStudies();
+  const searchParams = useSearchParams();
+  const [currentTab, setCurrentTab] = useState(
+    searchParams.get("tab") || "info"
+  );  
   const myPosts = posts || [];
   const myStudies = studies || [];
   const currentUser = convertUser(user || []);
@@ -80,6 +80,11 @@ export default function UserProfileUI({ user, posts, studies }: { user: ProfileR
     setProfileImage(previewUrl); 
     updateProfileImage.mutate(file);
   }
+  const handleTabChange = (value: string) => {
+     setCurrentTab(value);
+    // 2. URL만 변경 (리렌더링 없이)
+    window.history.replaceState(null, "", `/profile?tab=${value}`);
+  };
   // 🧹 메모리 해제
 useEffect(() => {
   return () => {
@@ -88,9 +93,7 @@ useEffect(() => {
     }
   };
 }, [profileImage]);
-  const getInitials = (username: string) => {
-    return username.split(" ").map((name) => name[0]).join("");
-  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
 
@@ -199,7 +202,9 @@ useEffect(() => {
         {/* 탭 컨텐츠 */}
         <section className="py-8 px-4 sm:px-6 lg:px-8">
           <div className="max-w-5xl mx-auto">
-            <Tabs defaultValue="info" className="space-y-6">
+            <Tabs value={currentTab}
+                onValueChange={handleTabChange}   
+                className="space-y-6">
               <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-auto lg:inline-flex">
                 <TabsTrigger value="info" className="gap-2">
                   <User className="w-4 h-4 hidden sm:inline" />내 정보

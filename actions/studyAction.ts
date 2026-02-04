@@ -1,14 +1,21 @@
 "use server";
 
-import { StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
+import { StudyCreateFormValues, studyCreateSchema, StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResponse } from "@/types/response/action";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { validateWithZod } from "@/utils/utils";
+import { StudiesResponse } from "@/types/response/studies";
+import { CustomUserAuth } from "@/utils/auth";
 
+
+
+
+// 로그인 유저가 스터디 생성
 export async function createStudy(
   formData: FormData
-): Promise<ActionResponse | never> {
+): Promise<ActionResponse> {
   const supabase = await createClient();
 
   const rawData = {
@@ -23,114 +30,100 @@ export async function createStudy(
     maxParticipants: Number(formData.get("maxParticipants")) as number,
     description: formData.get("description") as string,
   };
+  console.log(rawData);
 
-  console.log("rawData : ", rawData);
-  const parseResult = studySchema.safeParse(rawData);
-  if (!parseResult.success) {
-    const firstError = parseResult.error.issues[0];
-    const field = firstError.path[0] as string;
-    console.log("검증 실패 에러: ", firstError);
-    return {
-      success: false,
-      error: {
-        message: firstError.message,
-        field,
-      },
-    };
+  const parseResult = validateWithZod(studyCreateSchema, rawData);
+  if (parseResult.success === false) {
+    return parseResult;
   }
 
   const { title, studyCategory, region, maxParticipants, description } =
-    parseResult.data;
+    parseResult.data as StudyCreateFormValues;
 
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
-  }
+  const { user } = await CustomUserAuth(supabase);
   const { data, error } = await supabase.from("studies").insert({
     title,
     study_category: studyCategory,
     region,
     max_participants: maxParticipants,
     description,
-    creator_id: user.user.id,
+    creator_id: user.id,
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error("스터디 생성에 실패했습니다.");
   }
 
   revalidatePath("/posts", "layout");
   redirect("/posts");
 }
 
-export async function getMyStudies(): Promise<ActionResponse | never> {
+
+// 나의 참여 스터디 목록 조회
+export async function getMyStudies(): Promise<ActionResponse> {
   const supabase = await createClient();
 
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
-  }
+  const { user } = await CustomUserAuth(supabase);
   const { data, error } = await supabase
-    // .from("studies")
-    // .select("*")
-    // .eq("creator_id", user.user.id);
     .from("participants")
     .select("*, studies!participants_study_id_fkey(*)")
-    .eq("user_id", user.user.id)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
     
   if (error) {
-    return { success: false, error: { message: error.message } };
+    throw new Error("참여 스터디 목록 조회에 실패했습니다.");
   }
 
   return { success: true, data };
   
 }
 
-export async function getCreateMyStudies(): Promise<ActionResponse | never> {
+// 내가 생성한 스터디 목록 조회
+export async function getMyCreatedStudies(): Promise<ActionResponse> {
   const supabase = await createClient();
 
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
-  }
+  const { user } = await CustomUserAuth(supabase);
   const { data, error } = await supabase
     .from("studies")
     .select("*")
-    .eq("creator_id", user.user.id);
+    .eq("creator_id", user.id);
     if (error) {
-      return { success: false, error: { message: error.message } };
+      throw new Error("생성한 스터디 목록 조회에 실패했습니다.");
     }
     return { success: true, data };
 }
 
-export async function setStudyStatus(id: number, status: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("studies")
-    .update({ status })
-    .eq("id", id);
+// // 스터디 상태 변경
+// export async function setStudyStatus(id: number, status: string) {
+  
+//   const supabase = await createClient();
+//   const { data, error } = await supabase
+//     .from("studies")
+//     .update({ status })
+//     .eq("id", id);
 
-  if (error) {
-    return { success: false, error: { message: error.message } };
-  }
-  return { success: true, data };
-}
+//   if (error) {
+//     return { success: false, error: { message: error.message } };
+//   }
+//   return { success: true, data };
+// }
 
-export async function getStudyById(id: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("studies")
-    .select("*")
-    .eq("id", id)
-    .single();
-  if (error) {
-    return { success: false, error: { message: error.message } };
-  }
-  return { success: true, data };
-}
+// // 스터디 상세 조회
+// export async function getStudyById(id: string): Promise<ActionResponse> {
+//   const supabase = await createClient();
+//   const { data, error } = await supabase
+//     .from("studies")
+//     .select("*")
+//     .eq("id", id)
+//     .single();
+//   if (error) {
+//     return { success: false, error: { message: error.message } };
+//   }
+//   return { success: true, data };
+// }
 
-export async function getStudyDetail(id: string) {
+// 스터디 상세 조회
+export async function getStudyDetail(id: number): Promise<ActionResponse<StudiesResponse>> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("studies")
@@ -175,76 +168,40 @@ export async function getStudyDetail(id: string) {
   }
 
   if (error) {
-    return { success: false, error: { message: error.message } };
+    throw new Error("스터디 상세 조회에 실패했습니다.");
   }
   return { success: true, data };
 }
 
 export async function deleteStudy(id: string) {
   const supabase = await createClient();
+
+  const { user } = await CustomUserAuth(supabase);
   const { data, error } = await supabase
     .from("studies")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("creator_id", user.id);
+    
   const { data: participants, error: participantsError } = await supabase
     .from("participants")
     .delete()
-    .eq("study_id", id);
+    .eq("study_id", id)
+    .eq("user_id", user.id);
+
   if (error || participantsError) {
-    return { success: false, error: { message: error?.message || participantsError?.message } };
+    throw new Error("스터디 삭제에 실패했습니다.");
   }
-  return { success: true, data, participants };
+  revalidatePath("/studies", "layout");
+  revalidatePath("/profile", "layout");
+  redirect("/profile?tab=studies");
 }
 
-export async function editStudy(id: string, data: StudyFormValues) {
-  const supabase = await createClient();
 
-  const rawData = {
-    title: data.title,
-    mainCategory: data.mainCategory,
-    subCategory: data.subCategory,
-    studyCategory: data.studyCategory,
-    mainRegion: data.mainRegion,
-    region: data.region,
-    maxParticipants: data.maxParticipants,
-    description: data.description,
-  };
-
-  const parseResult = studySchema.safeParse(rawData);
-  if (!parseResult.success) {
-    const firstError = parseResult.error.issues[0];
-    const field = firstError.path[0] as string;
-    return { success: false, error: { message: firstError.message, field } };
-  }
-
-  const { title, studyCategory, region, maxParticipants, description } =
-    parseResult.data;
-
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
-  }
-
-  const { data: studyData, error } = await supabase
-    .from("studies")
-    .update({
-      title,
-      study_category: studyCategory,
-      region,
-      max_participants: maxParticipants,
-      description,
-    })
-    .eq("id", id)
-    .single();
-  if (error) {
-    return { success: false, error: { message: error.message } };
-  }
-  return { success: true, data };
-}
-
-export async function updateStudy(id: string, formData: FormData) {
+export async function updateStudy(formData: FormData): Promise<ActionResponse> {
   const supabase = await createClient();
   const rawData = {
+    id: formData.get("id") as string,
     title: formData.get("title") as string,
     mainCategory: formData.get("mainCategory") as string,
     subCategory: formData.get("subCategory") as string,
@@ -256,65 +213,50 @@ export async function updateStudy(id: string, formData: FormData) {
     maxParticipants: Number(formData.get("maxParticipants")) as number,
     description: formData.get("description") as string,
   };
-  console.log("updateStudy rawData : ", rawData);
 
-  const parseResult = studySchema.safeParse(rawData);
-  if (!parseResult.success) {
-    const firstError = parseResult.error.issues[0];
-    const field = firstError.path[0] as string;
-    return { success: false, error: { message: firstError.message, field } };
+  const parseResult = validateWithZod(studySchema, rawData);
+  if (!parseResult.success){
+    return parseResult
   }
+  const { id, title, studyCategory, region, maxParticipants, description } =
+    parseResult.data as StudyFormValues;
 
-  const { title, studyCategory, region, maxParticipants, description } =
-    parseResult.data;
-  console.log("updateStudy parseResult : ", parseResult);
-
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
-  }
-  const { data: study, error: studyError } = await supabase
-    .from("studies")
-    .select("*")
-    .eq("id", id)
-    .eq("creator_id", user.user.id)
-    .single();
-  if (studyError) {
-    return { success: false, error: { message: studyError.message } };
-  }
-  if (study.creator_id !== user.user.id) {
-    return { success: false, error: { message: "권한이 없습니다." } };
-  }
+  const { user } = await CustomUserAuth(supabase);
   const { data, error } = await supabase
-    .from("studies")
-    .update({
-      title,
-      study_category: studyCategory,
-      region,
-      max_participants: maxParticipants,
-      description,
-    })
-    .eq("id", id)
-    .single();
-  if (error) {
-    return { success: false, error: { message: error.message } };
-  }
-  return { success: true, data };
+  .from("studies")
+  .update({
+    title,
+    study_category: studyCategory,
+    region,
+    max_participants: maxParticipants,
+    description,
+  })
+  .eq("id", id)
+  .eq("creator_id", user.id)
+  .select();
+
+if (error) {
+  throw new Error("스터디 수정에 실패했습니다");
+}
+
+if (!data || data.length === 0) {
+  throw new Error("스터디를 찾을 수 없거나 권한이 없습니다");
+}
+  
+  revalidatePath("/profile", "layout");
+  redirect("/studies/" + id);
 }
 
 // ================ssr===============
 
 export async function getMyStudyByIdSSR(id: string) {
   const supabase = await createClient();
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
-  }
+  const { user } = await CustomUserAuth(supabase);
   const { data: study } = await supabase
     .from("studies")
     .select("*")
     .eq("id", id)
-    .eq("creator_id", user.user.id)
+    .eq("creator_id", user.id)
     .single();
  // 3. 없거나 권한 없으면
  if (!study) {
@@ -324,21 +266,66 @@ return study;
 
 }
 
-
-export async function getMyStudiesSSR() {
+export async function getMyStudiesSSR(): Promise<StudiesResponse[]> {
   const supabase = await createClient();
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  if (userError) {
-    throw new Error("사용자 정보를 찾을 수 없습니다.");
-  }
-  const id = user.user.id;
+  const { user } = await CustomUserAuth(supabase);
   const { data, error } = await supabase
-    .from("participants")
+    .from("participants") 
     .select("*, studies!participants_study_id_fkey(*)")
-    .eq("user_id", user.user.id)
+    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
   if (error) {
     notFound();
   }
-  return data;
+  return data as unknown as StudiesResponse[];
+}
+
+export async function getStudyDetailSSR(id: number): Promise<StudiesResponse> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("studies")
+    .select(
+      `
+      *,
+      creator:profiles!studies_creator_id_fkey (
+        id,
+        username,
+        email,
+        avatar_url
+      ),
+      participants!participants_study_id_fkey (
+        id,
+        user_id,
+        username,
+        user_email,
+        study_id,
+        role,
+        status,
+        avatar_url
+      ),
+      posts!posts_study_id_fkey (
+        id,
+        title,
+        study_id,
+        content,
+        image_url,
+        likes_count,
+        views_count,
+        created_at,
+        updated_at
+      )
+      `
+    )
+    .eq("id", id)
+    .single();
+
+  // participants를 id 오름차순으로 정렬
+  if (data && data.participants && Array.isArray(data.participants)) {
+    data.participants.sort((a: any, b: any) => a.id - b.id);
+  }
+
+  if (error) {
+    notFound();
+  }
+  return data as unknown as StudiesResponse;
 }

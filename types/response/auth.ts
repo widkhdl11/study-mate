@@ -6,7 +6,7 @@ export type LoginFormData = {
 
 // 회원가입 폼 데이터
 export type SignupFormData = {
-  user_id: string;
+  username: string;
   email: string;
   password: string;
   passwordConfirm: string;

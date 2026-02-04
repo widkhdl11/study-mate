@@ -1,10 +1,14 @@
+import { getStudyDetailSSR } from "@/actions/studyAction";
 import UserStudyDetailUI from "./ui";
+import { getMyProfileSSR } from "@/actions/profileAction";
 
 export default async function StudyDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <UserStudyDetailUI id={id} />;
+  const study = await getStudyDetailSSR(Number(id));
+  const user = await getMyProfileSSR();
+  return <UserStudyDetailUI study={study} user={user} />;
 }

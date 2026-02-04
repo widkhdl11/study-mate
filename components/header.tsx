@@ -192,8 +192,8 @@ export function Header() {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="cursor-pointer text-destructive focus:text-destructive"
-                      onClick={() => logoutMutation.mutate()}
+                      onClick={() => !logoutMutation.isPending && logoutMutation.mutate()}
+                      disabled={logoutMutation.isPending}
                     >
                       로그아웃
                     </DropdownMenuItem>

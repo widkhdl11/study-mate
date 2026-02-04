@@ -1,11 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { studySchema } from "@/lib/zod/schemas/studySchema";
+import { StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
 import {
   getCategoryCodeByValue,
   getCategoryPath,
@@ -41,158 +38,46 @@ import {
   getSubRegion,
 } from "@/lib/constants/region";
 import { useUpdateStudy } from "@/hooks/useStudy";
+import { zodResolverFirstError } from "@/utils/utils";
+import { StudyWithAllCategoriesAndRegions } from "@/types/response/studies";
 
-type StudyFormValues = z.infer<typeof studySchema>;
 
-interface StudyEditUIProps {
-  studyId: string;
-  initialData: {
-    title: string;
-    mainCategory: string;
-    subCategory: string;
-    detailCategory: string;
-    studyCategory: number;
-    mainRegion: string;
-    detailRegion: string;
-    region: number;
-    maxParticipants: number;
-    description: string;
-  };
-}
-
-export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+export function StudyEditUI({ studyId, initialData }: { studyId: string, initialData: StudyWithAllCategoriesAndRegions }) {
   const formRef = useRef<HTMLFormElement>(null);
-  const updateStudyMutation = useUpdateStudy({ id: studyId });
-  // 카테고리 상태
-  const [mainCategoryValue, setMainCategoryValue] = useState(
-    initialData.mainCategory
-  );
-  const [subCategoryValue, setSubCategoryValue] = useState(
-    initialData.subCategory
-  );
-  const [detailCategoryValue, setDetailCategoryValue] = useState(
-    initialData.detailCategory
-  );
-  const [studyCategoryValue, setStudyCategoryValue] = useState(0);
-
-  // 지역 상태
-  const [mainRegionValue, setMainRegionValue] = useState(
-    initialData.mainRegion
-  );
-  const [detailRegionValue, setDetailRegionValue] = useState(
-    initialData.detailRegion
-  );
-  const [regionValue, setRegionValue] = useState(0);
-
-  const form = useForm<StudyFormValues>({
-    resolver: zodResolver(studySchema),
+  const form = useForm<StudyWithAllCategoriesAndRegions>({
+    resolver: zodResolverFirstError(studySchema),
     defaultValues: initialData,  // ✅ 바로 사용 가능!
   });
+  const {mutate: updateStudyMutation, isPending} = useUpdateStudy((field ,message)=>{
+    form.setError(field as keyof StudyFormValues, {
+      type: "server",
+      message,
+    });
+  });
+  // 카테고리 상태
+  const [mainCategoryValue, setMainCategoryValue] = useState(initialData.mainCategory);
+  const [subCategoryValue, setSubCategoryValue] = useState(initialData.subCategory);
+  const [detailCategoryValue, setDetailCategoryValue] = useState(initialData.detailCategory);
+  const [studyCategoryValue, setStudyCategoryValue] = useState(initialData.studyCategory);
 
-  useEffect(() => {
-    if (initialData && initialData.studyCategory) {
+  // 지역 상태
+  const [mainRegionValue, setMainRegionValue] = useState(initialData.mainRegion);
+  const [detailRegionValue, setDetailRegionValue] = useState(initialData.detailRegion);
+  const [regionValue, setRegionValue] = useState(initialData.region);
 
-      const categoryPath = getCategoryPath(Number(initialData.studyCategory));
-      if (categoryPath.values.length >= 3) {
-        const [main, sub, detail] = categoryPath.values;
-
-        // ✅ useState 업데이트
-        setMainCategoryValue(main);
-        setSubCategoryValue(sub);
-        setDetailCategoryValue(detail);
-        setStudyCategoryValue(initialData.studyCategory);
-
-        // ✅ form.setValue로 React Hook Form 업데이트
-        form.setValue("mainCategory", main);
-        form.setValue("subCategory", sub);
-        form.setValue("detailCategory", detail);
-        form.setValue("studyCategory", initialData.studyCategory);
-
-     
-      }
-    }
-  }, [initialData, form]);
-
-  // ✅ 초기값 로드 (지역)
-  useEffect(() => {
-    if (initialData && initialData.region !== undefined) {
-      console.log("초기 region:", initialData.region);
-
-      if (initialData.region === 0) {
-        // 온라인
-        setMainRegionValue("ONLINE");
-        setRegionValue(0);
-        form.setValue("mainRegion", "ONLINE");
-        form.setValue("region", 0);
-        console.log("✅ 온라인으로 설정");
-      } else {
-        const regionPath = getRegionPath(Number(initialData.region));
-        console.log("regionPath:", regionPath);
-
-        if (regionPath.values.length >= 2) {
-          const [main, detail] = regionPath.values;
-
-          // ✅ useState 업데이트
-          setMainRegionValue(main);
-          setDetailRegionValue(detail);
-          setRegionValue(initialData.region);
-
-          // ✅ form.setValue로 React Hook Form 업데이트
-          form.setValue("mainRegion", main);
-          form.setValue("detailRegion", detail);
-          form.setValue("region", initialData.region);
-
-          console.log("✅ 지역 초기값 설정 완료:", {
-            main,
-            detail,
-          });
-        } else if (regionPath.values.length === 1) {
-          // 시/도만 있는 경우 (세종 등)
-          const [main] = regionPath.values;
-          setMainRegionValue(main);
-          setDetailRegionValue("");
-          setRegionValue(initialData.region);
-          form.setValue("mainRegion", main);
-          form.setValue("detailRegion", "");
-          form.setValue("region", initialData.region);
-        }
-      }
-    }
-  }, [initialData, form]);
 
   // 동적 옵션
   const mainCategories = getMainCategories();
-  const subcategories = mainCategoryValue
-    ? getSubcategories(mainCategoryValue)
-    : [];
-  const detailCategories =
-    mainCategoryValue && subCategoryValue
-      ? getDetailCategories(mainCategoryValue, subCategoryValue)
-      : [];
+  const subcategories = getSubcategories(mainCategoryValue)
+  const detailCategories = getDetailCategories(mainCategoryValue, subCategoryValue)
 
   const mainRegions = getMainRegion();
-  const detailRegions = mainRegionValue ? getSubRegion(mainRegionValue) : [];
+  const detailRegions = getSubRegion(mainRegionValue)
 
-  async function onSubmit(values: StudyFormValues) {
-    console.log("✅ 수정 제출:", values);
-    if (!formRef.current) {
-      console.log("formRef.current is null");
-      return;
-    }
-    form.clearErrors();
-    setIsLoading(true);
-    try {
-      const formData = new FormData(formRef.current);
-    
-      updateStudyMutation.mutate(formData);
-      // router.push(`/profile/studies/${studyId}`);
-    } catch (error) {
-      console.error("스터디 수정 오류:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  async function onSubmit() {
+    if (!formRef.current) return;
+    const formData = new FormData(formRef.current);
+    updateStudyMutation(formData);
   }
 
   return (
@@ -231,7 +116,7 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                     <FormControl>
                       <Input
                         placeholder="스터디 제목을 입력해주세요"
-                        disabled={isLoading}
+                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>
@@ -257,7 +142,7 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                         setStudyCategoryValue(0);
                         form.setValue("studyCategory", 0);
                       }}
-                      disabled={isLoading}
+                      disabled={isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -297,7 +182,7 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                         setStudyCategoryValue(0);
                         form.setValue("studyCategory", 0);
                       }}
-                      disabled={isLoading}
+                      disabled={isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -333,18 +218,15 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                       onValueChange={(value) => {
                         field.onChange(value);
                         setDetailCategoryValue(value);
-
-                        // ✅ 소분류 선택 시 즉시 계산
                         const code = getCategoryCodeByValue(value);
                         if (code) {
-                          console.log("✅ studyCategory 계산:", code);
                           setStudyCategoryValue(code);
                           form.setValue("studyCategory", code, {
                             shouldValidate: true,
                           });
                         }
                       }}
-                      disabled={isLoading}
+                      disabled={isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -382,7 +264,6 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                         setDetailRegionValue("");
 
                         if (value === "ONLINE") {
-                          console.log("✅ region 계산: 0 (온라인)");
                           setRegionValue(0);
                           form.setValue("region", 0, {
                             shouldValidate: true,
@@ -392,7 +273,7 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                           form.setValue("region", 0);
                         }
                       }}
-                      disabled={isLoading}
+                      disabled={isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -426,18 +307,16 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                           onValueChange={(value) => {
                             field.onChange(value);
                             setDetailRegionValue(value);
-
                             // ✅ 상세 지역 선택 시 즉시 계산
                             const code = getRegionCodeByValue(value);
                             if (code !== null && code !== undefined) {
-                              console.log("✅ region 계산:", code);
                               setRegionValue(code);
                               form.setValue("region", code, {
                                 shouldValidate: true,
                               });
                             }
                           }}
-                          disabled={isLoading}
+                          disabled={isPending}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -470,7 +349,7 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                         min="1"
                         max="20"
                         placeholder="1-20명"
-                        disabled={isLoading}
+                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>
@@ -489,7 +368,7 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                     <FormControl>
                       <Textarea
                         placeholder="스터디에 대해 설명해주세요 (최소 10자)"
-                        disabled={isLoading}
+                        disabled={isPending}
                         rows={5}
                         {...field}
                       />
@@ -504,23 +383,23 @@ export function StudyEditUI({ studyId, initialData }: StudyEditUIProps) {
                 <Button
                   type="submit"
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={isLoading}
+                  disabled={isPending}
                 >
-                  {isLoading ? "저장 중..." : "수정 완료"}
+                  {isPending ? "저장 중..." : "수정 완료"}
                 </Button>
-                <Link href={`/profile/studies/${studyId}`} className="flex-1">
+                <Link href={`/studies/${studyId}`} className="flex-1">
                   <Button
                     type="button"
                     variant="outline"
                     className="w-full bg-transparent"
-                    disabled={isLoading}
+                    disabled={isPending}
                   >
                     취소
                   </Button>
                 </Link>
               </div>
- {/* ✅ Hidden inputs - 실시간으로 계산된 값 바인딩 */}
- <input
+              <input type="hidden" name="id" value={studyId} />
+              <input
                 type="hidden"
                 name="mainCategory"
                 value={mainCategoryValue}

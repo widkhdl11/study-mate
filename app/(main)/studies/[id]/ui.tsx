@@ -24,65 +24,29 @@ import {
   UserCheck,
   UserX,
 } from "lucide-react";
-import { useDeleteStudy, useGetStudyDetail } from "@/hooks/useStudy";
+import { useDeleteStudy } from "@/hooks/useStudy";
 import {
   useAcceptParticipant,
   useRejectParticipant,
   useRemoveParticipant,
 } from "@/hooks/useParticipant";
 import { StudiesResponse } from "@/types/response/studies";
-import { statusConversion } from "@/types/conversion/participants";
-import { getCategoryLabelByCode, getCategoryPath } from "@/lib/constants/study-category";
+import { participantStatusConversion } from "@/utils/conversion/participants";
+import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
-import { studyStatusConversion } from "@/types/conversion/study";
+import { getStudyStatusColor, studyStatusConversion } from "@/utils/conversion/study";
 import { formatDate } from "date-fns";
 import { getProfileImageUrl } from "@/lib/supabase/storage";
-import { useEffect, useState } from "react";
-import { UserSession } from "@/types/userSession";
-import { useUser } from "@/hooks/useUser";
+import { ProfileResponse } from "@/types/response/profile";
 
-export default function UserStudyDetailUI({ id }: { id: string }) {
-  const { data: studyData } = useGetStudyDetail({ id });
-  const acceptParticipant = useAcceptParticipant(Number(id));
-  const rejectParticipant = useRejectParticipant(Number(id));
-  const removeParticipant = useRemoveParticipant(Number(id));
-  const deleteStudy = useDeleteStudy({ id });
-  const { data:userData } = useUser();
-  const user = userData;
-  const study = studyData?.data as StudiesResponse | undefined;
-  if (!study) {
-    return <div>스터디를 찾을 수 없습니다.</div>;
-  }
-
+export default function UserStudyDetailUI({ study, user }: { study: StudiesResponse, user: ProfileResponse }) {
+  const acceptParticipant = useAcceptParticipant(Number(study.id));
+  const rejectParticipant = useRejectParticipant(Number(study.id));
+  const removeParticipant = useRemoveParticipant(Number(study.id));
+  const deleteStudy = useDeleteStudy({ id: study.id.toString() });
 
   const categoryPath = getCategoryPath(Number(study.study_category));
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "모집중":
-        return "bg-green-500 text-white";
-      case "마감":
-        return "bg-red-500 text-white";
-      case "참여중":
-        return "bg-blue-500 text-white";
-      case "수락 대기중":
-        return "bg-yellow-500 text-white";
-      default:
-        return "bg-slate-500 text-white";
-    }
-  };
-
-  // const getCategoryColor = (category: string) => {
-  //   const colors: { [key: string]: string } = {
-  //     프론트엔드: "bg-blue-100 text-blue-700 border-blue-200",
-  //     백엔드: "bg-purple-100 text-purple-700 border-purple-200",
-  //     AI: "bg-amber-100 text-amber-700 border-amber-200",
-  //     모바일: "bg-green-100 text-green-700 border-green-200",
-  //     디자인: "bg-pink-100 text-pink-700 border-pink-200",
-  //   };
-  //   return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
-  // };
-
+  
   return (
     <div className="min-h-screen flex flex-col bg-background">
 
@@ -94,7 +58,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
               <div className="space-y-4">
                 {/* 뒤로가기 */}
                 <Link
-                  href="/user/info"
+                  href="/profile?tab=studies"
                   className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   ← 내 정보로 돌아가기
@@ -105,7 +69,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                   <h1 className="text-3xl font-bold text-foreground">
                     {study?.title}
                   </h1>
-                  <Badge className={getStatusColor(study.status)}>
+                  <Badge className={getStudyStatusColor(study.status)}>
                     {studyStatusConversion(study.status)}
                   </Badge>
                 </div>
@@ -151,9 +115,24 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                     모집글 작성
                   </Button>
                 </Link>
-                <Button variant="outline" className="gap-2 bg-transparent">
-                  <Settings className="w-4 h-4" />
-                  <Link href={`/studies/${study.id}/edit`}>스터디 수정</Link>
+                <Link href={`/studies/${study.id}/edit`}>
+                  <Button variant="outline" className="gap-2 bg-transparent">
+                    <Settings className="w-4 h-4" />
+                    스터디 수정
+                  </Button>
+                  </Link>
+                <Button
+                  variant="outline"
+                  className="w-full sm:w-auto gap-2 bg-transparent text-red-600 hover:text-red-700 border-red-300 hover:border-red-400"
+                  onClick={() => {
+                    if (confirm("정말 이 스터디를 삭제하시겠습니까? 모든 모집글과 채팅 기록이 함께 삭제됩니다.")) {
+                      deleteStudy.mutate();
+                    }
+                  }}
+                  disabled={deleteStudy.isPending}
+                >
+                  <Trash2 className="w-4 h-4" />
+                  스터디 삭제
                 </Button>
               </div>
             </div>
@@ -320,8 +299,8 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                         </div>
 
                         <div className="flex items-center gap-3">
-                          <Badge className={getStatusColor(member.status)}>
-                            {statusConversion(member.status)}
+                          <Badge className={getStudyStatusColor(member.status)}>
+                            {participantStatusConversion(member.status)}
                           </Badge>
                           
                           {/* 본인이 호스트 */}
@@ -369,7 +348,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                               )}
                               {/* 신청자가 신청 완료(수락)상태라면 강퇴 버튼, 단 호스트 자신 제외 */}
                               {member.status === "accepted" &&
-                                member.user_id !== study.creator.id.toString() && (
+                                member.user_id !== study.creator.id && (
                                   <Button
                                     size="sm"
                                     variant="outline"
@@ -418,7 +397,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                               )}
                               {/* 신청자가 신청 완료(수락)상태라면: 탈퇴 버튼 */}
                               {member.status === "accepted" && (
-                                user && user.id === study.creator.id.toString() ? (
+                                user && user.id === study.creator.id ? (
                                   // 생성자 본인: "스터디 삭제" 버튼
                                   <Button
                                     size="sm"
@@ -496,7 +475,7 @@ export default function UserStudyDetailUI({ id }: { id: string }) {
                             className="w-full h-full object-cover"
                           />
                           <div className="absolute top-3 right-3">
-                            <Badge className={getStatusColor(study.status)}>
+                            <Badge className={getStudyStatusColor(study.status)}>
                               {studyStatusConversion(study.status)}
                             </Badge>
                           </div>

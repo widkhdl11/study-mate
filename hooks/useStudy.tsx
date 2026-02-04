@@ -4,11 +4,9 @@
 import {
   createStudy,
   deleteStudy,
-  getCreateMyStudies,
+  getMyCreatedStudies,
   getMyStudies,
-  getStudyById,
   getStudyDetail,
-  setStudyStatus,
   updateStudy,
 } from "@/actions/studyAction";
 import { queryClient } from "@/config/ReactQueryClientProvider";
@@ -18,37 +16,29 @@ import { createClient } from "@/lib/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { StudiesResponse } from "@/types/response/studies";
+import { isRedirect } from "@/utils/utils";
 
-export function useCreateStudy() {
+export function useCreateStudy(onFieldError?: (field: string, message: string) => void) {
   return useMutation({
-    mutationFn: async (formData: FormData) => {
-      const create_study_response = await createStudy(formData);
-      // const add_participant_response = await studyAddParticipant(formData.get("id") as string);
-      // console.log("add_participant_response 실행");
-      // if (!add_participant_response || !add_participant_response.success) {
-      //   console.log("add_participant_response 실패");
-      //   return { success: false, error: { message: add_participant_response.error?.message } };
-      // }
-      // console.log("add_participant_response 성공");
-      return create_study_response;
-    },
+    mutationFn: createStudy,
     onSuccess: (response) => {
-      console.log("response : ", response);
-      if (!response || response.success) {
-        return;
+      if (!response.success) {
+        toast.error(response.error.message);
+         if (response.error.field && onFieldError) {
+          onFieldError(response.error.field, response.error.message);
+        }
       }
     },
     onError: (error: any) => {
-      const isRedirect =
-        (typeof error?.message === "string" &&
-          error.message === "NEXT_REDIRECT") ||
-        (typeof error?.digest === "string" &&
-          error.digest.startsWith("NEXT_REDIRECT"));
-
-      if (isRedirect) {
+      if (isRedirect(error)) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myStudies });
+        queryClient.invalidateQueries({ queryKey: queryKeys.myCreatedStudies });
+        toast.success("스터디를 생성했습니다.");
         return;
+      } else {
+        toast.error(error.message);
       }
-      toast.error(error.message);
     },
   });
 }
@@ -58,98 +48,113 @@ export function useGetMyStudies() {
     queryKey: queryKeys.myStudies,
     queryFn: async () => {
       const response = await getMyStudies();
-      return response;
-    },
-  });
-}
-
-export function useGetCreateMyStudies() {
-  return useQuery({
-    queryKey: queryKeys.createMyStudies,
-    queryFn: async () => {
-      const response = await getCreateMyStudies();
-      return response;
-    },
-  });
-}
-export function useSetStudyStatus({
-  id,
-  status,
-}: {
-  id: number;
-  status: string;
-}) {
-  return useMutation({
-    mutationFn: async () => {
-      return await setStudyStatus(id, status);
-    },
-    onSuccess: (response) => {
-      if (!response || !response.success) {
-        return;
+      if (!response.success) {
+        throw new Error(response.error.message);
       }
+      return response.data;
     },
-    onError: (error: any) => {
-      toast.error(error.message);
-    },
+    throwOnError: true,
   });
 }
 
-export function useGetStudy({ id }: { id: string }) {
+export function useGetMyCreatedStudies() {
   return useQuery({
-    queryKey: queryKeys.study(Number(id)),
+    queryKey: queryKeys.myCreatedStudies,
     queryFn: async () => {
-      return await getStudyById(id);
+      const response = await getMyCreatedStudies();
+      if (!response.success) {
+        throw new Error(response.error.message);
+      }
+      return response.data;
     },
+    throwOnError: true,
   });
 }
+// export function useSetStudyStatus({
+//   id,
+//   status,
+// }: {
+//   id: number;
+//   status: string;
+// }) {
+//   return useMutation({
+//     mutationFn: async () => {
+//       return await setStudyStatus(id, status);
+//     },
+//     onSuccess: (response) => {
+//       if (!response || !response.success) {
+//         return;
+//       }
+//     },
+//     onError: (error: any) => {
+//       toast.error(error.message);
+//     },
+//   });
+// }
 
-export function useGetStudyDetail({ id }: { id: string }) {
+// export function useGetStudy({ id }: { id: string }) {
+//   return useQuery({
+//     queryKey: queryKeys.study(Number(id)),
+//     queryFn: async () => {
+//       return await getStudyById(id);
+//     },
+//   });
+// }
+
+export function useGetStudyDetail(id: number) {
   return useQuery({
-    queryKey: queryKeys.studyDetail(Number(id)),
+    queryKey: queryKeys.studyDetail(id),
     queryFn: async () => {
-      return await getStudyDetail(id);
+      const response = await getStudyDetail(id);
+      if (!response.success) {
+        throw new Error(response.error.message);
+      }
+      return response.data as StudiesResponse;
     },
+    throwOnError: true,
   });
 }
-
 // 스터디 삭제
 export function useDeleteStudy({ id }: { id: string }) {
   return useMutation({
     mutationFn: async () => {
       return await deleteStudy(id);
     },
-    onSuccess: (response) => {
-      if (response?.success) {
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.studyDetail(Number(id)),
-        });
-        toast.success("스터디를 삭제했습니다");
-      } else {
-        toast.error(response?.error?.message || "스터디 삭제에 실패했습니다");
-        return;
-      }
-    },
     onError: (error: any) => {
-      toast.error(error.message);
+      if (isRedirect(error)) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myCreatedStudies });
+        toast.success("스터디를 삭제했습니다.");
+        return;
+      } else {
+        toast.error(error.message);
+      }
     },
   });
 }
 
 
-export function useUpdateStudy({ id }: { id: string }) {
-  const router = useRouter();
+export function useUpdateStudy(onFieldError?: (field: string, message: string) => void) {
   return useMutation({
     mutationFn: async (formData: FormData) => {
-      return await updateStudy(id, formData);
+      return await updateStudy(formData);
     },
     onSuccess: (response) => {
-      if (!response || response.success) {
-        router.push(`/studies/${id}`);
+      if (!response.success) {
+        toast.error(response.error?.message || "스터디 수정에 실패했습니다.");
+        if (response.error?.field && onFieldError) {
+          onFieldError(response.error.field, response.error.message);
+        }
         return;
       }
     },
     onError: (error: any) => {
-      toast.error(error.message);
+      if (isRedirect(error)) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myCreatedStudies });
+        toast.success("스터디를 수정했습니다.");
+        return;
+      } else {
+        toast.error(error.message);
+      }
     },
   });
 }

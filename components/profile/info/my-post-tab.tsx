@@ -10,7 +10,7 @@ import { getImageUrl } from "@/lib/supabase/storage";
 import { PostsResponse } from "@/types/response/post";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
-import { studyStatusConversion } from "@/types/conversion/study";
+import { studyStatusConversion } from "@/utils/conversion/study";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -47,7 +47,6 @@ export default function MyPostTab({
     e.preventDefault();      // ✅ Link 기본 동작 막기
     e.stopPropagation();     // ✅ 이벤트 전파 막기
 
-    console.log("handleUpdate: ", postId);
     router.push(`/posts/${postId}/edit`);
   };
 

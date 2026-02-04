@@ -21,61 +21,37 @@ import { signupSchema } from "@/lib/zod/schemas/authSchema";
 import { SignupFormValues } from "@/lib/zod/schemas/authSchema";
 import { useSignup } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatDateToInput, parseInputToDate, zodResolverFirstError } from "@/utils/utils";
+import { format, parse } from "date-fns";
 
 export default function SignupUI() {
-  const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<SignupFormValues>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolverFirstError(signupSchema),
     defaultValues: {
       username: "",
       email: "",
       password: "",
       passwordConfirm: "",
+      birthDate: "",
+      gender: undefined,
     },
   });
-  const signupMutation = useSignup();
+  const signupMutation = useSignup((field, message) => {
+    form.setError(field as keyof SignupFormValues, {
+      type: "server",
+      message,
+    });
+  });
 
   async function onSubmit(values: SignupFormValues) {
     if (!formRef.current) {
       return;
     }
-    form.clearErrors();
 
-    setIsLoading(true);
-    if (formRef.current) {
-      const fd = new FormData(formRef.current);
-      signupMutation.mutate(fd, {
-        onSuccess: (response) => {
-          if (!response || response.success) {
-            return;
-          }
-          // else {
-          //   const fieldName = response.error.field;
-          //   if (fieldName) {
-          //     form.setError(fieldName as keyof SignupFormValues, {
-          //       type: "server",
-          //       message: response.error.message,
-          //     });
-          //   }
-          // }
-        },
-        onError: (error: Error) => {
-          const fieldName = JSON.parse(error.message).field;
-          if (fieldName) {
-            form.setError(fieldName as keyof SignupFormValues, {
-              type: "server",
-              message: JSON.parse(error.message).message,
-            });
-          }
-          toast.error(
-            JSON.parse(error.message).message ??
-              "회원가입 중 오류가 발생했습니다"
-          );
-        },
-      });
-    }
-    setIsLoading(false);
+    const formData = new FormData(formRef.current);
+    signupMutation.mutate(formData);
   }
 
   return (
@@ -118,7 +94,7 @@ export default function SignupUI() {
                     <FormControl>
                       <Input
                         placeholder="아이디를 입력해주세요"
-                        disabled={isLoading}
+                        disabled={signupMutation.isPending}
                         {...field}
                       />
                     </FormControl>
@@ -138,7 +114,7 @@ export default function SignupUI() {
                       <Input
                         placeholder="example@email.com"
                         type="email"
-                        disabled={isLoading}
+                        disabled={signupMutation.isPending}
                         {...field}
                       />
                     </FormControl>
@@ -158,7 +134,7 @@ export default function SignupUI() {
                       <Input
                         placeholder="비밀번호를 입력해주세요"
                         type="password"
-                        disabled={isLoading}
+                        disabled={signupMutation.isPending}
                         {...field}
                       />
                     </FormControl>
@@ -178,10 +154,58 @@ export default function SignupUI() {
                       <Input
                         placeholder="비밀번호를 다시 입력해주세요"
                         type="password"
-                        disabled={isLoading}
+                        disabled={signupMutation.isPending}
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                name="birthDate"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>생년월일</FormLabel>
+                    <input 
+                      type="hidden" 
+                      name="birthDate" 
+                      value={field.value ?? ""} 
+                    />
+                    <FormControl>
+                     
+                      <Input 
+                        type="date"
+                        disabled={signupMutation.isPending} 
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>성별</FormLabel>
+                    <Select onValueChange={field.onChange} 
+                      defaultValue={field.value || ""} 
+                      disabled={signupMutation.isPending}>
+                      <input type="hidden" name="gender" value={field.value ?? ""} />
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="성별을 선택해주세요" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="male">남성</SelectItem>
+                        <SelectItem value="female">여성</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -191,10 +215,12 @@ export default function SignupUI() {
               <Button
                 type="submit"
                 className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white"
-                disabled={isLoading}
+                disabled={signupMutation.isPending}
               >
-                {isLoading ? "회원가입 중..." : "회원가입"}
+                {signupMutation.isPending ? "회원가입 중..." : "회원가입"}
               </Button>
+
+              
             </form>
           </Form>
         </Card>

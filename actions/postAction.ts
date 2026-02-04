@@ -356,7 +356,7 @@ export async function updatePost(postId: number, formData: FormData) {
   return { success: true, data };
 }
 // =================ssr ======================
-export async function getMyPostsSSR() {
+export async function getMyPostsSSR(): Promise<PostsResponse[]> {
   const supabase = await createClient();
   const { data: user, error: userError } = await supabase.auth.getUser();
   if (userError) {
@@ -395,5 +395,5 @@ export async function getMyPostsSSR() {
   if (error) {
     notFound();
   }
-  return data;
+  return data as unknown as PostsResponse[];
 }

@@ -13,13 +13,9 @@ export default async function UserProfilePage() {
     getMyStudiesSSR(),
   ]);
 
-  const profile = profileData;
-  const posts = postsData as unknown as PostsResponse[] || [];
-  const studies = studiesData as unknown as StudiesResponse[] || [];
-
   return (
     <div>
-      <UserProfileUI user={profile} posts={posts} studies={studies} />
+      <UserProfileUI user={profileData} posts={postsData} studies={studiesData} />
     </div>
   );
 }

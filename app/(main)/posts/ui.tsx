@@ -29,7 +29,7 @@ import {
 } from "@/lib/constants/study-category";
 import { getMainRegion, getRegionCodeByValue, getRegionPath, getSubRegion } from "@/lib/constants/region";
 import { STUDY_STATUS } from "@/lib/constants/study-status";
-import { getStudyStatusExistValue, studyStatusConversion } from "@/types/conversion/study";
+import { getStudyStatusExistValue, studyStatusConversion } from "@/utils/conversion/study";
 
 export default function PostsUI() {
 

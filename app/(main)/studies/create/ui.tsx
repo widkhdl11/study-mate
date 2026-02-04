@@ -1,9 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,24 +23,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
+import { studyCreateSchema, StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
 import { useCreateStudy } from "@/hooks/useStudy";
 import {
   getCategoryCodeByValue,
   getDetailCategories,
   getMainCategories,
   getSubcategories,
-  STUDY_CATEGORIES,
 } from "@/lib/constants/study-category";
 import { getMainRegion, getRegionCodeByValue, getSubRegion } from "@/lib/constants/region";
-import { toast } from "sonner";
+import { zodResolverFirstError } from "@/utils/utils";
 
 export default function StudyCreateUI() {
   const formRef = useRef<HTMLFormElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<StudyFormValues>({
-    resolver: zodResolver(studySchema),
+    resolver: zodResolverFirstError(studyCreateSchema),
     defaultValues: {
       title: "",
       mainCategory: "",
@@ -55,7 +52,12 @@ export default function StudyCreateUI() {
       description: "",
     },
   });
-  const createStudyMutation = useCreateStudy();
+  const { mutate: createStudyMutation, isPending } = useCreateStudy((field, message)=>{
+    form.setError(field as keyof StudyFormValues, {
+      type: "server",
+      message,
+    });
+  });
   // 1. 상태 정의
   const [mainCategoryValue, setMainCategoryValue] = useState("");
   const [subCategoryValue, setSubCategoryValue] = useState("");
@@ -68,47 +70,40 @@ export default function StudyCreateUI() {
 
   // 2. 동적 옵션 생성
   const mainCategories = getMainCategories();
-  const subcategories = mainCategoryValue
-    ? getSubcategories(mainCategoryValue)
-    : [];
-  const detailCategories =
-    mainCategoryValue && subCategoryValue
-      ? getDetailCategories(mainCategoryValue, subCategoryValue)
-      : [];
+  const subcategories = getSubcategories(mainCategoryValue)
+  const detailCategories = getDetailCategories(mainCategoryValue, subCategoryValue)
 
   // 동적 옵션
   const mainRegions = getMainRegion();
-  const detailRegions = mainRegionValue ? getSubRegion(mainRegionValue) : [];
+  const detailRegions = getSubRegion(mainRegionValue)
 
   async function onSubmit(values: StudyFormValues) {
     if (!formRef.current) {
       return;
     }
-    form.clearErrors();
-    setIsLoading(true);
-    try {
-      const formData = new FormData(formRef.current);
+    const formData = new FormData(formRef.current);
+    createStudyMutation(formData);
+    // try {
+    //   const formData = new FormData(formRef.current);
       
-      if(mainCategoryValue && subCategoryValue && detailCategoryValue) {
-        const studyCategory = getCategoryCodeByValue(detailCategoryValue);
-        formData.set("studyCategory", studyCategory?.toString() || "");
-      }else{
-        toast.error("카테고리를 모두 선택해주세요");
-        setIsLoading(false);
-        return;
-      }
-      if(mainRegionValue && detailRegionValue) {
-        const regionCode = getRegionCodeByValue(detailRegionValue);
-        formData.set("region", regionCode?.toString() || "");
-      }else{
-        toast.error("지역을 모두 선택해주세요");
-        setIsLoading(false);
-        return;
-      }
-      createStudyMutation.mutate(formData);
-    } finally {
-      setIsLoading(false);
-    }
+    //   if(mainCategoryValue && subCategoryValue && detailCategoryValue) {
+    //     const studyCategory = getCategoryCodeByValue(detailCategoryValue);
+    //     formData.set("studyCategory", studyCategory?.toString() || "");
+    //   }else{
+    //     toast.error("카테고리를 모두 선택해주세요");
+    //     return;
+    //   }
+    //   if(mainRegionValue && detailRegionValue) {
+    //     const regionCode = getRegionCodeByValue(detailRegionValue);
+    //     formData.set("region", regionCode?.toString() || "");
+    //   }else{
+    //     toast.error("지역을 모두 선택해주세요");
+    //     return;
+    //   }
+    //   createStudyMutation(formData);
+    // } catch (error) {
+    //   toast.error("스터디 생성에 실패했습니다.");
+    // }
   }
 
   return (
@@ -151,7 +146,7 @@ export default function StudyCreateUI() {
                     <FormControl>
                       <Input
                         placeholder="스터디 제목을 입력해주세요"
-                        disabled={isLoading}
+                        disabled={isPending}
                         type="text"
                         {...field}
                       />
@@ -248,14 +243,13 @@ export default function StudyCreateUI() {
                         // ✅ 소분류 선택 시 즉시 계산!
                         const code = getCategoryCodeByValue(value);
                         if (code) {
-                          console.log("✅ studyCategory 계산:", code);
                           setStudyCategoryValue(code);
                           form.setValue("studyCategory", code, {
                             shouldValidate: true,
                           });
                         }
                       }}
-                      disabled={isLoading}
+                      disabled={isPending}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="소분류 선택" />
@@ -289,7 +283,6 @@ export default function StudyCreateUI() {
                         
                         // ✅ 온라인 선택 시 즉시 region = 0
                         if (value === "ONLINE") {
-                          console.log("✅ region 계산: 0 (온라인)");
                           setRegionValue(0);
                           form.setValue("region", 0, {
                             shouldValidate: true,
@@ -337,7 +330,6 @@ export default function StudyCreateUI() {
                             // ✅ 상세 지역 선택 시 즉시 계산!
                             const code = getRegionCodeByValue(value);
                             if (code !== null && code !== undefined) {
-                              console.log("✅ region 계산:", code);
                               setRegionValue(code);
                               form.setValue("region", code, {
                                 shouldValidate: true,
@@ -375,7 +367,7 @@ export default function StudyCreateUI() {
                         min="1"
                         max="20"
                         placeholder="1-20명"
-                        disabled={isLoading}
+                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>
@@ -394,7 +386,7 @@ export default function StudyCreateUI() {
                     <FormControl>
                       <Textarea
                         placeholder="스터디에 대해 설명해주세요."
-                        disabled={isLoading}
+                        disabled={isPending}
                         rows={5}
                         {...field}
                       />
@@ -409,23 +401,22 @@ export default function StudyCreateUI() {
                 <Button
                   type="submit"
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={isLoading}
+                  disabled={isPending}
                 >
-                  {isLoading ? "만드는 중..." : "스터디 만들기"}
+                  {isPending ? "만드는 중..." : "스터디 만들기"}
                 </Button>
                 <Link href="/" className="flex-1">
                   <Button
                     type="button"
                     variant="outline"
                     className="w-full bg-transparent"
-                    disabled={isLoading}
+                    disabled={isPending}
                   >
                     취소
                   </Button>
                 </Link>
               </div>
 
-              {/* ✅ Hidden inputs - 실시간으로 계산된 값 바인딩 */}
               <input
                 type="hidden"
                 name="mainCategory"
@@ -452,7 +443,6 @@ export default function StudyCreateUI() {
                 value={detailRegionValue}
               />
               
-              {/* ✅ 계산된 값들 - 항상 최신 상태 */}
               <input
                 type="hidden"
                 name="studyCategory"

@@ -12,7 +12,7 @@ import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
 
 export default function HomeUI() {
   const { data } = useGetAllPosts();
-  const posts = data?.success ? (data.data as PostsResponse[]) : [];
+  const posts = data?.success ? (data.data as unknown as PostsResponse[]) : [];
   const getStatusColor = (status: string) => {
     switch (status) {
       case "모집중":
@@ -214,7 +214,6 @@ export default function HomeUI() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {posts?.map(
                 (post: PostsResponse) => (
-                  console.log(post),
                   (
                     <Link key={post.id} href={`/posts/${post.id}`}>
                       <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col cursor-pointer hover:border-accent/50">

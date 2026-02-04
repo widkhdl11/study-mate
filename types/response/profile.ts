@@ -5,6 +5,7 @@ export type ProfileResponse = {
     avatar_url: string | null;
     birth_date: string | null;
     gender: string | null;
+    bio: string | null;
     points: number | null;
     created_at: string | null;
     updated_at: string | null;
