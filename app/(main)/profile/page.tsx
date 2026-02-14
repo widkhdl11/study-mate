@@ -2,8 +2,7 @@ import { getMyPostsSSR } from "@/actions/postAction";
 import { getMyStudiesSSR } from "@/actions/studyAction";
 import { getMyProfileSSR } from "@/actions/profileAction";
 import UserProfileUI from "./ui";
-import { PostsResponse } from "@/types/response/post";
-import { StudiesResponse } from "@/types/response/studies";
+import { notFound } from "next/navigation";
 
 export default async function UserProfilePage() {
 
@@ -12,6 +11,9 @@ export default async function UserProfilePage() {
     getMyPostsSSR(),
     getMyStudiesSSR(),
   ]);
+  if (!profileData) {
+    return notFound();
+  }
 
   return (
     <div>

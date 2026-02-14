@@ -16,7 +16,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { StudiesResponse } from "@/types/response/studies";
+import { StudiesResponse } from "@/types/studiesType";
 import { isRedirect } from "@/utils/utils";
 
 export function useCreateStudy(onFieldError?: (field: string, message: string) => void) {

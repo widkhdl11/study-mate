@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,29 +14,21 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useLogout } from "@/hooks/useAuth"
 import { useUser } from "@/hooks/useUser"
-import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage"
+import { getProfileImageUrl } from "@/lib/supabase/storage"
 import { useGetNotifications, useReadNotification } from "@/hooks/useNotification"
-import { formatTimeAgo } from "@/utils/formatTimeAgo"
-import { NotificationResponse } from "@/types/response/notification"
+import { formatTimeAgo } from "@/utils/utils"
+import { NotificationResponse } from "@/types/notificationType"
 
-export function Header() {
+export const Header = () => {
   const router = useRouter();
-  const { data: userData, isLoading } = useUser();
+  const { data: user } = useUser();
   const logoutMutation = useLogout();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { data: notifications } = useGetNotifications();
   const readNotificationMutation = useReadNotification();
-  useEffect(() => {
-    if (userData) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, [userData]);
   
-  const user = userData as unknown as any;
+  
   const handleCreateStudy = () => {
-    if (!isLoggedIn) {
+    if (!user) {
       router.push("/auth/login");
       return;
     }
@@ -84,7 +75,7 @@ export function Header() {
               />
             </div>
 
-            {isLoggedIn && user ? (
+            {user ? (
               <>
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -122,11 +113,11 @@ export function Header() {
                             }}>
                               <div className="flex items-start gap-2">
                                 <span className="text-base">
-                                  {notification.type === "study_invite" && "📩"}
-                                  {notification.type === "comment" && "💬"}
-                                  {notification.type === "study_update" && "📅"}
-                                  {notification.type === "mention" && "🏷️"}
-                                  {notification.type === "system" && "🔔"}
+                                  {notification.type === "participant_request" && "👋"}
+                                  {notification.type === "request_accepted" && "✅"}
+                                  {notification.type === "request_rejected" && "❌"}
+                                  {notification.type === "participant_left" && "👋"}
+                                  {notification.type === "participant_kicked" && "🚫"}
                                 </span>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2">
@@ -156,15 +147,7 @@ export function Header() {
                     </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                {/* Notifications
-                <button className="relative p-2 text-foreground hover:bg-muted rounded-lg transition-colors">
-                  🔔
-                  {notifications && notifications?.length > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-danger text-white text-xs">
-                      {notifications?.length}
-                    </Badge>
-                  )}
-                </button> */}
+          
 
                 {/* User Menu */}
                 <DropdownMenu>

@@ -21,12 +21,11 @@ export const queryKeys = {
   participant: (studyId: number) => ["participant", "status", studyId],
 
   // 채팅
-  chats: ["chats"],
   chat: (id: number) => ["chats", id],
-    // chatMessages: (chatId: number) => ["chat-messages", chatId] as const,
   chatMessages: (chatId: number) => ["chatMessages", chatId],
-
+  myChatRooms: ["myChatRooms"],
   notifications: ["notifications"],
+  chatParticipants: (chatId: number) => ["chatParticipants", chatId],
 
 
   

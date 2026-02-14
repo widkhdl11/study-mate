@@ -1,15 +1,14 @@
 import { StudyEditUI } from "./ui";
-import { getMyStudyByIdSSR } from "@/actions/studyAction";
+import { getStudyDetailSSR } from "@/actions/studyAction";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
-import { StudyWithAllCategoriesAndRegions } from "@/types/response/studies";
+import { StudyWithAllCategoriesAndRegions } from "@/types/studiesType";
 
 
 export default async function StudyEditPage({ params }: { params: Promise<{ id: string }>}) {
   const { id } = await params;
-  const study = await getMyStudyByIdSSR(id);
+  const study = await getStudyDetailSSR(Number(id));
 
-  // ✅ 서버에서 미리 계산
   const categoryPath = getCategoryPath(Number(study.study_category));
   const [mainCategory, subCategory, detailCategory] = categoryPath.values;
 

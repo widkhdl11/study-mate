@@ -19,8 +19,8 @@ export type PostsResponse = {
     id: number;
     title: string;
     description: string;
-    study_category: string;
-    region: string;
+    study_category: number;
+    region: number;
     max_participants: number;
     current_participants: number;
     status: string;
@@ -40,3 +40,40 @@ export type PostsResponse = {
     avatar_url: string | null;
   };
 };
+
+
+
+export type PostDetailResponse = {
+  id: number;
+  title: string;
+  content: string;
+  author_id: string;
+  likes_count: number;
+  views_count: number;
+  created_at: string;
+  image_url: {
+    id: string;
+    url: string;
+    originalName: string;
+    siae:number;
+  }[];
+  study: {
+    id: number;
+    title: string;
+    description: string;
+    study_category: number;
+    region: number;
+    max_participants: number;
+    current_participants: number;
+    status: string;
+    created_at: string;
+  };
+  author: {
+    id: number;
+    email: string;
+    username: string;
+    avatar_url: string | null;
+  };
+};
+
+

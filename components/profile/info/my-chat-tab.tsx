@@ -5,24 +5,25 @@ import {TabsContent} from "@/components/ui/tabs";
 import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar";
 import {Badge} from "@/components/ui/badge";
 import Link from "next/link";
-
+import { ChatRoom } from "@/types/chatType";
+import { formatTimeAgo } from "@/utils/utils";
 export default function MyChatTab({chatRooms} : {
-    chatRooms : any[]
+    chatRooms : ChatRoom[]
 }) {
     return (<> {/* 채팅 탭 */}
         <TabsContent value="chats" className="space-y-4">
             <div className="space-y-3"> {
                 chatRooms.map((room) => (
-                <Link key={room.chats.id} href={`/chat/${room.chats.id}`}>
-                <Card 
-                    className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
-                    <div className="flex items-start gap-4">
+                <Card
+                    className="group overflow-hidden hover:shadow-md transition-all h-full flex flex-col p-0 gap-0 min-h-[100px]">
+                    <Link key={room.chat.id} href={`/chat/${room.chat.id}`}>
+                    <div className="flex items-start gap-4 p-4">
                         <Avatar className="h-12 w-12 flex-shrink-0">
                             <AvatarImage src={
-                                    room.avatar || "/placeholder.svg"
+                                    room.profile.avatar_url || "/placeholder.svg"
                                 }
                                 alt={
-                                    room.chats.name
+                                    room.name
                                 }/>
                             <AvatarFallback className="bg-blue-600 text-white"> {
                                 room?.name|| "??"
@@ -31,23 +32,25 @@ export default function MyChatTab({chatRooms} : {
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2 mb-1">
                                 <h3 className="font-semibold text-foreground truncate"> {
-                                    room.chats.name
+                                    room.chat.name
                                 } </h3>
-                                {
+                                {/* 읽지 않은 메세지 */}
+                                {/* {
                                 room.unreadCount > 0 && (<Badge className="bg-red-500 text-white"> {
                                     room.unreadCount
                                 } </Badge>)
-                            } </div>
+                            }  */}
+                            </div>
                             <p className="text-sm text-muted-foreground truncate"> {
-                                room.lastMessage
+                                room.chat.last_message
                             } </p>
                             <p className="text-xs text-muted-foreground mt-1"> {
-                                room.lastMessageTime
+                                formatTimeAgo(room.chat.last_message_at)
                             } </p>
                         </div>
                     </div>
+                    </Link>
                 </Card>
-                </Link>
                 ))
             } </div>
         </TabsContent>

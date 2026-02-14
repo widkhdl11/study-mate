@@ -2,11 +2,11 @@
 
 import { StudyCreateFormValues, studyCreateSchema, StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
 import { createClient } from "@/lib/supabase/server";
-import type { ActionResponse } from "@/types/response/action";
+import type { ActionResponse } from "@/types/actionType";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { validateWithZod } from "@/utils/utils";
-import { StudiesResponse } from "@/types/response/studies";
+import { StudiesResponse, StudyResponse } from "@/types/studiesType";
 import { CustomUserAuth } from "@/utils/auth";
 
 
@@ -248,25 +248,27 @@ if (!data || data.length === 0) {
 }
 
 // ================ssr===============
-
-export async function getMyStudyByIdSSR(id: string) {
+// 내가 생성한 스터디 조회
+export async function getMyCreatedStudiesSSR(): Promise<StudiesResponse> {
   const supabase = await createClient();
   const { user } = await CustomUserAuth(supabase);
-  const { data: study } = await supabase
+  const { data, error } = await supabase
     .from("studies")
     .select("*")
-    .eq("id", id)
     .eq("creator_id", user.id)
-    .single();
  // 3. 없거나 권한 없으면
- if (!study) {
+ if (error) {
   notFound();
 }
-return study;
+if (!data || data.length === 0) {
+  return [];
+}
+return data as unknown as StudiesResponse;
 
 }
 
-export async function getMyStudiesSSR(): Promise<StudiesResponse[]> {
+// 참여중인 스터디
+export async function getMyStudiesSSR(): Promise<StudiesResponse> {
   const supabase = await createClient();
   const { user } = await CustomUserAuth(supabase);
   const { data, error } = await supabase
@@ -277,10 +279,11 @@ export async function getMyStudiesSSR(): Promise<StudiesResponse[]> {
   if (error) {
     notFound();
   }
-  return data as unknown as StudiesResponse[];
+  return data as unknown as StudiesResponse;
 }
 
-export async function getStudyDetailSSR(id: number): Promise<StudiesResponse> {
+// 스터디 상세 조회
+export async function getStudyDetailSSR(id: number): Promise<StudyResponse> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("studies")
@@ -327,5 +330,5 @@ export async function getStudyDetailSSR(id: number): Promise<StudiesResponse> {
   if (error) {
     notFound();
   }
-  return data as unknown as StudiesResponse;
+  return data as unknown as StudyResponse;
 }

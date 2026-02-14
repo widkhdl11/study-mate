@@ -5,8 +5,7 @@ import {
   createPost,
   deletePost,
   getAllPosts,
-  getMyPosts,
-  getPostById,
+  getPostDetail,
   increaseViewCount,
   toggleLike,
   updatePost,
@@ -15,135 +14,34 @@ import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
 import { useUser } from "./useUser";
-import { getUser } from "@/actions/profileAction";
+import { isRedirect } from "@/utils/utils";
+import { PostDetailResponse } from "@/types/postType";
 
-export function useCreatePost() {
+export function useCreatePost(onFieldError?: (field: string, message: string) => void) {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (formData: FormData) => {
-      return await createPost(formData);
-    },
+    mutationFn: createPost,
     onSuccess: (response) => {
-      if (!response || response.success) {
-        return;
+      if (!response.success) {
+        toast.error(response.error.message);
+         if (response.error.field && onFieldError) {
+          onFieldError(response.error.field, response.error.message);
+        }
       }
     },
     onError: (error: any) => {
-      const isRedirect =
-        (typeof error?.message === "string" &&
-          error.message === "NEXT_REDIRECT") ||
-        (typeof error?.digest === "string" &&
-          error.digest.startsWith("NEXT_REDIRECT"));
-
-      if (isRedirect) {
+      if (isRedirect(error)) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myPosts });
+        queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+        toast.success("게시글을 생성했습니다.");
         return;
       }
-      console.log("useCreatePost error : ", error);
       toast.error(error.message);
     },
   });
 }
-export function useGetMyPosts() {
-  const query = useQuery({
-    queryKey: queryKeys.myPosts,
-    queryFn: async () => {
-      return await getMyPosts();
-    },
-  });
-  return query;
-}
 
-// 게시글 조회(쿠키사용 조회수 중복증가 방지)
-// export function useGetPost(id: number) {
-//   const hasIncrementedRef = useRef(false);  // 중복 방지
-  
-//   const query = useQuery({
-//     queryKey: queryKeys.post(id),  // ← 수정: myPosts → post(id)
-//     queryFn: async () => {
-//       return await getPostById(id);
-//     },
-//   });
-
-//   // ✅ 조회수 증가
-//   useEffect(() => {
-//     // 이미 증가시켰으면 스킵
-//     if (hasIncrementedRef.current) return;
-    
-//     // 쿠키로 24시간 중복 방지
-//     const viewKey = `post_view_${id}`;
-//     const hasViewed = Cookies.get(viewKey);
-    
-//     if (!hasViewed && query.isSuccess) {
-//       // 조회수 증가 (비동기)
-//       increaseViewCount(id).catch(console.error);
-      
-//       // 24시간 동안 중복 방지
-//       Cookies.set(viewKey, '1', { expires: 1 });
-      
-//       // ref로 중복 방지
-//       hasIncrementedRef.current = true;
-//     }
-//   }, [id, query.isSuccess]);
-
-//   // 에러 처리
-//   useEffect(() => {
-//     if (query.error) {
-//       const error = query.error as any;
-//       const isRedirect =
-//         (typeof error?.message === "string" &&
-//           error.message === "NEXT_REDIRECT") ||
-//         (typeof error?.digest === "string" &&
-//           error.digest.startsWith("NEXT_REDIRECT"));
-
-//       if (isRedirect) {
-//         return;
-//       }
-//       console.log("useGetPost error : ", error);
-//       toast.error(error.message || "게시글을 불러오는데 실패했습니다.");
-//     }
-//   }, [query.error]);
-  
-//   return query;
-// }
-
-// 게시글 조회 (리렌더링시 조회수 증가만 방지)
-export function useGetPost(id: number) {
-  const hasIncrementedRef = useRef(false);  // 컴포넌트 내 중복 방지만
-  
-  const query = useQuery({
-    queryKey: queryKeys.post(id),
-    queryFn: async () => {
-      return await getPostById(id);
-    },
-  });
-
-  // ✅ 조회수 증가 (간단 버전)
-  useEffect(() => {
-    if (!hasIncrementedRef.current && query.isSuccess) {
-      increaseViewCount(id).catch(console.error);
-      hasIncrementedRef.current = true;
-    }
-  }, [id, query.isSuccess]);
-
-  useEffect(() => {
-    if (query.error) {
-      const error = query.error as any;
-      const isRedirect =
-        (typeof error?.message === "string" &&
-          error.message === "NEXT_REDIRECT") ||
-        (typeof error?.digest === "string" &&
-          error.digest.startsWith("NEXT_REDIRECT"));
-
-      if (isRedirect) {
-        return;
-      }
-      toast.error(error.message || "게시글을 불러오는데 실패했습니다.");
-    }
-  }, [query.error]);
-  
-  return query;
-}
 
 export function useGetAllPosts() {
   const query = useQuery({
@@ -156,16 +54,9 @@ export function useGetAllPosts() {
   useEffect(() => {
     if (query.error) {
       const error = query.error as any;
-      const isRedirect =
-        (typeof error?.message === "string" &&
-          error.message === "NEXT_REDIRECT") ||
-        (typeof error?.digest === "string" &&
-          error.digest.startsWith("NEXT_REDIRECT"));
-
-      if (isRedirect) {
+      if (isRedirect(error)) {
         return;
       }
-      console.log("useGetAllPosts error : ", error);
       toast.error(error.message || "게시글 목록을 불러오는데 실패했습니다.");
     }
   }, [query.error]);
@@ -190,7 +81,12 @@ export function useCheckIsLiked(postId: number) {
   return useQuery({
     queryKey: queryKeys.like(postId),
     queryFn: async () => {
-      return await checkIsLiked(postId);
+      const result = await checkIsLiked(postId);
+      if (result.success) {
+        return result.data;
+      } else {
+        throw new Error(result.error?.message || "좋아요 여부 확인에 실패했습니다.");
+      }
     },
     enabled: !!user,
     staleTime: 1000 * 60 * 5,
@@ -206,38 +102,27 @@ export function useToggleLike(postId: number) {
     mutationFn: async () => {
       return await toggleLike(postId);
     },
-    // ✅ 낙관적 업데이트
     onMutate: async () => {
-      // 진행 중인 쿼리 취소
-      await queryClient.cancelQueries({ queryKey: queryKeys.like(postId) });
-      await queryClient.cancelQueries({ queryKey: queryKeys.post(postId) });
-      
-      // 이전 데이터 저장
-      const previousLike = queryClient.getQueryData<{ data: { liked: boolean } }>(queryKeys.like(postId));
-      const previousPost = queryClient.getQueryData(queryKeys.post(postId));
-      
-      // 낙관적 업데이트
-      queryClient.setQueryData(queryKeys.like(postId), (old: any) => ({
+
+    await queryClient.cancelQueries({ queryKey: queryKeys.like(postId) });
+    await queryClient.cancelQueries({ queryKey: queryKeys.post(postId) });
+  
+    const previousLike = queryClient.getQueryData<boolean>(queryKeys.like(postId));
+    const previousPost = queryClient.getQueryData<PostDetailResponse>(queryKeys.post(postId));
+  
+    // 좋아요 토글
+    queryClient.setQueryData(queryKeys.like(postId), !previousLike);
+    
+    // 좋아요 수 업데이트
+    queryClient.setQueryData(queryKeys.post(postId), (old: PostDetailResponse | undefined) => {
+      if (!old) return old;
+      return {
         ...old,
-        data: !old?.data  // 토글
-      }));
-      
-      queryClient.setQueryData(queryKeys.post(postId), (old: any) => {
-        if (!old?.data) return old;
-        
-        const currentLiked = previousLike?.data || false;
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            likes_count: currentLiked 
-              ? old.data.likes_count - 1  // 취소
-              : old.data.likes_count + 1  // 추가
-          }
-        };
-      });
-      
-      return { previousLike, previousPost };
+        likes_count: previousLike ? old.likes_count - 1 : old.likes_count + 1
+      };
+    });
+  
+    return { previousLike, previousPost };
     },
     
     onSuccess: (response) => {
@@ -246,7 +131,7 @@ export function useToggleLike(postId: number) {
         queryClient.invalidateQueries({ queryKey: queryKeys.like(postId) });
         queryClient.invalidateQueries({ queryKey: queryKeys.post(postId) });
       } else {
-        toast.error(response?.error?.message || "좋아요 처리 실패");
+        toast.error("좋아요 처리에 실패했습니다");
       }
     },
     
@@ -271,35 +156,58 @@ export function useDeletePost() {
       return await deletePost(postId);
     },
     onSuccess: (response) => {
-      if (response?.success) {
-        toast.success("게시글을 삭제했습니다");
-        queryClient.invalidateQueries({ queryKey: queryKeys.myPosts });
-        queryClient.invalidateQueries({ queryKey: queryKeys.posts });
-      } else {
-        toast.error(response?.error?.message || "게시글 삭제에 실패했습니다");
+      if (!response.success) {
+        // 삭제 실패
+        toast.error(response.error.message);
       }
     },
     onError: (error: any) => {
+      if (isRedirect(error)) {
+        toast.success("게시글을 삭제했습니다");
+        queryClient.invalidateQueries({ queryKey: queryKeys.myPosts });
+        queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+        return;
+      }
       toast.error(error.message || "게시글 삭제 중 오류가 발생했습니다");
     },
   });
 }
 
-export function useUpdatePost() {
+export function useUpdatePost(onFieldError?: (field: string, message: string) => void) {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ postId, formData }: { postId: number, formData: FormData }) => {
-      return await updatePost(postId, formData);
+    mutationFn: async (formData : FormData) => {
+      return await updatePost(formData);
     },
     onSuccess: (response) => {
-      if (response?.success) {
-        toast.success("게시글을 수정했습니다");
-     
-      } else {
-        toast.error(response?.error?.message || "게시글 수정에 실패했습니다");
+      if (!response.success) {
+        toast.error(response.error.message);
+        if (response.error.field && onFieldError) {
+          onFieldError(response.error.field, response.error.message);
+        }
       }
     },
     onError: (error: any) => {
+      if (isRedirect(error)) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.myPosts });
+        queryClient.invalidateQueries({ queryKey: queryKeys.posts });
+        toast.success("게시글을 수정했습니다");
+        return;
+      }
       toast.error(error.message || "게시글 수정 중 오류가 발생했습니다");
     },
+  });
+}
+// 게시글 상세 조회, 서버->리액트 쿼리 캐시등록
+export function usePostDetail(initialPost: PostDetailResponse) {
+  return useQuery({
+    queryKey: queryKeys.post(initialPost.id),
+    queryFn: async () => {
+      const result = await getPostDetail(initialPost.id);
+      if (result.success) return result.data as PostDetailResponse;
+      throw new Error(result.error?.message);
+    },
+    initialData: initialPost,
+    staleTime: 1000 * 60 * 5,  // 5분간 refetch 안 함
   });
 }

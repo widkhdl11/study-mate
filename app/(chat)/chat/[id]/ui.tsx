@@ -7,23 +7,22 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { ArrowLeft, Menu, Send, ImageIcon as ImageIconComponent, Smile } from "lucide-react"
-import { ChatParticipant, ChatRoom } from "@/types/response/chat"
-import { useUser } from "@/hooks/useUser"
+import { ChatParticipant, ChatRoom } from "@/types/chatType"
 import { getProfileImageUrl } from "@/lib/supabase/storage"
 import { useGetChatMessages, useSendMessage } from "@/hooks/useChat"
 import { ChatMessage } from "@/hooks/use-realtime-chat"
 import { useChatScroll } from "@/hooks/use-chat-scroll"
+import { useUser } from "@/hooks/useUser"
 
 export function ChatRoomUI({ chatParticipants, chatRoom }: 
   { chatParticipants: ChatParticipant[], chatRoom: ChatRoom }) {
-    
-    // ✅ 훅으로 변경
+
     const { data: user } = useUser();
     const inputRef = useRef<HTMLInputElement>(null);
     const { data: messages, isLoading } = useGetChatMessages(Number(chatRoom.id));
     const sendMessageMutation = useSendMessage(Number(chatRoom.id));    
     const [newMessage, setNewMessage] = useState("")
-    const messagesEndRef = useRef<HTMLDivElement>(null)
+    // const messagesEndRef = useRef<HTMLDivElement>(null)
     const { containerRef, scrollToBottom } = useChatScroll()
 
   // 메시지가 추가되면 스크롤 이동
@@ -32,7 +31,6 @@ export function ChatRoomUI({ chatParticipants, chatRoom }:
     inputRef.current?.focus()
   }, [messages, scrollToBottom])
 
-  // ✅ 수정: mutation 사용
   const handleSendMessage = () => {
     if (newMessage.trim() === "" || sendMessageMutation.isPending) return
     sendMessageMutation.mutate(newMessage.trim());
@@ -50,8 +48,7 @@ export function ChatRoomUI({ chatParticipants, chatRoom }:
     if (!sendMessageMutation.isPending && inputRef.current) { 
       inputRef.current.focus(); 
     } 
-  }, [sendMessageMutation.isPending, inputRef.current]);
-  // ✅ 로딩 처리
+  }, [sendMessageMutation.isPending]);
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -117,7 +114,6 @@ export function ChatRoomUI({ chatParticipants, chatRoom }:
       <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 space-y-4" ref={containerRef}>
         {messages?.map((message: ChatMessage) => {
           const isMe = message.sender_id === user?.id;
-          
           return (
             <div
               key={message.id}
@@ -157,17 +153,17 @@ export function ChatRoomUI({ chatParticipants, chatRoom }:
             </div>
           );
         })}
-        <div ref={messagesEndRef} />
+        {/* <div ref={messagesEndRef} /> */}
       </div>
 
       {/* 입력 영역 */}
       <div className="border-t border-border bg-background p-4 sm:p-6 flex-shrink-0">
         <div className="flex items-end gap-3">
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon" className="flex-shrink-0">
+            <Button variant="ghost" size="icon" className="flex-shrink-0" disabled>
               <ImageIconComponent className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="flex-shrink-0">
+            <Button variant="ghost" size="icon" className="flex-shrink-0" disabled>
               <Smile className="w-5 h-5" />
             </Button>
           </div>

@@ -1,13 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   User,
   MessageSquare,
@@ -22,23 +19,20 @@ import MyChatTab from "@/components/profile/info/my-chat-tab";
 import MyPostTab from "@/components/profile/info/my-post-tab";
 import MyStudiesTab from "@/components/profile/info/my-studies-tab";
 import MyInfoTab from "@/components/profile/info/my-info-tab";
-import { useGetMyProfile, useUser } from "@/hooks/useUser";
 import { convertUser } from "@/utils/conversion/user";
-import { useGetAllPosts, useGetMyPosts, useGetPost } from "@/hooks/usePost";
-import { PostsResponse } from "@/types/response/post";
-import { StudiesResponse } from "@/types/response/studies";
-import { useGetMyStudies } from "@/hooks/useStudy";
+import { PostsResponse } from "@/types/postType";
+import { StudiesResponse } from "@/types/studiesType";
 import { useEffect, useState } from "react";
 import { useUpdateProfileImage } from "@/hooks/useProfile";
 import { getProfileImageUrl } from "@/lib/supabase/storage";
-import { ProfileResponse } from "@/types/response/profile";
+import { ProfileResponse } from "@/types/profileType";
 import { useLogout } from "@/hooks/useAuth";
-import { useGetChats } from "@/hooks/useChat";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useGetMyChatRooms } from "@/hooks/useChat";
+import { useSearchParams } from "next/navigation";
 
-export default function UserProfileUI({ user, posts, studies }: { user: ProfileResponse, posts: PostsResponse[], studies: StudiesResponse[] }) {
+export default function UserProfileUI({ user, posts, studies }: { user: ProfileResponse, posts: PostsResponse[], studies: StudiesResponse }) {
  
-  const {data: chatRooms} = useGetChats();
+  const {data: chatRooms} = useGetMyChatRooms();
   const searchParams = useSearchParams();
   const [currentTab, setCurrentTab] = useState(
     searchParams.get("tab") || "info"
@@ -47,6 +41,8 @@ export default function UserProfileUI({ user, posts, studies }: { user: ProfileR
   const myStudies = studies || [];
   const currentUser = convertUser(user || []);
   const logoutMutation = useLogout();
+
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "모집중":
@@ -75,7 +71,6 @@ export default function UserProfileUI({ user, posts, studies }: { user: ProfileR
     const file = e.target.files?.[0];
     if (!file) return;
     
-    // ✅ 미리보기: URL.createObjectURL (빠름!)
     const previewUrl = URL.createObjectURL(file);
     setProfileImage(previewUrl); 
     updateProfileImage.mutate(file);

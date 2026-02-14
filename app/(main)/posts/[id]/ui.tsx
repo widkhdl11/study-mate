@@ -1,171 +1,71 @@
 "use client";
 
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
-import { useCheckIsLiked, useGetPost, useToggleLike,  } from "@/hooks/usePost";
-import { formatDistanceToNow } from "date-fns";
-import { ko } from "date-fns/locale";
+import { useCheckIsLiked, usePostDetail, useToggleLike,  } from "@/hooks/usePost";
 import { getImageUrl } from "@/lib/supabase/storage";
 import {
   useApplyParticipant,
-  useCheckParticipantStatus,
-  useParticipant, // ← 이거 추가 (useQuery 버전)
+  useParticipant,
 } from "@/hooks/useParticipant";
 import { getRegionPath } from "@/lib/constants/region";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
-import { useUser } from "@/hooks/useUser";
+import { PostDetailResponse } from "@/types/postType";
+import { ProfileResponse } from "@/types/profileType";
+import { formatDate } from "@/utils/utils";
+import { StudyActionButton } from "@/components/post/renderActionButton";
+import { STATUS_MAP } from "@/types/studiesType";
+import { useRef } from "react";
 
-export default function PostDetailUI({ id }: { id: number }) {
-  const { data, isLoading, error } = useGetPost(id);
-  const post = data?.data;
+export default function PostDetailUI({ initialPost, user }: { initialPost: PostDetailResponse, user: ProfileResponse | null }) {
 
+  const { data: post } = usePostDetail(initialPost);
+  const { data: isLikedData } = useCheckIsLiked(post.id);
+  // const { data: likesCountData } = useGetLikesCount(post.id);
+  const isLiked = isLikedData || false;
 
-  // ✅ 1. 모든 Hook을 컴포넌트 최상단으로 이동
-  const studyId = post?.study?.id || 0;
-  const { data: isLikedData } = useCheckIsLiked(id);
-  const isLiked = isLikedData?.data || false;// ✅ useQuery 버전 사용 (자동으로 계속 최신 상태 유지)
+  const { data: participantData } = useParticipant(post.study.id);  
+  const participantStatus = participantData?.status || "";
 
-  const { data: participantData } = useParticipant(studyId);  
-  const applyMutation = useApplyParticipant(studyId);
-  const participantStatus = participantData?.data?.status || "";
-  const toggleLikeMutation = useToggleLike(id);
-  // 날짜 포맷 함수
-  const formatDate = (dateString: string) => {
-    return formatDistanceToNow(new Date(dateString), {
-      addSuffix: true,
-      locale: ko,
-    });
-  };
+  const { mutate: applyMutation, isPending: isApplying } = useApplyParticipant(post.study.id);
+  const { mutate: toggleLikeMutation, isPending: isTogglingLike } = useToggleLike(post.id);
 
-  const { data: userData } = useUser();
+// Carousel 컴포넌트 대신 직접 사용
+// const [emblaRef, emblaApi] = useEmblaCarousel();
+// const [currentIndex, setCurrentIndex] = useState(0);
 
-  // 이니셜 생성
-  const getInitials = (email: string) => {
-    return email[0].toUpperCase();
-  };
-
-  // ✅ 2. 핸들러에서는 mutate만 호출
-  const studyApplyHandler = () => {
-    // applyMutation.mutate(studyId, {
-    //   onSuccess: (response) => {
-    //     if (response?.success) {
-    //       setStudyStatusMutation.mutate();
-    //     }
-    //   },
-    // });
-    applyMutation.mutate();
-  };
-
-  // 상태 결정 함수
-  const getStatus = () => {
-    if (!participantStatus) return "모집중";
-
-    if (participantStatus === "accepted") {
-      return "참여중";
-    }
-    if (participantStatus === "pending") {
-      return "수락 대기중";
-    }
-    if (participantStatus === "rejected") {
-      return "스터디 종료";
-    }
-    return "모집중";
-  };
-
-  const status = getStatus();
+// useEffect(() => {
+//   if (!emblaApi) return;
   
-  const handleLikeClick = () => {
-    if (!userData) {
-      toast.error("로그인이 필요합니다");
-      return;
-    }
-    toggleLikeMutation.mutate();
-  };
+//   const onSelect = () => {
+//     setCurrentIndex(emblaApi.selectedScrollSnap());
+//   };
   
-  if (isLoading) return <div>로딩 중...</div>;
-  if (!post) return <div>게시글을 찾을 수 없습니다</div>;
+//   emblaApi.on("select", onSelect);
+//   return () => { emblaApi.off("select", onSelect); };
+// }, [emblaApi]);
 
-  // 로딩 상태
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">게시글을 불러오는 중...</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
+// 혹시 모를 서버요청 중복 방지
+const isProcessingRef = useRef(false);
 
-  // 에러 상태
-  if (error || !post) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col">
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-destructive mb-4">
-              게시글을 불러올 수 없습니다.
-            </p>
-            <Button onClick={() => window.history.back()}>돌아가기</Button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // 상태별 액션 버튼 렌더링
-  const renderActionButton = () => {
-    switch (status) {
-      case "모집중":
-        return (
-          <Button
-            className="w-full py-6 text-lg bg-blue-600 hover:bg-blue-700"
-            onClick={studyApplyHandler}
-            disabled={applyMutation.isPending}
-          >
-            {applyMutation.isPending ? "신청 중..." : "참여 신청"}
-          </Button>
-        );
-      case "수락 대기중":
-        return (
-          <Button
-            disabled
-            className="w-full py-6 text-lg bg-yellow-600 hover:bg-yellow-700"
-          >
-            수락 대기중
-          </Button>
-        );
-      case "참여중":
-        return (
-          <div className="flex gap-3">
-            <Badge className="flex-1  text-center bg-success text-white text-base justify-center">
-              참여중
-            </Badge>
-            <Button variant="outline" className="flex-1 bg-transparent">
-              채팅방 입장
-            </Button>
-          </div>
-        );
-      case "스터디 종료":
-        return (
-          <Button disabled className="w-full py-6 text-lg bg-muted">
-            모집 마감
-          </Button>
-        );
-      default:
-        return null;
+const handleLikeClick = () => {
+  if (!user || isProcessingRef.current) return;
+  isProcessingRef.current = true;
+  
+  toggleLikeMutation(undefined, {
+    onSettled: () => {
+      isProcessingRef.current = false;
     }
-  };
+  });
+};
+  const status = STATUS_MAP[participantStatus] || "모집중";
+  
 
   // 관련 포스트 (같은 스터디의 다른 포스트들 - 임시)
   const relatedPosts: any[] = [];
@@ -177,6 +77,8 @@ export default function PostDetailUI({ id }: { id: number }) {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* 포스트 이미지 */}
           <div className="relative w-full mb-8">
+            {post.image_url.length > 0 ? (
+              <>
             <Carousel className="w-full">
               <CarouselContent>
                 {post.image_url.map((image: { url: string }, index: number) => (
@@ -195,10 +97,16 @@ export default function PostDetailUI({ id }: { id: number }) {
               <CarouselPrevious className="left-4" />
               <CarouselNext className="right-4" />
             </Carousel>
+            
             {/* 이미지 카운터 */}
-            <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-              1 / {post.image_url.length}
-            </div>
+            {/* <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+              {currentIndex + 1} / {post.image_url.length}
+            </div> */}
+            </>
+            ) : (
+              <div className="w-full h-96 bg-muted rounded-lg flex items-center justify-center">
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -218,7 +126,7 @@ export default function PostDetailUI({ id }: { id: number }) {
                       alt={post.author?.username || ""}
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground">
-                      {getInitials(post.author?.email)}
+                      {post.author?.email[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
@@ -226,16 +134,17 @@ export default function PostDetailUI({ id }: { id: number }) {
                       {post.author?.username}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {formatDate(post.created_at!)}
+                      {formatDate(post.created_at)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
-                    onClick={handleLikeClick}
-                    disabled={toggleLikeMutation.isPending}
+                    onClick={() => handleLikeClick()}
+                    disabled={isTogglingLike}
                     className={`gap-2 ${isLiked ? "bg-blue-50 border-blue-600 text-blue-600" : ""}`}
                   >
                     <ThumbsUp className={`h-4 w-4 ${isLiked ? "fill-blue-600" : ""}`} />
@@ -325,7 +234,7 @@ export default function PostDetailUI({ id }: { id: number }) {
                       alt={post.author?.username}
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {getInitials(post.author?.email)}
+                      {post.author?.email[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -337,7 +246,11 @@ export default function PostDetailUI({ id }: { id: number }) {
                 </div>
 
                 {/* 액션 버튼 */}
-                {renderActionButton()}
+                <StudyActionButton 
+                  status={status} 
+                  isApplying={isApplying} 
+                  onApply={() => applyMutation()} 
+                />
               </Card>
             </div>
           </div>

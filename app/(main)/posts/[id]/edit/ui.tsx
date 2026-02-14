@@ -1,95 +1,91 @@
-"use client";
+"use client"
 
-import type React from "react";
-import { useRef, useState } from "react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { postSchema } from "@/lib/zod/schemas/postSchema";
-import { PostFormValues } from "@/lib/zod/schemas/postSchema";
-import { useCreatePost } from "@/hooks/usePost";
-import { Input } from "@/components/ui/input";
-import { StudiesResponse, StudyResponse } from "@/types/studiesType";
-import { zodResolverFirstError } from "@/utils/utils";
+import type React from "react"
+import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
+import { useForm } from "react-hook-form"
 
-export default function PostCreateUI({ studies }: { studies: StudiesResponse }) {
-  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
-  const {mutate: createPost, isPending: isLoading} = useCreatePost((filed, message )=>{
-    form.setError(filed as keyof PostFormValues, { 
-      type: "server", 
-      message,
-    });
-  });
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { postSchema, PostFormValues, updatePostSchema } from "@/lib/zod/schemas/postSchema"
+import { zodResolverFirstError } from "@/utils/utils"
+import { PostDetailResponse, PostsResponse } from "@/types/postType"
+import { useUpdatePost } from "@/hooks/usePost"
+import { StudiesResponse, StudyResponse } from "@/types/studiesType"
+import { Input } from "@/components/ui/input"
+import { getImageUrl } from "@/lib/supabase/storage"
+
+
+export function PostEditUI({ initialData, studies }: { initialData: PostDetailResponse, studies: StudiesResponse }) {
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([])
+
   const formRef = useRef<HTMLFormElement>(null);
-
   const form = useForm<PostFormValues>({
-    resolver: zodResolverFirstError(postSchema),
-    defaultValues: {
-      title: "",  
-      studyId: 0,
-      content: "",
-      images: [] as File[],
-    },
-  });
+      resolver: zodResolverFirstError(updatePostSchema),
+      defaultValues: {
+        ...initialData,  
+        studyId: initialData.study.id, 
+        images: initialData.image_url.map((image) => new File([], image.url)) as File[] || [],
+      },
+    })
+
+    const {mutate: updatePostMutation, isPending} = useUpdatePost((field ,message)=>{
+      form.setError(field as keyof PostFormValues, {
+        type: "server",
+        message,
+      });
+    });
+
+  useEffect(() => {
+
+    const files = Array.from(form.getValues("images") || [])
+    if (files.length === 0) return
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file))
+    setImagePreviewUrls(newPreviewUrls)
+    console.log("newPreviewUrls 출력", newPreviewUrls)
+
+  }, [])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
 
-    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
-    setImagePreviewUrls((prev) => [...prev, ...newPreviewUrls]);
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file))
 
+    setImagePreviewUrls((prev) => [...prev, ...newPreviewUrls])
 
-    const currentImages = form.getValues("images") || [];
-    form.setValue("images", [...currentImages, ...files]);
-  };
+    const currentImages = form.getValues("images") || []
+    form.setValue("images", [...currentImages, ...files])
+  }
 
   const removeImage = (index: number) => {
     setImagePreviewUrls((prev) => {
-      const newUrls = prev.filter((_, i) => i !== index);
-      if (prev[index]) {
-        URL.revokeObjectURL(prev[index]);
+      const newUrls = prev.filter((_, i) => i !== index)
+      if (prev[index] && prev[index].startsWith("blob:")) {
+        URL.revokeObjectURL(prev[index])
       }
       return newUrls;
-    });
+    })
 
-    const currentImages = form.getValues("images") || [];
+    const currentImages = form.getValues("images") || []
     form.setValue(
       "images",
-      currentImages.filter((_, i) => i !== index)
-    );
-  };
+      currentImages.filter((_, i) => i !== index),
+    )
+  }
 
   async function onSubmit(values: PostFormValues) {
-    if (!formRef.current) {
-      return;
+    if (!formRef.current) return;
+    const formData = new FormData(formRef.current);
+    if (values.images) {
+      values.images.forEach((file) => {
+        formData.append("images", file as File);
+      });
     }
-      const formData = new FormData(formRef.current);
-      // File 직접 추가
-      if (values.images) {
-        values.images.forEach((file) => {
-          formData.append("images", file as File);
-        });
-      }
-      createPost(formData);
+    updatePostMutation(formData);
   }
 
   return (
@@ -101,43 +97,33 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
               <span className="text-lg font-bold text-white">S</span>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Study Mate
-          </h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            함께 성장하는 스터디 문화
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Study Mate</h1>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">함께 성장하는 스터디 문화</p>
         </div>
 
         <Card className="p-6 md:p-8">
-          <h2 className="mb-6 text-2xl font-semibold text-slate-900 dark:text-white">
-            모집글 작성
-          </h2>
+          <h2 className="mb-6 text-2xl font-semibold text-slate-900 dark:text-white">모집글 수정</h2>
 
           <Form {...form}>
-            <form
-              ref={formRef}
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6"
-            >
-              {/* 게시글 제목 */}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" ref={formRef}>
+
               <FormField
                 control={form.control}
                 name="title"
-                render={({ field }) => (
+                render={({field})=>(
                   <FormItem>
                     <FormLabel>게시글 제목</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="게시글 제목을 입력해주세요"
-                        disabled={isLoading}
+                        disabled={isPending}
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-
               {/* 스터디 선택 */}
               <FormField
                 control={form.control}
@@ -145,37 +131,44 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>스터디 선택 *</FormLabel>
-                    {/* <FormDescription>
-                      모집글을 작성할 스터디를 선택해주세요
-                    </FormDescription> */}
-                    {studies?.length > 0 ? (
-                      <Select
-                        onValueChange={field.onChange}
-                        disabled={isLoading}
-                      >
+                    <FormDescription>모집글을 작성할 스터디를 선택해주세요</FormDescription>
+                    <Select 
+                      value={field.value?.toString()} 
+                      onValueChange={(value) => field.onChange(Number(value))} 
+                      disabled={isPending}
+                    >
+                      <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="스터디를 선택해주세요" />
                         </SelectTrigger>
-                        <SelectContent>
-                          {studies?.map((study: StudyResponse) => (
-                            <SelectItem key={study.id} value={study.id.toString()}>
-                              {study.title}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center">
-                        <div className="flex flex-col items-center justify-between h-full w-full">
-                        <p className="text-sm text-slate-500 dark:text-slate-400">스터디가 없습니다</p>
-                        <Link href="/studies/create" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">스터디 만들기</Link>
-                        </div>
-                      </div>
-                    )}
+                      </FormControl>
+                      <SelectContent>
+                        {studies?.map((study: StudyResponse) => (
+                          <SelectItem key={study.id} value={study.id.toString()}>
+                            {study.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* 모임 날짜
+              <FormField
+                control={form.control}
+                name="meeting_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>모임 날짜 *</FormLabel>
+                    <FormControl>
+                      <Input type="date" disabled={isPending} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              /> */}
 
               {/* 내용 */}
               <FormField
@@ -184,13 +177,11 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>내용 *</FormLabel>
-                    <FormDescription>
-                      모집글의 상세한 내용을 입력해주세요 (최소 10자)
-                    </FormDescription>
+                    <FormDescription>모집글의 상세한 내용을 입력해주세요 (최소 10자)</FormDescription>
                     <FormControl>
                       <Textarea
                         placeholder="스터디에 대한 상세한 설명을 입력하세요"
-                        disabled={isLoading}
+                        disabled={isPending}
                         rows={6}
                         className="resize-none"
                         {...field}
@@ -205,12 +196,10 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
               <FormField
                 control={form.control}
                 name="images"
-                render={( {field} ) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>이미지</FormLabel>
-                    <FormDescription>
-                      선택사항: 이미지를 업로드하면 모집글이 더 눈에 띕니다
-                    </FormDescription>
+                    <FormDescription>선택사항: 이미지를 업로드하면 모집글이 더 눈에 띕니다</FormDescription>
                     <FormControl>
                       <div className="space-y-4">
                         <label className="relative flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-lg p-8 hover:border-blue-600 hover:bg-blue-50 transition-all cursor-pointer dark:border-slate-700 dark:hover:bg-slate-800/50">
@@ -230,16 +219,14 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
                           <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                             이미지를 클릭하거나 드래그해서 업로드하세요
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                            PNG, JPG, GIF (최대 10MB)
-                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">PNG, JPG, GIF (최대 10MB)</p>
                           <input
                             type="file"
                             multiple
                             accept="image/*"
                             onChange={handleImageChange}
                             className="sr-only"
-                            disabled={isLoading}
+                            disabled={isPending}
                           />
                         </label>
 
@@ -256,7 +243,7 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
                                   type="button"
                                   onClick={() => removeImage(index)}
                                   className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                  disabled={isLoading}
+                                  disabled={isPending}
                                 >
                                   ×
                                 </button>
@@ -269,35 +256,26 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
                   </FormItem>
                 )}
               />
-              <input
-                type="hidden"
-                name="studyId"
-                value={form.watch("studyId")}
-              />
 
               <div className="flex gap-3 pt-4">
-                <Button
-                  type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "작성 중..." : "모집글 작성"}
+                <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white" disabled={isPending}>
+                  {isPending ? "수정 중..." : "수정 완료"}
                 </Button>
-                <Link href="/" className="flex-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full bg-transparent"
-                    disabled={isLoading}
-                  >
+                <Link href={`/posts/${initialData.id}`} className="flex-1">
+                  <Button type="button" variant="outline" className="w-full bg-transparent" disabled={isPending}>
                     취소
                   </Button>
                 </Link>
               </div>
+
+              <input type="hidden" name="id" value={initialData.id} />
+              <input type="hidden" name="title" value={form.watch("title")} />
+              <input type="hidden" name="content" value={form.watch("content")} />
+              <input type="hidden" name="studyId" value={form.watch("studyId")} />
             </form>
           </Form>
         </Card>
       </div>
     </div>
-  );
+  )
 }

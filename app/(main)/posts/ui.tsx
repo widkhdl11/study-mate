@@ -18,7 +18,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Search, MapPin, Users, Calendar, ThumbsUp, Eye } from "lucide-react";
 import { useGetAllPosts } from "@/hooks/usePost";
-import { PostsResponse } from "@/types/response/post";
+import { PostsResponse } from "@/types/postType";
 import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
 import {
   getCategoryCodeByValue,
@@ -65,7 +65,6 @@ export default function PostsUI() {
         .includes(searchQuery.toLowerCase()) ||
       post.study?.title?.toLowerCase().includes(searchQuery.toLowerCase());
 
-     // ✅ 카테고리 필터링 (계층 구조 고려)
      let matchesCategory = true;
      if (detailCategoryValue && detailCategoryValue !== "전체") {
        // 소분류 선택됨
@@ -86,7 +85,6 @@ export default function PostsUI() {
        // 예: 대분류 100 선택 → 101, 102, 10101, 10102 모두 포함
        matchesCategory = Math.floor(postCategory / 100) === Math.floor(mainCategoryCode/100);
      }
-     // ✅ 지역 필터링 (계층 구조 고려)
      let matchesRegion = true;
      if (detailRegionValue && detailRegionValue !== "전체") {
        // 시/군/구 선택됨
@@ -101,7 +99,6 @@ export default function PostsUI() {
         // 예: 서울(11) 선택 → 1101(강남), 1102(강북) 모두 포함
         matchesRegion = Math.floor(postRegion/1000) === Math.floor(mainRegionCode/1000);
      }
-     // ✅ 상태 필터링
      const matchesStatus =
        selectedStatus === "전체 상태" || 
        post.study?.status === getStudyStatusExistValue(selectedStatus.trim());

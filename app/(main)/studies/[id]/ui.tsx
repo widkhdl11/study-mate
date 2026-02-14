@@ -30,19 +30,20 @@ import {
   useRejectParticipant,
   useRemoveParticipant,
 } from "@/hooks/useParticipant";
-import { StudiesResponse } from "@/types/response/studies";
+import { StudiesResponse, StudyResponse } from "@/types/studiesType";
 import { participantStatusConversion } from "@/utils/conversion/participants";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
 import { getStudyStatusColor, studyStatusConversion } from "@/utils/conversion/study";
 import { formatDate } from "date-fns";
 import { getProfileImageUrl } from "@/lib/supabase/storage";
-import { ProfileResponse } from "@/types/response/profile";
+import { ProfileResponse } from "@/types/profileType";
 
-export default function UserStudyDetailUI({ study, user }: { study: StudiesResponse, user: ProfileResponse }) {
+export default function UserStudyDetailUI({ study, user }: { study: StudyResponse, user: ProfileResponse | null }) {
   const acceptParticipant = useAcceptParticipant(Number(study.id));
   const rejectParticipant = useRejectParticipant(Number(study.id));
   const removeParticipant = useRemoveParticipant(Number(study.id));
+  
   const deleteStudy = useDeleteStudy({ id: study.id.toString() });
 
   const categoryPath = getCategoryPath(Number(study.study_category));

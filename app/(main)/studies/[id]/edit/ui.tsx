@@ -39,14 +39,14 @@ import {
 } from "@/lib/constants/region";
 import { useUpdateStudy } from "@/hooks/useStudy";
 import { zodResolverFirstError } from "@/utils/utils";
-import { StudyWithAllCategoriesAndRegions } from "@/types/response/studies";
+import { StudyWithAllCategoriesAndRegions } from "@/types/studiesType";
 
 
 export function StudyEditUI({ studyId, initialData }: { studyId: string, initialData: StudyWithAllCategoriesAndRegions }) {
   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<StudyWithAllCategoriesAndRegions>({
     resolver: zodResolverFirstError(studySchema),
-    defaultValues: initialData,  // ✅ 바로 사용 가능!
+    defaultValues: initialData, 
   });
   const {mutate: updateStudyMutation, isPending} = useUpdateStudy((field ,message)=>{
     form.setError(field as keyof StudyFormValues, {
@@ -307,7 +307,6 @@ export function StudyEditUI({ studyId, initialData }: { studyId: string, initial
                           onValueChange={(value) => {
                             field.onChange(value);
                             setDetailRegionValue(value);
-                            // ✅ 상세 지역 선택 시 즉시 계산
                             const code = getRegionCodeByValue(value);
                             if (code !== null && code !== undefined) {
                               setRegionValue(code);
@@ -425,7 +424,6 @@ export function StudyEditUI({ studyId, initialData }: { studyId: string, initial
                 value={detailRegionValue}
               />
               
-              {/* ✅ 계산된 값들 - 항상 최신 상태 */}
               <input
                 type="hidden"
                 name="studyCategory"

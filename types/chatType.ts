@@ -17,7 +17,7 @@ export interface ChatParticipant {
     user_id: string;
     created_at: string;
     last_read_at: string;
-
+    
     profile: {
         username: string;
         avatar_url: string | null;
@@ -25,8 +25,24 @@ export interface ChatParticipant {
 }
 
 export interface ChatRoom {
-    id: string;
-    study_id: string;
+    id: number;
+    study_id: number;
     is_group: boolean;
     name: string;
+    profile: {
+        username: string;
+        avatar_url: string | null;
+    };
+    created_at: string;
+    last_message_at: string;
+    chat :{
+        id: number;
+        name: string;
+        created_at: string;
+        creator_id: string;
+        study_id: number;
+        is_group: boolean;
+        last_message : string;
+        last_message_at: string;
+    }
 }

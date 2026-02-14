@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, MapPin, MoreVertical, Trash2 } from "lucide-react";
 import { ThumbsUp, Eye } from "lucide-react";
 import { getImageUrl } from "@/lib/supabase/storage";
-import { PostsResponse } from "@/types/response/post";
+import { PostsResponse } from "@/types/postType";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
 import { studyStatusConversion } from "@/utils/conversion/study";
@@ -34,8 +34,8 @@ export default function MyPostTab({
   const router = useRouter();
 
   const handleDelete = (postId: number, e: React.MouseEvent) => {
-    e.preventDefault();      // ✅ Link 기본 동작 막기
-    e.stopPropagation();     // ✅ 이벤트 전파 막기
+    e.preventDefault();     
+    e.stopPropagation();     
 
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
@@ -44,8 +44,8 @@ export default function MyPostTab({
   };
 
   const handleUpdate = (postId: number, e: React.MouseEvent) => {
-    e.preventDefault();      // ✅ Link 기본 동작 막기
-    e.stopPropagation();     // ✅ 이벤트 전파 막기
+    e.preventDefault();     
+    e.stopPropagation();    
 
     router.push(`/posts/${postId}/edit`);
   };
@@ -55,9 +55,9 @@ export default function MyPostTab({
       {myPosts && myPosts?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {myPosts.map((post) => (
-            <div key={post.id} className="relative">  {/* ✅ Link를 Card 밖으로 */}
+            <div key={post.id} className="relative">  
               <Card className="group overflow-hidden hover:shadow-md transition-all h-full flex flex-col p-0 gap-0">
-                <Link href={`/posts/${post.id}`}>  {/* ✅ Link를 이미지에만 */}
+                <Link href={`/posts/${post.id}`}>  
                   <div className="relative w-full h-40 bg-muted overflow-hidden cursor-pointer">
                     <img
                       src={getImageUrl(post.image_url?.[0]?.url || "/placeholder.svg")}
@@ -103,7 +103,7 @@ export default function MyPostTab({
                     </DropdownMenu>
                   </div>
 
-                  <Link href={`/posts/${post.id}`}>  {/* ✅ Link를 제목/내용에 */}
+                  <Link href={`/posts/${post.id}`}>  
                     <div className="cursor-pointer">
                       <div className="flex items-center gap-2 mb-2">
                         {getCategoryPath(

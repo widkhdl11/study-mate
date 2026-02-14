@@ -1,5 +1,7 @@
 import PostCreateUI from "./ui";
+import { getMyCreatedStudiesSSR } from "@/actions/studyAction";
 
-export default function PostCreatePage() {
-  return <PostCreateUI />;
+export default async function PostCreatePage() {
+  const userStudies = await getMyCreatedStudiesSSR();
+  return <PostCreateUI studies={userStudies} />;
 }

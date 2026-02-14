@@ -5,7 +5,7 @@
   import { createClient } from "@/lib/supabase/server";
   import { createClientAdmin } from "@/lib/supabase/client-admin";
   import { LoginFormValues, loginSchema, SignupFormValues, signupSchema } from "@/lib/zod/schemas/authSchema";
-  import { ActionResponse } from "@/types/response/action";
+  import { ActionResponse } from "@/types/actionType";
   import { validateWithZod } from "@/utils/utils";
 
   /**

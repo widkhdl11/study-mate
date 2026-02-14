@@ -2,11 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
 import Link from "next/link"
-import { useRef, useState } from "react"
-import { useRouter } from "next/navigation"
-
+import { useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -16,22 +13,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft } from "lucide-react"
 import { useUpdateProfile } from "@/hooks/useProfile"
 import profileEditSchema, { ProfileEditFormValues } from "@/lib/zod/schemas/profileSchema"
+import { ProfileResponse } from "@/types/profileType"
 
 
-interface ProfileEditUIProps {
-  initialData: {
-    username: string
-    email: string
-    bio?: string
-    birthDate: string
-    gender: string
-  }
-}
 
-export function ProfileEditUI({ initialData }: ProfileEditUIProps) {
-  const updateProfileMutation = useUpdateProfile()
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+export function ProfileEditUI({ initialData }: { initialData: ProfileResponse }) {
+  const { mutate: updateProfileMutation, isPending } = useUpdateProfile()
   const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<ProfileEditFormValues>({
@@ -40,24 +27,19 @@ export function ProfileEditUI({ initialData }: ProfileEditUIProps) {
       username: initialData.username,
       email: initialData.email,
       bio: initialData.bio || "",
-      birthDate: initialData.birthDate,
-      gender: initialData.gender,
+      birthDate: initialData.birth_date || "",
+      gender: initialData.gender || "",
     },
   })
 
   async function onSubmit(values: ProfileEditFormValues) {
-    setIsLoading(true)
     if (!formRef.current) {
       return;
     }
-    form.clearErrors();
-    try {
       const formData = new FormData(formRef.current);
       // TODO: 실제 프로필 수정 API 호출
-      updateProfileMutation.mutate(formData);
-    } finally {
-      setIsLoading(false)
-    }
+      updateProfileMutation(formData);
+    
   }
 
   return (
@@ -87,7 +69,7 @@ export function ProfileEditUI({ initialData }: ProfileEditUIProps) {
                   <FormItem>
                     <FormLabel>아이디</FormLabel>
                     <FormControl>
-                      <Input placeholder="이름을 입력해주세요" disabled={isLoading} {...field} />
+                      <Input placeholder="이름을 입력해주세요" disabled={isPending} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -119,7 +101,7 @@ export function ProfileEditUI({ initialData }: ProfileEditUIProps) {
                     <FormControl>
                       <Textarea
                         placeholder="자기소개를 입력해주세요"
-                        disabled={isLoading}
+                        disabled={isPending}
                         rows={4}
                         className="resize-none"
                         {...field}
@@ -138,7 +120,7 @@ export function ProfileEditUI({ initialData }: ProfileEditUIProps) {
                   <FormItem>
                     <FormLabel>생년월일</FormLabel>
                     <FormControl>
-                      <Input type="date" disabled={isLoading} {...field} className="w-36 mw-auto" />
+                      <Input type="date" disabled={isPending} {...field} className="w-36 mw-auto" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -152,7 +134,7 @@ export function ProfileEditUI({ initialData }: ProfileEditUIProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>성별</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isPending}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="성별을 선택해주세요" />
@@ -173,12 +155,12 @@ export function ProfileEditUI({ initialData }: ProfileEditUIProps) {
                 <Button
                   type="submit"
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                  disabled={updateProfileMutation.isPending}
+                  disabled={isPending}
                 >
-                  {updateProfileMutation.isPending ? "수정 중..." : "수정하기"}
+                  {isPending ? "수정 중..." : "수정하기"}
                 </Button>
                 <Link href="/profile" className="flex-1">
-                  <Button type="button" variant="outline" className="w-full bg-transparent" disabled={isLoading}>
+                  <Button type="button" variant="outline" className="w-full bg-transparent" disabled={isPending}>
                     취소
                   </Button>
                 </Link>

@@ -1,6 +1,6 @@
-import { getNotifications, readNotification } from "@/actions/notificationActions";
+import { getNotifications, readNotification } from "@/actions/notificationAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
-import { NotificationResponse } from "@/types/response/notification";
+import { NotificationResponse } from "@/types/notificationType";
 import { createClient } from "@/lib/supabase/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -27,6 +27,8 @@ export function useGetNotifications(){
     });
 
     useEffect(() => {
+        if (!user?.id) return;
+
         const channel = supabase.channel("notifications")
         .on("postgres_changes", {
             event: "INSERT",
@@ -35,7 +37,7 @@ export function useGetNotifications(){
             filter: `user_id=eq.${user?.id}`,
         },
         async (payload) => {
-          const newNotification = payload.new as Notification;
+          const newNotification = payload.new as NotificationResponse;
 
           // 캐시에 추가
           queryClient.setQueryData(
@@ -47,6 +49,10 @@ export function useGetNotifications(){
           );
         });
         channel.subscribe();
+        // cleanup
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [user?.id, queryClient, supabase]);
 
 

@@ -1,4 +1,4 @@
-import {createChat, getChatMessages, getMyChatRooms, sendMessage} from "@/actions/chatAction";
+import {createChat, getChatMessages, getChatParticipants, getMyChatRooms, sendMessage} from "@/actions/chatAction";
 import {queryKeys} from "@/lib/reactQuery/queryKeys";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 import { ChatMessage } from "./use-realtime-chat";
@@ -6,31 +6,45 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useUser } from "./useUser";
+import { ChatParticipant, ChatRoom } from "@/types/chatType";
 
 
-// 채팅방 생성
+// 채팅방 생성(아직 사용처 없음)
 export const useCreateChat = () => {
     return useMutation({
         mutationFn: async (formData : FormData) => {
             const create_chat_response = await createChat(formData);
             return create_chat_response;
-        }
+        },
+        onSuccess: (response) => {
+            if (!response.success) {
+                toast.error(response.error?.message || "채팅방 생성 중 오류가 발생했습니다");
+            }
+        },
+        onError: (error) => {
+            toast.error(error?.message || "채팅방 생성 중 오류가 발생했습니다");
+        },
     })
 }
 
 // 채팅방 목록 불러오기
-export const useGetChats = () => {
+export const useGetMyChatRooms = () => {
     return useQuery({
-        queryKey: queryKeys.chats,
+        queryKey: queryKeys.myChatRooms,
         queryFn: async () => {
-            return await getMyChatRooms();
-        }
+            const result = await getMyChatRooms();
+            if (!result.success) {
+                throw new Error(result.error?.message || "채팅방 목록 불러오기 중 오류가 발생했습니다");
+            }
+            return result.data as unknown as ChatRoom[];
+        },
+        throwOnError: true,
     });
 }
 // 메세지 보내기
 
 // 메세지 불러오기
-export function useGetChatMessages(chatId : number) {
+export const useGetChatMessages = (chatId : number) => {
   const queryClient = useQueryClient();
   const supabase = createClient();  // Realtime용
   const { data: user } = useUser();
@@ -39,7 +53,7 @@ export function useGetChatMessages(chatId : number) {
     queryKey: queryKeys.chatMessages(chatId),
     queryFn: async () => {
       const result = await getChatMessages(chatId);
-      if (!result.success || result.error) {
+      if (!result.success) {
         throw new Error(result.error?.message || "메시지 로드 중 오류가 발생했습니다");
       }
       return result.data as unknown as ChatMessage[];
@@ -48,6 +62,7 @@ export function useGetChatMessages(chatId : number) {
 
   // 실시간 구독 (클라이언트)
   useEffect(() => {
+    if (!user?.id) return;
     const channel = supabase
       .channel(`chat-${chatId}`)
       .on(
@@ -101,22 +116,24 @@ export function useGetChatMessages(chatId : number) {
     
 }
 // 채팅방 참여자 불러오기
-// export const useGetChatParticipants = (chatId : number) => {
-//     return useQuery({
-//         queryKey: queryKeys.chatParticipants(chatId),
-//         queryFn: async () => {
-//             return await getChatParticipants(chatId);
-//         },
-//         enabled: chatId > 0
-//     });
-// }
-// 채팅방 삭제
-
-// 참여중인 채팅방 목록 불러오기(마지막 메세지 포함)
+export const useGetChatParticipants = (chatId : number) => {
+    return useQuery({
+        queryKey: queryKeys.chatParticipants(chatId),
+        queryFn: async () => {
+            const result = await getChatParticipants(chatId);
+            if (!result.success) {
+                throw new Error(result.error?.message || "채팅방 참여자 불러오기 중 오류가 발생했습니다");
+            }
+            return result.data as unknown as ChatParticipant[];
+        },
+        enabled: chatId > 0
+    });
+}
+// 채팅방 삭제(스터디 삭제시 같이 삭제되도록)
 
 
 // 메시지 전송 훅
-export function useSendMessage(chatId: number) {
+export const useSendMessage = (chatId: number) => {
   const queryClient = useQueryClient();
   const { data: user } = useUser();
 

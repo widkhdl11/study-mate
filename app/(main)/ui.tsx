@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { BookOpen, Sparkles, Target, Users } from "lucide-react";
 import { useGetAllPosts } from "@/hooks/usePost";
-import { PostsResponse } from "@/types/response/post";
+import { PostsResponse } from "@/types/postType";
 import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
 
 export default function HomeUI() {

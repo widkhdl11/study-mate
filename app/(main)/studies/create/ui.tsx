@@ -170,7 +170,6 @@ export default function StudyCreateUI() {
                         setMainCategoryValue(value);
                         setSubCategoryValue("");
                         setDetailCategoryValue("");
-                        // ✅ 하위 선택 초기화 시 계산값도 초기화
                         setStudyCategoryValue(0);
                         form.setValue("studyCategory", 0);
                       }}
@@ -205,7 +204,6 @@ export default function StudyCreateUI() {
                         field.onChange(value);
                         setSubCategoryValue(value);
                         setDetailCategoryValue("");
-                        // ✅ 하위 선택 초기화 시 계산값도 초기화
                         setStudyCategoryValue(0);
                         form.setValue("studyCategory", 0);
                       }}
@@ -240,7 +238,6 @@ export default function StudyCreateUI() {
                         field.onChange(value);
                         setDetailCategoryValue(value);
                         
-                        // ✅ 소분류 선택 시 즉시 계산!
                         const code = getCategoryCodeByValue(value);
                         if (code) {
                           setStudyCategoryValue(code);
@@ -281,7 +278,6 @@ export default function StudyCreateUI() {
                         setMainRegionValue(value);
                         setDetailRegionValue("");
                         
-                        // ✅ 온라인 선택 시 즉시 region = 0
                         if (value === "ONLINE") {
                           setRegionValue(0);
                           form.setValue("region", 0, {
@@ -327,7 +323,6 @@ export default function StudyCreateUI() {
                             field.onChange(value);
                             setDetailRegionValue(value);
                             
-                            // ✅ 상세 지역 선택 시 즉시 계산!
                             const code = getRegionCodeByValue(value);
                             if (code !== null && code !== undefined) {
                               setRegionValue(code);

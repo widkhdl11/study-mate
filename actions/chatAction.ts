@@ -1,54 +1,54 @@
 'use server';
 
 import {createClient} from "@/lib/supabase/server";
-import {getUser} from "./profileAction";
 import { notFound } from "next/navigation";
+import { CustomUserAuth } from "@/utils/auth";
+import { ActionResponse } from "@/types/actionType";
+import { ChatMessage, ChatParticipant, ChatRoom } from "@/types/chatType";
 
 
-export async function createChat(formData : FormData) {
+// 채팅방 생성
+export async function createChat(formData : FormData): Promise<ActionResponse<ChatRoom>> {
     const supabase = await createClient();
+    const { user } = await CustomUserAuth(supabase);
     const {data, error} = await supabase.from("chats").insert({study_id: formData.get("study_id")as string}).select();
-    return data;
-}
-
-export async function getMyChatRooms() {
-    const supabase = await createClient();
-
-
-    const {data: user, error: userError} = await supabase.auth.getUser();
-    if (userError) {
-        throw new Error("사용자 정보를 찾을 수 없습니다.");
-    }
-    const userId = user.user.id;
-    const {data, error} = await supabase.from("chat_participants")
-    .select("*, chats!chat_participants_chat_id_fkey(*)")
-    .eq("user_id", userId);
     if (error) {
-        throw new Error(error.message);
+        throw new Error("채팅방 생성에 실패했습니다.");
     }
-    return data;
+    return { success: true, data: data as unknown as ChatRoom };
 }
 
-export async function getChatMessages(chatId : number) {
+// 참여중인 채팅방들 불러오기(마지막 메세지 포함)
+export async function getMyChatRooms(): Promise<ActionResponse<ChatRoom[]>> {
+  const supabase = await createClient();
+  const { user } = await CustomUserAuth(supabase);
+
+  const { data, error } = await supabase
+    .from("chat_participants")
+    .select(`
+      *,
+      chat:chats(*),
+      profile:profiles!chat_participants_user_id_fkey(username, avatar_url)
+    `)
+    .eq("user_id", user.id)
+    .order("chat(last_message_at)", { ascending: false });
+
+  if (error) {
+    throw new Error("채팅방 목록 불러오기에 실패했습니다.");
+  }
+  
+  return { success: true, data: data as unknown as ChatRoom[] };
+}
+
+// 채팅방 메시지 불러오기
+export async function getChatMessages(chatId : number): Promise<ActionResponse<ChatMessage[]>> {
     const supabase = await createClient();
-    const user = await getUser();
-    if (! user) {
-        throw new Error("사용자 정보를 찾을 수 없습니다.");
-    }
-    const userId = user.id;
+    const {user} = await CustomUserAuth(supabase);
+
     // 호출한 쪽에서 try/catch 필수
-    try {
-        const chatParticipant = await checkChatParticipant(chatId, userId);
-        if (! chatParticipant) {
-            throw new Error("채팅방 참여자를 찾을 수 없습니다.");
-        }
-    } catch (error) {
-        return {
-            success: false,
-            error: {
-                message: (error as Error).message
-            }
-        };
+    const chatParticipant = await checkChatParticipant(chatId, user.id);
+    if (!chatParticipant || chatParticipant.length === 0) {
+        throw new Error("채팅방 참여자를 찾을 수 없습니다.");
     }
 
     const {data, error} = await supabase
@@ -69,24 +69,28 @@ export async function getChatMessages(chatId : number) {
   return { success: true, data };
 }
 
-export async function getChatParticipants(chatId : number) {
+// 채팅방 참여자 불러오기
+export async function getChatParticipants(chatId : number): Promise<ActionResponse<ChatParticipant[]>> {
     const supabase = await createClient();
-    const {data, error} = await supabase.from("chat_participants").select("*").eq("id", chatId);
-    return data;
+    const {user} = await CustomUserAuth(supabase);
+    const {data, error} = await supabase.from("chat_participants").select("*").eq("chat_id", chatId);
+    if (error) {
+        throw new Error("채팅방 참여자 불러오기에 실패했습니다.");
+    }
+    return { success: true, data: data as unknown as ChatParticipant[] };
 }
 
 
 // 해당 채팅방 참여 유저 확인
-export async function checkChatParticipant(chatId : number, userId : string) {
+export async function checkChatParticipant(ChatId: number, userId: string): Promise<ChatParticipant[]> {
     const supabase = await createClient();
-
-    const {data, error} = await supabase.from("chat_participants").select("*").eq("chat_id", chatId).eq("user_id", userId);
+    const {data, error} = await supabase.from("chat_participants").select("*").eq("chat_id", ChatId).eq("user_id", userId);
 
     if (error) {
         throw new Error(error.message);
     }
     if (!data) {
-        throw new Error("채팅방 참여자를 찾을 수 없습니다.");
+        throw new Error("해당 채팅방에 참여하지 않은 유저입니다.");
     }
     return data;
 }
@@ -97,10 +101,7 @@ export async function sendMessage(chatId: number, content: string) {
   const supabase = await createClient();
   
   // 1. 로그인 확인
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: { message: "로그인이 필요합니다" } };
-  }
+  const { user } = await CustomUserAuth(supabase);
 
   // 2. 참여자 검증
   const { data: participant } = await supabase
@@ -135,62 +136,55 @@ export async function sendMessage(chatId: number, content: string) {
 
 // =============ssr================
 
+// 채팅방 메시지 불러오기(ssr)
 export async function getChatMessagesSSR(chatId : number) {
     const supabase = await createClient();  
 
-    const {data: user, error: userError} = await supabase.auth.getUser();
-    if (userError) {
-        throw new Error("사용자 정보를 찾을 수 없습니다.");
-    }
-    const userId = user.user.id;
-    const chatParticipant = await checkChatParticipant(chatId, userId);
-    if (! chatParticipant) {
+    const {user} = await CustomUserAuth(supabase);
+    const chatParticipant = await checkChatParticipant(chatId, user.id);
+    if (!chatParticipant || chatParticipant.length === 0) {
         throw new Error("채팅방 참여자를 찾을 수 없습니다.");
     }
     const {data, error} = await supabase.from("chat_messages")
     .select(`*, profile:profiles!chat_messages_sender_id_fkey(username, avatar_url)`)
     .eq("chat_id", chatId).order("created_at", { ascending: true });
     if (error) {
-        console.log("getChatMessagesSSR error", error);
         notFound();
     }
     return data;
 }
 
-export async function getChatParticipantsSSR(chatId : number) {
+// 채팅방 참여자 불러오기(ssr)
+export async function getChatParticipantsSSR(ChatId : number) {
     const supabase = await createClient();
-     const {data: user, error: userError} = await supabase.auth.getUser();
-    if (userError) {
-        throw new Error("사용자 정보를 찾을 수 없습니다.");
-    }
-    const userId = user.user.id;
-    const chatParticipant = await checkChatParticipant(chatId, userId);
-    if (! chatParticipant) {
+    const {user} = await CustomUserAuth(supabase);
+    const chatParticipant = await checkChatParticipant(ChatId, user.id);
+    if (!chatParticipant || chatParticipant.length === 0) {
         throw new Error("채팅방 참여자를 찾을 수 없습니다.");
     }
     const {data, error} = await supabase.from("chat_participants")
-    .select(`*, profile:profiles!chat_participants_user_id_fkey(username, avatar_url)`).eq("chat_id", chatId);
+    .select(`*, profile:profiles!chat_participants_user_id_fkey(username, avatar_url)`).eq("chat_id",  ChatId);
     if (error || !data) {
-        console.log("getChatParticipantsSSR error", error);
         notFound();
     }
     return data;
 }
 
-export async function getChatSSR(chatId : number) {
+// 채팅방 정보 불러오기(ssr)
+export async function getChatSSR(ChatId : number) {
     const supabase = await createClient();
-     const {data: user, error: userError} = await supabase.auth.getUser();
-    if (userError) {
-        throw new Error("사용자 정보를 찾을 수 없습니다.");
+    const {user} = await CustomUserAuth(supabase);
+    const chatParticipant = await checkChatParticipant(ChatId, user.id);
+    if (!chatParticipant || chatParticipant.length === 0) {
+        throw new Error("해당 채팅방에 참여하지 않은 유저입니다.");
     }
-    const userId = user.user.id;
-    const chatParticipant = await checkChatParticipant(chatId, userId);
-    if (! chatParticipant) {
-        throw new Error("채팅방 참여자를 찾을 수 없습니다.");
-    }
-    const {data, error} = await supabase.from("chats").select(`* , profile:profiles!chats_creator_id_fkey(username, avatar_url)`).eq("id", chatId).maybeSingle();
+    const {data, error} = await supabase
+    .from("chats")
+    .select(`* , profile:profiles!chats_creator_id_fkey(username, avatar_url)`)
+    .eq("id", ChatId)
+    .maybeSingle();
+    
     if (error || !data) {
-        console.log("getChatSSR error", error);
         notFound();
     }
     return data;

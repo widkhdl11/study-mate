@@ -1,6 +1,8 @@
 import { getStudyDetailSSR } from "@/actions/studyAction";
 import UserStudyDetailUI from "./ui";
 import { getMyProfileSSR } from "@/actions/profileAction";
+import { ProfileResponse } from "@/types/profileType";
+import { StudiesResponse, StudyResponse } from "@/types/studiesType";
 
 export default async function StudyDetailPage({
   params,

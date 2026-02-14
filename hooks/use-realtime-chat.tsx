@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '@/lib/client'
+import { createClient } from '@/lib/supabase/client'
 import { useCallback, useEffect, useState } from 'react'
 
 interface UseRealtimeChatProps {
@@ -55,12 +55,15 @@ export function useRealtimeChat({ roomName, username }: UseRealtimeChatProps) {
       if (!channel || !isConnected) return
 
       const message: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: Number(crypto.randomUUID()),
+        chat_id: Number(roomName),
         content,
-        user: {
-          name: username,
+        sender_id: username,
+        profile: {
+          username: username,
+          avatar_url: "",
         },
-        createdAt: new Date().toISOString(),
+        created_at: new Date().toISOString(),
       }
 
       // Update local state immediately for the sender
