@@ -157,7 +157,7 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
                           <SelectValue placeholder="스터디를 선택해주세요" />
                         </SelectTrigger>
                         <SelectContent>
-                          {studies?.map((study: StudyResponse) => (
+                          {studies?.map((study) => (
                             <SelectItem key={study.id} value={study.id.toString()}>
                               {study.title}
                             </SelectItem>

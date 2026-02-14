@@ -143,7 +143,7 @@ export function PostEditUI({ initialData, studies }: { initialData: PostDetailRe
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {studies?.map((study: StudyResponse) => (
+                        {studies?.map((study) => (
                           <SelectItem key={study.id} value={study.id.toString()}>
                             {study.title}
                           </SelectItem>

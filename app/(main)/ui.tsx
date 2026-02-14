@@ -255,7 +255,7 @@ export default function HomeUI() {
                             {/* Category & Location */}
                             <div className="flex flex-wrap gap-2">
                               <Badge
-                                className={`${getCategoryColor(post.study.study_category)} border-0`}
+                                className={`${getCategoryColor(post.study.study_category.toString())} border-0`}
                               >
                                 {post.study.study_category}
                               </Badge>

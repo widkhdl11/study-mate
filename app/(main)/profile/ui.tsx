@@ -39,7 +39,7 @@ export default function UserProfileUI({ user, posts, studies }: { user: ProfileR
   );  
   const myPosts = posts || [];
   const myStudies = studies || [];
-  const currentUser = convertUser(user || []);
+  const currentUser = user;
   const logoutMutation = useLogout();
 
 
@@ -144,7 +144,7 @@ useEffect(() => {
                     </p>
                   </div>
                   <Badge className="bg-blue-600 text-white w-fit">
-                    {currentUser?.level || ""}
+                    {currentUser?.points || ""}
                   </Badge>
                 </div>
 

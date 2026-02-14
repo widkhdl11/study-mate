@@ -53,7 +53,7 @@ export const RealtimeChat = ({
       (message, index, self) => index === self.findIndex((m) => m.id === message.id)
     )
     // Sort by creation date
-    const sortedMessages = uniqueMessages.sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    const sortedMessages = uniqueMessages.sort((a, b) => a.created_at.localeCompare(b.created_at))
 
     return sortedMessages
   }, [initialMessages, realtimeMessages])
@@ -92,7 +92,7 @@ export const RealtimeChat = ({
         <div className="space-y-1">
           {allMessages.map((message, index) => {
             const prevMessage = index > 0 ? allMessages[index - 1] : null
-            const showHeader = !prevMessage || prevMessage.user.name !== message.user.name
+            const showHeader = !prevMessage || prevMessage.profile.username !== message.profile.username
 
             return (
               <div
@@ -101,7 +101,7 @@ export const RealtimeChat = ({
               >
                 <ChatMessageItem
                   message={message}
-                  isOwnMessage={message.user.name === username}
+                  isOwnMessage={message.sender_id === username}
                   showHeader={showHeader}
                 />
               </div>

@@ -153,7 +153,7 @@ export const useSendMessage = (chatId: number) => {
       const tempMessage: ChatMessage = {
         id: Date.now(),  // 임시 ID
         chat_id: chatId,
-        sender_id: user?.id || null,
+        sender_id: user?.id || "",
         content,
         created_at: new Date().toISOString(),
         profile: {

@@ -20,6 +20,10 @@
 # production
 /build
 
+# Docker export (로컬 빌드 이미지)
+study-mate.tar.gz
+study-mate.tar
+
 # misc
 .DS_Store
 *.pem
