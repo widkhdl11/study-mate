@@ -40,6 +40,8 @@ export async function getMyChatRooms(): Promise<ActionResponse<ChatRoom[]>> {
   return { success: true, data: data as unknown as ChatRoom[] };
 }
 
+
+
 // 채팅방 메시지 불러오기
 export async function getChatMessages(chatId : number): Promise<ActionResponse<ChatMessage[]>> {
     const supabase = await createClient();

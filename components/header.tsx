@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { useLogout } from "@/hooks/useAuth"
 import { useUser } from "@/hooks/useUser"
 import { getProfileImageUrl } from "@/lib/supabase/storage"
-import { useGetNotifications, useReadNotification } from "@/hooks/useNotification"
+import { useAllReadNotification, useGetNotifications, useReadNotification } from "@/hooks/useNotification"
 import { formatTimeAgo } from "@/utils/utils"
 import { NotificationResponse } from "@/types/notificationType"
 
@@ -25,6 +25,7 @@ export const Header = () => {
   const logoutMutation = useLogout();
   const { data: notifications } = useGetNotifications();
   const readNotificationMutation = useReadNotification();
+  const { mutate: allReadNotification } = useAllReadNotification();
   
   
   const handleCreateStudy = () => {
@@ -39,7 +40,6 @@ export const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link
             href="/"
             className="flex items-center gap-2 font-bold text-xl text-foreground hover:text-accent transition-colors"
@@ -50,7 +50,6 @@ export const Header = () => {
             Study Mate
           </Link>
 
-          {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center gap-8">
             <Link href="/posts" className="text-foreground hover:text-accent transition-colors font-medium">
               모집글
@@ -63,9 +62,7 @@ export const Header = () => {
             </button>
           </nav>
 
-          {/* Right Actions */}
           <div className="flex items-center gap-4">
-            {/* Search Bar - Hidden on mobile */}
             <div className="hidden lg:flex items-center bg-muted rounded-lg px-3 py-2 w-64">
               <span className="text-muted-foreground">🔍</span>
               <input
@@ -94,7 +91,7 @@ export const Header = () => {
                     <div className="flex items-center justify-between px-3 py-2 border-b border-border">
                       <span className="font-semibold text-sm text-foreground">알림</span>
                       {notifications && notifications?.filter(n => !n.is_read).length > 0 && (
-                        <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                        <button className="text-xs text-muted-foreground hover:text-foreground transition-colors" onClick={() => allReadNotification()}>
                           모두 읽음
                         </button>
                       )}
@@ -149,7 +146,6 @@ export const Header = () => {
                 </DropdownMenu>
           
 
-                {/* User Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer">

@@ -30,7 +30,7 @@ import {
   useRejectParticipant,
   useRemoveParticipant,
 } from "@/hooks/useParticipant";
-import { StudiesResponse, StudyResponse } from "@/types/studiesType";
+import { StudyResponse } from "@/types/studiesType";
 import { participantStatusConversion } from "@/utils/conversion/participants";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";

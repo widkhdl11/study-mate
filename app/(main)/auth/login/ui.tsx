@@ -23,7 +23,6 @@ import { useLogin } from "@/hooks/useAuth";
 
 export default function LoginUI() {
   const formRef = useRef<HTMLFormElement>(null);
-  // const loginMutation = useLogin();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     mode: "onTouched", 
@@ -32,7 +31,6 @@ export default function LoginUI() {
       password: "",
     },
   });
-  // 훅에 콜백 전달
     const loginMutation = useLogin((field, message) => {
       form.setError(field as keyof LoginFormValues, {
         type: "server",

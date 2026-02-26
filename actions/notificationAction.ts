@@ -76,3 +76,20 @@ export async function deleteNotification(notificationId: number): Promise<Action
     }
     return { success: true, data: data as unknown as NotificationResponse };
 }
+
+// 모든 알람 읽기(is_read = true로 변경)
+export async function allReadNotification(): Promise<ActionResponse<NotificationResponse[]>> {
+    const supabase = await createClient();
+    const { user } = await CustomUserAuth(supabase);
+    
+    const { data, error } = await supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("user_id", user.id)
+        .eq("is_deleted", false);
+
+    if (error) {
+        throw new Error("모든 알람 읽기 중 오류가 발생했습니다");
+    }
+    return { success: true, data: data as unknown as NotificationResponse[] };
+}

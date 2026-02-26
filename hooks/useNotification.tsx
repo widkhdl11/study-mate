@@ -1,4 +1,4 @@
-import { getNotifications, readNotification } from "@/actions/notificationAction";
+import { allReadNotification, getNotifications, readNotification } from "@/actions/notificationAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
 import { NotificationResponse } from "@/types/notificationType";
 import { createClient } from "@/lib/supabase/client";
@@ -66,6 +66,32 @@ export function useReadNotification() {
     return useMutation({
         mutationFn: async (notificationId: number) => {
             return await readNotification(notificationId);
+        },
+        onSuccess: (response) => {
+            if (response.success) {
+                queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
+            }
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        },
+    });
+}
+
+export function useAllReadNotification() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async () => {
+            return await allReadNotification();
+        },
+        onMutate: async () => {
+            await queryClient.cancelQueries({ queryKey: queryKeys.notifications });
+            const previousNotifications = queryClient.getQueryData<NotificationResponse[]>(queryKeys.notifications);
+            queryClient.setQueryData(queryKeys.notifications, (old: NotificationResponse[] | undefined) => {
+                if (!old) return old;
+                return old.map(notification => ({ ...notification, is_read: true }));
+            });
+            return { previousNotifications };
         },
         onSuccess: (response) => {
             if (response.success) {

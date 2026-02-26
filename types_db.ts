@@ -98,6 +98,8 @@ export type Database = {
           creator_id: string | null
           id: number
           is_group: boolean
+          last_message: string | null
+          last_message_at: string | null
           name: string | null
           study_id: number | null
           updated_at: string | null
@@ -107,6 +109,8 @@ export type Database = {
           creator_id?: string | null
           id?: number
           is_group?: boolean
+          last_message?: string | null
+          last_message_at?: string | null
           name?: string | null
           study_id?: number | null
           updated_at?: string | null
@@ -116,6 +120,8 @@ export type Database = {
           creator_id?: string | null
           id?: number
           is_group?: boolean
+          last_message?: string | null
+          last_message_at?: string | null
           name?: string | null
           study_id?: number | null
           updated_at?: string | null
@@ -178,6 +184,7 @@ export type Database = {
           content: string | null
           created_at: string | null
           id: number
+          is_deleted: boolean | null
           is_read: boolean | null
           reference_id: number | null
           reference_type: string | null
@@ -190,6 +197,7 @@ export type Database = {
           content?: string | null
           created_at?: string | null
           id?: number
+          is_deleted?: boolean | null
           is_read?: boolean | null
           reference_id?: number | null
           reference_type?: string | null
@@ -202,6 +210,7 @@ export type Database = {
           content?: string | null
           created_at?: string | null
           id?: number
+          is_deleted?: boolean | null
           is_read?: boolean | null
           reference_id?: number | null
           reference_type?: string | null

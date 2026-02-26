@@ -26,7 +26,6 @@ import {
 import { StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
 import {
   getCategoryCodeByValue,
-  getCategoryPath,
   getDetailCategories,
   getMainCategories,
   getSubcategories,
