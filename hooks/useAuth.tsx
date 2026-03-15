@@ -1,89 +1,98 @@
-"use client";
+'use client'
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { login, signup, logout } from "@/actions/authAction";
-import { queryKeys } from "@/lib/reactQuery/queryKeys";
-import { isRedirect } from "@/utils/utils";
-
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { login, signup, logout } from '@/actions/authAction'
+import { queryKeys } from '@/lib/reactQuery/queryKeys'
+import { isRedirect } from '@/utils/utils'
 
 // 로그인
-export function useLogin(onFieldError?: (field: string, message: string) => void) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: login,
-    onSuccess: (response) => {
-      if (!response.success) {
-        toast.error(response.error.message);
-         if (response.error.field && onFieldError) {
-          onFieldError(response.error.field, response.error.message);
-        }
-      }
-    },
-    onError: (error: Error) => {
-      if (isRedirect(error)) {
-        queryClient.invalidateQueries({ queryKey: queryKeys.user });
-        queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
-        toast.success("로그인 성공했습니다.");
-        return;
-      }
-      toast.error(error.message);
-    },
-  });
+export function useLogin(
+    onFieldError?: (field: string, message: string) => void
+) {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: login,
+        onSuccess: (response) => {
+            if (!response.success) {
+                toast.error(response.error.message)
+                if (response.error.field && onFieldError) {
+                    onFieldError(response.error.field, response.error.message)
+                }
+            }
+        },
+        onError: (error: Error) => {
+            if (isRedirect(error)) {
+                queryClient.invalidateQueries({ queryKey: queryKeys.user })
+                queryClient.invalidateQueries({
+                    queryKey: queryKeys.notifications,
+                })
+                toast.success('로그인 성공했습니다.')
+                return
+            }
+            toast.error(error.message)
+        },
+    })
 }
 
 // 회원가입
-export function useSignup(onFieldError?: (field: string, message: string) => void) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: signup,
-    onSuccess: (response) => {
-      if (!response.success) {
-        toast.error(response.error.message);
-        if (response.error.field && onFieldError) {
-          onFieldError(response.error.field, response.error.message);
-        }
-      }
-    },
-    onError: (error: Error & { digest?: string }) => {
-      if (isRedirect(error)) {
-        toast.success("회원가입 되었습니다");
-        queryClient.invalidateQueries({ queryKey: queryKeys.user });
-        queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
-        return;
-      };
-      toast.error("회원가입 중 오류가 발생했습니다");
-    },
-  });
+export function useSignup(
+    onFieldError?: (field: string, message: string) => void
+) {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: signup,
+        onSuccess: (response) => {
+            if (!response.success) {
+                toast.error(response.error.message)
+                if (response.error.field && onFieldError) {
+                    onFieldError(response.error.field, response.error.message)
+                }
+            }
+        },
+        onError: (error: Error & { digest?: string }) => {
+            if (isRedirect(error)) {
+                toast.success('회원가입 되었습니다')
+                queryClient.invalidateQueries({ queryKey: queryKeys.user })
+                queryClient.invalidateQueries({
+                    queryKey: queryKeys.notifications,
+                })
+                return
+            }
+            toast.error('회원가입 중 오류가 발생했습니다')
+        },
+    })
 }
 
 // 로그아웃
 export function useLogout() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: logout,
-    onSuccess: (response) => {
-      if (!response.success) {
-        toast.error(response.error.message);
-      }
-    },
-    onError: (error: Error & { digest?: string }) => {
-      if (isRedirect(error)) {
-        toast.success("로그아웃되었습니다");
-        queryClient.invalidateQueries({ queryKey: queryKeys.user });
-        queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
-        return;
-      };
-      toast.error("로그아웃 중 오류가 발생했습니다");
-    },
-  });
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: logout,
+        onSuccess: (response) => {
+            if (!response.success) {
+                toast.error(response.error.message)
+            }
+        },
+        onError: (error: Error & { digest?: string }) => {
+            if (isRedirect(error)) {
+                toast.success('로그아웃되었습니다')
+                queryClient.invalidateQueries({ queryKey: queryKeys.user })
+                queryClient.invalidateQueries({
+                    queryKey: queryKeys.notifications,
+                })
+                return
+            }
+            toast.error('로그아웃 중 오류가 발생했습니다')
+        },
+    })
 }
 
 // export function useLogin() {
 //   const queryClient = useQueryClient();
 //   const router = useRouter();
-  
+
 //   return useMutation({
 //     mutationFn: async (formData: FormData) => {
 //       return await login(formData);
@@ -104,10 +113,10 @@ export function useLogout() {
 //     onSettled: async () => {
 //       // 1. React Query 캐시 무효화
 //       await queryClient.invalidateQueries({ queryKey: queryKeys.user });
-      
+
 //       // 2. Next.js 서버 컴포넌트 재렌더링
 //       router.refresh();
-      
+
 //       // 3. 약간의 딜레이 후 다시 refetch
 //       setTimeout(() => {
 //         queryClient.refetchQueries({ queryKey: queryKeys.user });

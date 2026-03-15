@@ -1,244 +1,132 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  User,
-  MessageSquare,
-  FileText,
-  BookOpen,
-  Edit,
-  Lock,
-  LogOut,
-  Settings,
-} from "lucide-react";
-import MyChatTab from "@/components/profile/info/my-chat-tab";
-import MyPostTab from "@/components/profile/info/my-post-tab";
-import MyStudiesTab from "@/components/profile/info/my-studies-tab";
-import MyInfoTab from "@/components/profile/info/my-info-tab";
-import { convertUser } from "@/utils/conversion/user";
-import { PostsResponse } from "@/types/postType";
-import { StudiesResponse } from "@/types/studiesType";
-import { useEffect, useState } from "react";
-import { useUpdateProfileImage } from "@/hooks/useProfile";
-import { getProfileImageUrl } from "@/lib/supabase/storage";
-import { ProfileResponse } from "@/types/profileType";
-import { useLogout } from "@/hooks/useAuth";
-import { useGetMyChatRooms } from "@/hooks/useChat";
-import { useSearchParams } from "next/navigation";
-import { ChatRoom } from "@/types/chatType";
+    User,
+    MessageSquare,
+    FileText,
+    BookOpen,
+    Edit,
+    Lock,
+    LogOut,
+    Settings,
+} from 'lucide-react'
+import MyChatTab from '@/components/profile/info/my-chat-tab'
+import MyPostTab from '@/components/profile/info/my-post-tab'
+import MyStudiesTab from '@/components/profile/info/my-studies-tab'
+import MyInfoTab from '@/components/profile/info/my-info-tab'
+import { PostsResponse } from '@/types/postType'
+import { StudiesResponse } from '@/types/studiesType'
+import { useEffect, useState } from 'react'
+import { useUpdateProfileImage } from '@/hooks/useProfile'
+import { getProfileImageUrl } from '@/lib/supabase/storage'
+import { ProfileResponse } from '@/types/profileType'
+import { useLogout } from '@/hooks/useAuth'
+import { useGetMyChatRooms } from '@/hooks/useChat'
+import { useSearchParams } from 'next/navigation'
+import { ChatRoom } from '@/types/chatType'
+import ProfileSection from '@/components/profile/ProfileSection'
+import TabSection from '@/components/profile/TabSection'
 
-export default function UserProfileUI({ user, posts, studies, chatRooms }
-  : { user: ProfileResponse, posts: PostsResponse[], studies: StudiesResponse, chatRooms: ChatRoom[] }) {
- 
-  // const {data: chatRooms} = useGetMyChatRooms();
-  const searchParams = useSearchParams();
-  const [currentTab, setCurrentTab] = useState(
-    searchParams.get("tab") || "info"
-  );  
-  const myPosts = posts || [];
-  const myStudies = studies || [];
-  const currentUser = user;
-  const logoutMutation = useLogout();
+export default function UserProfileUI({
+    user,
+    posts,
+    studies,
+    chatRooms,
+}: {
+    user: ProfileResponse
+    posts: PostsResponse
+    studies: StudiesResponse
+    chatRooms: ChatRoom[]
+}) {
+    // const {data: chatRooms} = useGetMyChatRooms();
+    const searchParams = useSearchParams()
+    const [currentTab, setCurrentTab] = useState(
+        searchParams.get('tab') || 'info'
+    )
+    const myPosts = posts || []
+    const myStudies = studies || []
+    const currentUser = user
+    const logoutMutation = useLogout()
 
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "모집중":
-        return "bg-green-500 text-white";
-      case "마감":
-        return "bg-red-500 text-white";
-      default:
-        return "bg-slate-500 text-white";
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case '모집중':
+                return 'bg-green-500 text-white'
+            case '마감':
+                return 'bg-red-500 text-white'
+            default:
+                return 'bg-slate-500 text-white'
+        }
     }
-  };
-  const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
-      프론트엔드: "bg-blue-100 text-blue-700 border-blue-200",
-      백엔드: "bg-purple-100 text-purple-700 border-purple-200",
-      AI: "bg-amber-100 text-amber-700 border-amber-200",
-      모바일: "bg-green-100 text-green-700 border-green-200",
-      디자인: "bg-pink-100 text-pink-700 border-pink-200",
-    };
-    return colors[category] || "bg-slate-100 text-slate-700 border-slate-200";
-  };
-  const [profileImage, setProfileImage] = useState(currentUser?.avatar_url || "/placeholder.svg")
-
-  const updateProfileImage = useUpdateProfileImage();
-  // 프로필 이미지 변경 핸들러
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    const previewUrl = URL.createObjectURL(file);
-    setProfileImage(previewUrl); 
-    updateProfileImage.mutate(file);
-  }
-  const handleTabChange = (value: string) => {
-     setCurrentTab(value);
-    // 2. URL만 변경 (리렌더링 없이)
-    window.history.replaceState(null, "", `/profile?tab=${value}`);
-  };
-  // 🧹 메모리 해제
-useEffect(() => {
-  return () => {
-    if (profileImage && profileImage.startsWith('blob:')) {
-      URL.revokeObjectURL(profileImage);
+    const getCategoryColor = (category: string) => {
+        const colors: { [key: string]: string } = {
+            프론트엔드: 'bg-blue-100 text-blue-700 border-blue-200',
+            백엔드: 'bg-purple-100 text-purple-700 border-purple-200',
+            AI: 'bg-amber-100 text-amber-700 border-amber-200',
+            모바일: 'bg-green-100 text-green-700 border-green-200',
+            디자인: 'bg-pink-100 text-pink-700 border-pink-200',
+        }
+        return (
+            colors[category] || 'bg-slate-100 text-slate-700 border-slate-200'
+        )
     }
-  };
-}, [profileImage]);
+    const [profileImage, setProfileImage] = useState(
+        currentUser?.avatar_url || '/placeholder.svg'
+    )
 
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
+    const updateProfileImage = useUpdateProfileImage()
+    // 프로필 이미지 변경 핸들러
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
 
-      <main className="flex-1">
-        {/* 프로필 헤더 */}
-        <section className="border-b border-border bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-900 dark:to-slate-800 py-10">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:gap-8">
-            <div className="relative flex-shrink-0">
-                <Avatar className="h-24 w-24 ring-4 ring-primary/20">
-                  <AvatarImage src={getProfileImageUrl(currentUser?.avatar_url || "") || "/placeholder.svg"} alt={currentUser.username || ""} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
-                    {currentUser.email?.[0]}
-                  </AvatarFallback>
-                </Avatar>
+        const previewUrl = URL.createObjectURL(file)
+        setProfileImage(previewUrl)
+        updateProfileImage.mutate(file)
+    }
+    const handleTabChange = (value: string) => {
+        setCurrentTab(value)
+        // 2. URL만 변경 (리렌더링 없이)
+        window.history.replaceState(null, '', `/profile?tab=${value}`)
+    }
+    // 🧹 메모리 해제
+    useEffect(() => {
+        return () => {
+            if (profileImage && profileImage.startsWith('blob:')) {
+                URL.revokeObjectURL(profileImage)
+            }
+        }
+    }, [profileImage])
 
-                {/* 톱니바퀴 아이콘 버튼 */}
-                <label
-                  htmlFor="profile-image-upload"
-                  className="absolute bottom-0 right-0 bg-gray-600 hover:bg-blue-700 text-white rounded-full p-2 cursor-pointer shadow-lg transition-all hover:scale-110"
-                  title="프로필 이미지 변경"
-                >
-                  <Settings className="w-4 h-4" />
-                </label>
-
-                {/* 숨겨진 파일 입력 */}
-                <input
-                  id="profile-image-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="sr-only"
+    return (
+        <div className='min-h-screen flex flex-col bg-background'>
+            <main className='flex-1'>
+                {/* 프로필 헤더 */}
+                <ProfileSection
+                    currentUser={currentUser}
+                    handleImageChange={handleImageChange}
+                    myStudies={myStudies}
+                    myPosts={myPosts}
+                    logoutMutation={logoutMutation}
                 />
-              </div>
-              {/* <Avatar className="h-24 w-24 ring-4 ring-primary/20 flex-shrink-0">
-                <AvatarImage
-                  src={currentUser?.avatar || "/placeholder.svg"}
-                  alt={currentUser?.username || ""}
+
+                {/* 탭 컨텐츠 */}
+                <TabSection
+                    currentTab={currentTab}
+                    handleTabChange={handleTabChange}
+                    chatRooms={chatRooms}
+                    myPosts={myPosts}
+                    myStudies={myStudies}
+                    currentUser={currentUser}
+                    getStatusColor={getStatusColor}
+                    getCategoryColor={getCategoryColor}
                 />
-                <AvatarFallback className="bg-blue-600 text-white text-2xl font-bold">
-                  {currentUser?.initials || ""}
-                </AvatarFallback>
-              </Avatar> */}
-
-              <div className="flex-1 mt-4 sm:mt-0">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                  <div>
-                    <h1 className="text-3xl font-bold text-foreground">
-                      {currentUser?.username || ""}
-                    </h1>
-                    <p className="text-muted-foreground mt-1">
-                      {currentUser?.email || ""}
-                    </p>
-                  </div>
-                  <Badge className="bg-blue-600 text-white w-fit">
-                    {currentUser?.points || ""}
-                  </Badge>
-                </div>
-
-                <p className="text-muted-foreground mb-4">{currentUser.bio}</p>
-
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <p className="text-2xl font-bold text-foreground">
-                      {myStudies.length}
-                    </p>
-                    <p className="text-xs text-muted-foreground">내 스터디</p>
-                  </div>
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <p className="text-2xl font-bold text-foreground">
-                      {myPosts.length}
-                    </p>
-                    <p className="text-xs text-muted-foreground">모집글</p>
-                  </div>
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <p className="text-2xl font-bold text-foreground">
-                      {currentUser.points}
-                    </p>
-                    <p className="text-xs text-muted-foreground">포인트</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <Link href="/profile/edit">
-                    <Button className="bg-blue-600 hover:bg-blue-700 gap-2">
-                    <Edit className="w-4 h-4" />
-                    프로필 수정
-                  </Button>
-                  </Link>
-                  <Link href="/profile/password">
-                    <Button variant="outline" className="gap-2 bg-transparent">
-                      <Lock className="w-4 h-4" />
-                      비밀번호 변경
-                    </Button>
-                  </Link>
-                  <Button variant="outline" className="gap-2 bg-transparent" onClick={() => logoutMutation.mutate()} disabled={logoutMutation.isPending}>
-                    <LogOut className="w-4 h-4" />
-                    로그아웃
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 탭 컨텐츠 */}
-        <section className="py-8 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-5xl mx-auto">
-            <Tabs value={currentTab}
-                onValueChange={handleTabChange}   
-                className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:w-auto lg:inline-flex">
-                <TabsTrigger value="info" className="gap-2">
-                  <User className="w-4 h-4 hidden sm:inline" />내 정보
-                </TabsTrigger>
-                <TabsTrigger value="chats" className="gap-2">
-                  <MessageSquare className="w-4 h-4 hidden sm:inline" />
-                  채팅 ({chatRooms.length || 0})
-                </TabsTrigger>
-                <TabsTrigger value="posts" className="gap-2">
-                  <FileText className="w-4 h-4 hidden sm:inline" />
-                  작성한 글 ({myPosts.length})
-                </TabsTrigger>
-                <TabsTrigger value="studies" className="gap-2">
-                  <BookOpen className="w-4 h-4 hidden sm:inline" />내 스터디 (
-                  {myStudies.length})
-                </TabsTrigger>
-              </TabsList>
-
-              {/* 내 정보 탭 */}
-              <MyInfoTab currentUser={currentUser} />
-
-              <MyChatTab chatRooms={chatRooms || []} />
-              <MyPostTab
-                myPosts={myPosts}
-                getStatusColor={getStatusColor}
-                getCategoryColor={getCategoryColor}
-              />
-              <MyStudiesTab
-                myStudies={myStudies}
-                getStatusColor={getStatusColor}
-                getCategoryColor={getCategoryColor}
-              />
-            </Tabs>
-          </div>
-        </section>
-      </main>
-
-    </div>
-  );
+            </main>
+        </div>
+    )
 }
