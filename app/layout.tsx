@@ -1,15 +1,30 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/config/ReactQueryClientProvider";
 import { Toaster } from "@/components/ui/sonner";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+// import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { GeistPixelSquare } from "geist/font/pixel";
+import localFont from "next/font/local";
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const GeistSans = localFont({
+  src: "../public/fonts/geist/geist-latin.woff2",
+  variable: "--font-geist-sans",
+  display: "swap",
+});
+
+// const _geist = Geist({ subsets: ["latin"] });
+// const _geistMono = Geist_Mono({ subsets: ["latin"] });
+// const geist = Geist({ 
+//   subsets: ["latin"],
+//   display: 'swap',
+// });
+// const geistMono = Geist_Mono({ 
+//   subsets: ["latin"],
+//   display: 'swap',
+// });
 
 export const metadata: Metadata = {
   title: "Study Mate - 함께 성장하는 스터디 문화",
@@ -42,8 +57,8 @@ export default function RootLayout({
 }>) {
   return (
     <QueryClientProvider client={queryClient}>
-      <html lang="ko">
-        <body className={`font-sans antialiased`}>
+      <html lang="ko" className={`${GeistSans.variable} ${GeistMono.variable} ${GeistPixelSquare.variable}`}>
+        <body className="antialiased font-sans">
           {children}
           <Toaster />
         </body>

@@ -5,8 +5,8 @@ import { addNotification } from "./notificationAction";
 import { CustomUserAuth } from "@/utils/auth";
 import { ActionResponse } from "@/types/actionType";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { ParticipantWithStudyResponse } from "@/types/participantType";
+import { notFound, redirect } from "next/navigation";
+import { ParticipantResponse, ParticipantWithStudyResponse } from "@/types/participantType";
 
 // export async function getParticipant(studyId: number) {
 //   const supabase = await createClient();
@@ -307,4 +307,24 @@ export async function removeParticipant(participantId: number): Promise<ActionRe
   }
   revalidatePath("/profile", "layout");
   redirect(`/profile?tab=studies`);
+}
+
+// 참여 상태 확인
+export async function checkParticipantStatusSSR(studyId: number): Promise<ParticipantResponse | null> {
+  const supabase = await createClient();
+  const {user} = await CustomUserAuth(supabase);
+
+  // 참여 상태 확인
+  const { data, error } = await supabase
+    .from("participants")
+    .select("*")
+    .eq("study_id", studyId)
+    .eq("user_id", user.id)
+    .in("status", ["accepted", "pending"])
+    .maybeSingle();
+
+  if (error) {
+    notFound();
+  }
+  return data as unknown as ParticipantResponse;
 }

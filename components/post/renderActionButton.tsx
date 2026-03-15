@@ -36,9 +36,9 @@ export function StudyActionButton({ status, isApplying, onApply }: Props) {
             <Badge className="flex-1  text-center bg-success text-white text-base justify-center">
               참여중
             </Badge>
-            <Button variant="outline" className="flex-1 bg-transparent">
+            {/* <Button variant="outline" className="flex-1 bg-transparent">
               채팅방 입장
-            </Button>
+            </Button> */}
           </div>
         );
       case "스터디 종료":

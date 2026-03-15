@@ -307,9 +307,7 @@ export default function StudyCreateUI() {
               />
 
               {/* 시/군/구 - 여기서 region 계산! */}
-              {mainRegionValue &&
-                mainRegionValue !== "ONLINE" &&
-                detailRegions.length > 0 && (
+  
                   <FormField
                     control={form.control}
                     name="detailRegion"
@@ -347,7 +345,6 @@ export default function StudyCreateUI() {
                       </FormItem>
                     )}
                   />
-                )}
 
               {/* 최대 인원 */}
               <FormField

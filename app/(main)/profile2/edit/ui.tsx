@@ -24,8 +24,8 @@ export function ProfileEditUI({ initialData }: { initialData: ProfileResponse })
   const form = useForm<ProfileEditFormValues>({
     resolver: zodResolver(profileEditSchema),
     defaultValues: {
-      username: initialData.username || "",
-      email: initialData.email || "",
+      username: initialData.username,
+      email: initialData.email,
       bio: initialData.bio || "",
       birthDate: initialData.birth_date || "",
       gender: initialData.gender || "",

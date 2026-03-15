@@ -1,7 +1,7 @@
 export type ProfileResponse = { 
-    id: string;
-    email: string;
-    username: string;
+    id: string | null;
+    email: string | null;
+    username: string | null;
     avatar_url: string | null;
     birth_date: string | null;
     gender: string | null;

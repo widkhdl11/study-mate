@@ -5,6 +5,7 @@ import {
   createPost,
   deletePost,
   getAllPosts,
+  getMyPosts,
   getPostDetail,
   increaseViewCount,
   toggleLike,
@@ -16,7 +17,20 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useUser } from "./useUser";
 import { isRedirect } from "@/utils/utils";
-import { PostDetailResponse } from "@/types/postType";
+import { PostDetailResponse, PostsResponse } from "@/types/postType";
+
+export function useGetMyPosts() {
+  return useQuery({
+    queryKey: queryKeys.myPosts,
+    queryFn: async () => {
+      const response = await getMyPosts();
+      if (response.success) {
+        return response.data as unknown as PostsResponse[];
+      }
+      throw new Error(response.error.message);
+    },
+  });
+}
 
 export function useCreatePost(onFieldError?: (field: string, message: string) => void) {
   const queryClient = useQueryClient();

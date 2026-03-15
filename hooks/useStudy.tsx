@@ -51,7 +51,7 @@ export function useGetMyStudies() {
       if (!response.success) {
         throw new Error(response.error.message);
       }
-      return response.data;
+      return response.data as unknown as StudiesResponse[];
     },
     throwOnError: true,
   });

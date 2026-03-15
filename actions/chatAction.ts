@@ -191,3 +191,30 @@ export async function getChatSSR(ChatId : number) {
     }
     return data;
 }
+
+
+
+// 참여중인 채팅방들 불러오기(마지막 메세지 포함)
+export async function getMyChatRoomsSSR(): Promise<ChatRoom[]> {
+  const supabase = await createClient();
+  const { user } = await CustomUserAuth(supabase);
+  if (!user) {
+    notFound();
+  }
+  
+  const { data, error } = await supabase
+    .from("chat_participants")
+    .select(`
+      *,
+      chat:chats(*),
+      profile:profiles!chat_participants_user_id_fkey(username, avatar_url)
+    `)
+    .eq("user_id", user.id)
+    .order("chat(last_message_at)", { ascending: false });
+
+  if (error) {
+    notFound();
+  }
+  
+  return data as unknown as ChatRoom[];
+}

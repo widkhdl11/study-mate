@@ -31,11 +31,13 @@ import { getMainRegion, getRegionCodeByValue, getRegionPath, getSubRegion } from
 import { STUDY_STATUS } from "@/lib/constants/study-status";
 import { getStudyStatusExistValue, studyStatusConversion } from "@/utils/conversion/study";
 
-export default function PostsUI({ allPosts }: { allPosts: PostsResponse[] }) {
+export default function PostsUI() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
   const [selectedStatus, setSelectedStatus] = useState("전체 상태");
+  const { data, isLoading, error } = useGetAllPosts();
+  const allPosts = data?.success ? (data.data as PostsResponse[]) : [];
   const [mainCategoryValue, setMainCategoryValue] = useState("");
   const [subCategoryValue, setSubCategoryValue] = useState("");
   const [detailCategoryValue, setDetailCategoryValue] = useState("");

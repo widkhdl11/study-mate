@@ -13,15 +13,18 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { useLogout } from "@/hooks/useAuth"
-import { useUser } from "@/hooks/useUser"
+import { useGetMyProfile, useUser } from "@/hooks/useUser"
 import { getProfileImageUrl } from "@/lib/supabase/storage"
 import { useAllReadNotification, useGetNotifications, useReadNotification } from "@/hooks/useNotification"
 import { formatTimeAgo } from "@/utils/utils"
 import { NotificationResponse } from "@/types/notificationType"
+import { ProfileResponse } from "@/types/profileType"
 
 export const Header = () => {
   const router = useRouter();
-  const { data: user } = useUser();
+  // const { data: user } = useUser();
+  const { data: profile } = useGetMyProfile();
+  const user = profile?.data as ProfileResponse;
   const logoutMutation = useLogout();
   const { data: notifications } = useGetNotifications();
   const readNotificationMutation = useReadNotification();
@@ -148,20 +151,27 @@ export const Header = () => {
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
+                    <div>
                     <button className="flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={ getProfileImageUrl(user.avatar_url) || "/placeholder.svg"} alt={user.username} />
+                        <AvatarImage src={ getProfileImageUrl(user.avatar_url || "") || "/placeholder.svg"} alt={user.username || ""} />
                         <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                           {user.email?.[0]}
                         </AvatarFallback>
                       </Avatar>
                       <span className="hidden sm:inline text-sm font-medium text-foreground">{user.username}</span>
                     </button>
+                    </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem className="cursor-pointer">
                       <Link href="/profile" className="w-full">
                         프로필
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Link href="/profile2" className="w-full">
+                        프로필2
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer">

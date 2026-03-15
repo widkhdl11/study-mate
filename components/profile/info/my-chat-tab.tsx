@@ -14,9 +14,9 @@ export default function MyChatTab({chatRooms} : {
         <TabsContent value="chats" className="space-y-4">
             <div className="space-y-3"> {
                 chatRooms.map((room) => (
-                <Card
+                <Card key={room.chat.id}
                     className="group overflow-hidden hover:shadow-md transition-all h-full flex flex-col p-0 gap-0 min-h-[100px]">
-                    <Link key={room.chat.id} href={`/chat/${room.chat.id}`}>
+                    <Link href={`/chat/${room.chat.id}`}>
                     <div className="flex items-start gap-4 p-4">
                         <Avatar className="h-12 w-12 flex-shrink-0">
                             <AvatarImage src={

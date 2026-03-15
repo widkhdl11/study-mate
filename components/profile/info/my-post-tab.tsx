@@ -60,7 +60,7 @@ export default function MyPostTab({
                 <Link href={`/posts/${post.id}`}>  
                   <div className="relative w-full h-40 bg-muted overflow-hidden cursor-pointer">
                     <img
-                      src={getImageUrl(post.image_url?.[0]?.url || "/placeholder.svg")}
+                      src={getImageUrl(post.image_url?.[0]?.url || "/default-post-thumbnail.jpg")}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />

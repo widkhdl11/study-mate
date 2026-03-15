@@ -19,30 +19,33 @@ import MyChatTab from "@/components/profile/info/my-chat-tab";
 import MyPostTab from "@/components/profile/info/my-post-tab";
 import MyStudiesTab from "@/components/profile/info/my-studies-tab";
 import MyInfoTab from "@/components/profile/info/my-info-tab";
-import { convertUser } from "@/utils/conversion/user";
-import { PostsResponse } from "@/types/postType";
-import { StudiesResponse } from "@/types/studiesType";
 import { useEffect, useState } from "react";
 import { useUpdateProfileImage } from "@/hooks/useProfile";
 import { getProfileImageUrl } from "@/lib/supabase/storage";
-import { ProfileResponse } from "@/types/profileType";
 import { useLogout } from "@/hooks/useAuth";
 import { useGetMyChatRooms } from "@/hooks/useChat";
 import { useSearchParams } from "next/navigation";
-import { ChatRoom } from "@/types/chatType";
+import { useGetMyStudies } from "@/hooks/useStudy";
+import { useGetMyPosts } from "@/hooks/usePost";
+import { useGetMyProfile } from "@/hooks/useUser";
+import { ProfileResponse } from "@/types/profileType";
 
-export default function UserProfileUI({ user, posts, studies, chatRooms }
-  : { user: ProfileResponse, posts: PostsResponse[], studies: StudiesResponse, chatRooms: ChatRoom[] }) {
- 
-  // const {data: chatRooms} = useGetMyChatRooms();
+export default function UserProfileUI() {
+  const [mounted, setMounted] = useState(false);
+  const {data: chatRooms} = useGetMyChatRooms();
   const searchParams = useSearchParams();
   const [currentTab, setCurrentTab] = useState(
     searchParams.get("tab") || "info"
-  );  
-  const myPosts = posts || [];
-  const myStudies = studies || [];
-  const currentUser = user;
+  ); 
+  const {data: myPosts} = useGetMyPosts();
+  const {data: myStudies} = useGetMyStudies();
+  const {data: currentUserData} = useGetMyProfile();
+  const currentUser = currentUserData?.data as ProfileResponse;
   const logoutMutation = useLogout();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
 
   const getStatusColor = (status: string) => {
@@ -91,9 +94,27 @@ useEffect(() => {
   };
 }, [profileImage]);
 
+  // 하이드레이션 방지: 마운트 전에는 서버와 클라이언트에 동일한 placeholder 렌더
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <main className="flex-1 flex items-center justify-center py-20">
+          <p className="text-muted-foreground">로딩 중...</p>
+        </main>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <h1 className="text-muted-foreground">로그인 후 이용해주세요.</h1>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-
       <main className="flex-1">
         {/* 프로필 헤더 */}
         <section className="border-b border-border bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-900 dark:to-slate-800 py-10">
@@ -101,9 +122,9 @@ useEffect(() => {
             <div className="flex flex-col sm:flex-row sm:items-start sm:gap-8">
             <div className="relative flex-shrink-0">
                 <Avatar className="h-24 w-24 ring-4 ring-primary/20">
-                  <AvatarImage src={getProfileImageUrl(currentUser?.avatar_url || "") || "/placeholder.svg"} alt={currentUser.username || ""} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
-                    {currentUser.email?.[0]}
+                  <AvatarImage src={getProfileImageUrl(currentUser?.avatar_url || "") || "/placeholder.svg"} alt={currentUser?.username || ""} />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold" >
+                    {currentUser?.email?.[0] || "U"}
                   </AvatarFallback>
                 </Avatar>
 
@@ -150,24 +171,24 @@ useEffect(() => {
                   </Badge>
                 </div>
 
-                <p className="text-muted-foreground mb-4">{currentUser.bio}</p>
+                <p className="text-muted-foreground mb-4">{currentUser?.bio}</p>
 
                 <div className="grid grid-cols-3 gap-4 mb-6">
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <p className="text-2xl font-bold text-foreground">
-                      {myStudies.length}
+                      {myStudies?.length}
                     </p>
                     <p className="text-xs text-muted-foreground">내 스터디</p>
                   </div>
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <p className="text-2xl font-bold text-foreground">
-                      {myPosts.length}
+                      {myPosts?.length}
                     </p>
                     <p className="text-xs text-muted-foreground">모집글</p>
                   </div>
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <p className="text-2xl font-bold text-foreground">
-                      {currentUser.points}
+                      {currentUser?.points}
                     </p>
                     <p className="text-xs text-muted-foreground">포인트</p>
                   </div>
@@ -208,15 +229,15 @@ useEffect(() => {
                 </TabsTrigger>
                 <TabsTrigger value="chats" className="gap-2">
                   <MessageSquare className="w-4 h-4 hidden sm:inline" />
-                  채팅 ({chatRooms.length || 0})
+                  채팅 ({chatRooms?.length || 0})
                 </TabsTrigger>
                 <TabsTrigger value="posts" className="gap-2">
                   <FileText className="w-4 h-4 hidden sm:inline" />
-                  작성한 글 ({myPosts.length})
+                  작성한 글 ({myPosts?.length})
                 </TabsTrigger>
                 <TabsTrigger value="studies" className="gap-2">
                   <BookOpen className="w-4 h-4 hidden sm:inline" />내 스터디 (
-                  {myStudies.length})
+                  {myStudies?.length})
                 </TabsTrigger>
               </TabsList>
 
@@ -225,12 +246,12 @@ useEffect(() => {
 
               <MyChatTab chatRooms={chatRooms || []} />
               <MyPostTab
-                myPosts={myPosts}
+                myPosts={myPosts || []}
                 getStatusColor={getStatusColor}
                 getCategoryColor={getCategoryColor}
               />
               <MyStudiesTab
-                myStudies={myStudies}
+                myStudies={myStudies || []}
                 getStatusColor={getStatusColor}
                 getCategoryColor={getCategoryColor}
               />
@@ -238,7 +259,6 @@ useEffect(() => {
           </div>
         </section>
       </main>
-
     </div>
   );
 }

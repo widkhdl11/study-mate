@@ -421,3 +421,48 @@ export async function getPostDetailSSR(id: number): Promise<PostDetailResponse> 
   }
   return data as unknown as PostDetailResponse;
 }
+
+
+// 모든 게시글 가져오기
+export async function getAllPostsSSR(): Promise<
+  PostsResponse[] | never
+> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("posts")
+    .select(
+      `
+      id,
+      title,
+      content,
+      image_url,
+      author_id,
+      likes_count,
+      views_count,
+      created_at,
+      study:study_id (
+        id,
+        title,
+        description,
+        study_category,
+        region,
+        max_participants,
+        current_participants,
+        status
+      ),
+      author:author_id (
+        id,
+        username,
+        email,
+        avatar_url
+      )
+    `
+    )
+    .in("study.status", ["recruiting", "completed"])
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    notFound();
+  }
+  return data as unknown as PostsResponse[];
+}

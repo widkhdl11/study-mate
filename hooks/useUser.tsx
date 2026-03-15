@@ -24,7 +24,11 @@ export function useGetMyProfile() {
     queryKey: queryKeys.myProfile,
     queryFn: async () => {
       const profile = await getMyProfile();
-      return profile;
+      if (profile?.success && profile.data) {
+        return profile;
+      }
+      return null;
     },
+    throwOnError: true,
   });
 }

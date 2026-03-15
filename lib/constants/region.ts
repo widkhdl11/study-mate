@@ -13,12 +13,12 @@ type RegionItem = {
 
 export const STUDY_REGIONS = {
   // 0: 온라인
-  ONLINE: {
-    code: 0,
-    label: "온라인",
-    value: "ONLINE",
-    subcategories: {},
-  },
+  // ONLINE: {
+  //   code: 0,
+  //   label: "온라인",
+  //   value: "ONLINE",
+  //   subcategories: {},
+  // },
 
   // 1000: 서울
   SEOUL: {

@@ -2,8 +2,9 @@
 
 import { Card } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
+import { ProfileResponse } from "@/types/profileType";
 
-export default function MyInfoTab({ currentUser }: { currentUser: any }) {
+export default function MyInfoTab({ currentUser }: { currentUser: ProfileResponse }) {
   return (
     <>
       <TabsContent value="info" className="space-y-6">
@@ -14,25 +15,25 @@ export default function MyInfoTab({ currentUser }: { currentUser: any }) {
               <div className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">닉네임</p>
                 <p className="text-lg font-semibold text-foreground">
-                  {currentUser.username}
+                  {currentUser?.username}
                 </p>
               </div>
               <div className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">이메일</p>
                 <p className="text-lg font-semibold text-foreground">
-                  {currentUser.email}
+                  {currentUser?.email}
                 </p>
               </div>
               <div className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">생년월일</p>
                 <p className="text-lg font-semibold text-foreground">
-                  {currentUser.birthDate}
+                  {currentUser?.birth_date}
                 </p>
               </div>
               <div className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">성별</p>
                 <p className="text-lg font-semibold text-foreground">
-                  {currentUser.gender}
+                  {currentUser?.gender}
                 </p>
               </div>
             </div>
@@ -45,13 +46,13 @@ export default function MyInfoTab({ currentUser }: { currentUser: any }) {
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground mb-1">가입일</p>
               <p className="text-lg font-semibold text-foreground">
-                {currentUser.joinedDate}
+                {currentUser?.created_at}
               </p>
             </div>
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground mb-1">회원 등급</p>
               <p className="text-lg font-semibold text-foreground">
-                {currentUser.level}
+                {currentUser?.points}
               </p>
             </div>
           </div>

@@ -97,11 +97,11 @@ export async function updateMyProfile(formData: FormData): Promise<ActionRespons
 
 // =================ssr ======================
 
-export async function getMyProfileSSR(): Promise<ProfileResponse | null> {
+export async function getMyProfileSSR(): Promise<ProfileResponse> {
   const supabase = await createClient();
   const { data: user, error: userError } = await supabase.auth.getUser();
   if (userError) {
-    return null;
+    notFound();
   }
   const id = user.user.id;
   const { data, error } = await supabase
@@ -110,7 +110,7 @@ export async function getMyProfileSSR(): Promise<ProfileResponse | null> {
     .eq("id", id)
     .single();
     
-  if (error) {
+  if (error || !data) {
     notFound();
   }
   return data as unknown as ProfileResponse;
