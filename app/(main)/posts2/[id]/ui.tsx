@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { PostDetailResponse } from "@/types/postType";
 import { ProfileResponse } from "@/types/profileType";
 import { formatDate } from "@/utils/utils";
-import { StudyActionButton } from "@/components/post/renderActionButton";
+import { StudyActionButton } from "@/components/posts/detail/RenderActionButton";
 import { STATUS_MAP } from "@/types/studiesType";
 import { useRef } from "react";
 import { useTrackPostView } from "@/hooks/useTrackPostView";

@@ -25,7 +25,7 @@ export function useGetMyPosts() {
     queryFn: async () => {
       const response = await getMyPosts();
       if (response.success) {
-        return response.data as unknown as PostsResponse[];
+        return response.data as unknown as PostsResponse;
       }
       throw new Error(response.error.message);
     },
@@ -61,7 +61,11 @@ export function useGetAllPosts() {
   const query = useQuery({
     queryKey: queryKeys.posts,
     queryFn: async () => {
-      return await getAllPosts();
+      const response = await getAllPosts();
+      if (response.success) {
+        return response.data as unknown as PostsResponse;
+      }
+      throw new Error(response.error.message);
     },
   });
 
@@ -219,7 +223,7 @@ export function usePostDetail(initialPost: PostDetailResponse) {
     queryFn: async () => {
       const result = await getPostDetail(initialPost.id);
       if (result.success) return result.data as PostDetailResponse;
-      throw new Error(result.error?.message);
+      else throw new Error(result.error?.message);
     },
     initialData: initialPost,
     staleTime: 1000 * 60 * 5,  // 5분간 refetch 안 함

@@ -339,7 +339,7 @@ export async function updatePost(formData: FormData): Promise<ActionResponse<Pos
   redirect(`/posts/${id}`);
 }
 // =================ssr ======================
-export async function getMyPostsSSR(): Promise<PostsResponse[]> {
+export async function getMyPostsSSR(): Promise<PostsResponse> {
   const supabase = await createClient();
   const { data: user, error: userError } = await supabase.auth.getUser();
   if (userError) {
@@ -378,7 +378,7 @@ export async function getMyPostsSSR(): Promise<PostsResponse[]> {
   if (error) {
     notFound();
   }
-  return data as unknown as PostsResponse[];
+  return data as unknown as PostsResponse;
 }
 
 
@@ -425,7 +425,7 @@ export async function getPostDetailSSR(id: number): Promise<PostDetailResponse> 
 
 // 모든 게시글 가져오기
 export async function getAllPostsSSR(): Promise<
-  PostsResponse[] | never
+  PostsResponse | never
 > {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -464,5 +464,5 @@ export async function getAllPostsSSR(): Promise<
   if (error) {
     notFound();
   }
-  return data as unknown as PostsResponse[];
+  return data as unknown as PostsResponse;
 }
