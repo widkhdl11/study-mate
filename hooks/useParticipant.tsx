@@ -13,7 +13,7 @@ import { isRedirect } from "@/utils/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export function useParticipant(studyId: number) {
+export function useParticipant(initialParticipant: ParticipantResponse | null, studyId: number) {
   return useQuery({
     queryKey: queryKeys.participant(studyId),
     queryFn: async () => {
@@ -24,8 +24,10 @@ export function useParticipant(studyId: number) {
         throw new Error(result.error?.message || "참여 상태를 조회하는데 실패했습니다");
       }
     },
-    enabled: studyId > 0, // studyId가 있을 때만 실행
+    enabled: studyId > 0,
     throwOnError: true,
+    initialData: initialParticipant,
+    staleTime: 1000 * 60 * 5, // 5분간 refetch 안 함
   });
 }
 
@@ -36,6 +38,21 @@ export function useApplyParticipant(studyId: number) {
   return useMutation({
     mutationFn: async () => {
       return await applyParticipant(studyId);
+    },
+    onMutate: () => {
+      queryClient.cancelQueries({ queryKey: queryKeys.participant(studyId) });
+      const previousData = queryClient.getQueryData(queryKeys.participant(studyId));
+      queryClient.setQueryData(queryKeys.participant(studyId), (old: ParticipantResponse) => {
+        return {
+          ...old,
+          status: "pending",
+        };
+      });
+      return { previousData };
+    },
+    onError: (error: any, variables, context) => {
+      queryClient.setQueryData(queryKeys.participant(studyId), context?.previousData);
+      toast.error(error.message || "참여 신청 중 오류가 발생했습니다");
     },
     onSuccess: (response) => {
       if (response?.success) {
@@ -50,9 +67,6 @@ export function useApplyParticipant(studyId: number) {
       } else {
         toast.error(response?.error?.message || "신청에 실패했습니다");
       }
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "참여 신청 중 오류가 발생했습니다");
     },
   });
 }

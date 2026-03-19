@@ -310,7 +310,7 @@ export async function removeParticipant(participantId: number): Promise<ActionRe
 }
 
 // 참여 상태 확인
-export async function checkParticipantStatusSSR(studyId: number): Promise<ParticipantResponse | null> {
+export async function checkParticipantStatusSSR(studyId: number): Promise<ParticipantResponse> {
   const supabase = await createClient();
   const {user} = await CustomUserAuth(supabase);
 

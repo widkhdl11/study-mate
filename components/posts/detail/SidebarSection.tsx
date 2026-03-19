@@ -10,6 +10,7 @@ import { getRegionPath } from "@/lib/constants/region"
 import { useApplyParticipant } from "@/hooks/useParticipant"
 
 export default function SidebarSection({ post, status }: { post: PostDetailResponse, status: string }) {
+  
     const { mutate: applyMutation, isPending: isApplying } = useApplyParticipant(post.study.id);
 
     return (
