@@ -1,7 +1,8 @@
 'use client'
 
-import { Link, Users } from "lucide-react"
+import Link from "next/link"
 import { Button } from "../ui/button"
+import { Users } from "lucide-react"
 
 export default function HeaderSection() {
     return (

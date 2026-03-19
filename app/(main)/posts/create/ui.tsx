@@ -29,7 +29,6 @@ export default function PostCreateUI({ studies }: { studies: StudiesResponse }) 
             모집글 작성
           </h2>
 
-
         <CreateForm studies={studies} />
         </Card>
       </div>

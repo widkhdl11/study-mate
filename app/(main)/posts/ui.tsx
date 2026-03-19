@@ -5,7 +5,6 @@ import HeaderSection from "@/components/posts/HeaderSection";
 import MainSection from "@/components/posts/MainSection";
 
 export default function PostsUI({ allPosts }: { allPosts: PostsResponse }) {
-
   
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -23,7 +22,6 @@ export default function PostsUI({ allPosts }: { allPosts: PostsResponse }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-
       <main className="flex-1">
         {/* Header Section */}
         <HeaderSection />

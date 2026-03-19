@@ -35,6 +35,15 @@ import { StudiesResponse } from "@/types/studiesType";
 export default function CreateForm({ studies }: { studies: StudiesResponse }) {
  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   
+  const form = useForm<PostFormValues>({
+    resolver: zodResolverFirstError(postSchema),
+    defaultValues: {
+      title: "",  
+      studyId: 0,
+      content: "",
+      images: [] as File[],
+    },
+  });
   const {mutate: createPost, isPending: isLoading} = useCreatePost((filed, message )=>{
     form.setError(filed as keyof PostFormValues, { 
       type: "server", 
@@ -87,15 +96,6 @@ export default function CreateForm({ studies }: { studies: StudiesResponse }) {
       createPost(formData);
   }
     
-  const form = useForm<PostFormValues>({
-    resolver: zodResolverFirstError(postSchema),
-    defaultValues: {
-      title: "",  
-      studyId: 0,
-      content: "",
-      images: [] as File[],
-    },
-  });
 
     return (
          <Form {...form}>
