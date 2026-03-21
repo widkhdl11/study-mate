@@ -1,0 +1,31 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.1">
+  <diagram id="solution" name="해결 방법 (removeQueries)">
+    <mxGraphModel dx="1213" dy="730" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="500" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="LSni8al2ZJU7cEcUnxjq-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="280" width="800" x="20" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=14;" value="해결: invalidateQueries → setQueryData + removeQueries" vertex="1">
+          <mxGeometry height="30" width="400" x="200" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="before" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;spacingLeft=10;verticalAlign=top;fontFamily=Courier New;fontSize=11;" value="❌ 기존 (invalidateQueries)&#xa;&#xa;queryClient.invalidateQueries({ queryKey: queryKeys.user })&#xa;queryClient.invalidateQueries({ queryKey: queryKeys.notifications })&#xa;&#xa;→ refetch 트리거 → 500 에러" vertex="1">
+          <mxGeometry height="130" width="340" x="40" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="after" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;spacingLeft=10;verticalAlign=top;fontFamily=Courier New;fontSize=11;" value="✅ 해결 (setQueryData + removeQueries)&#xa;&#xa;queryClient.setQueryData(queryKeys.user, null)&#xa;queryClient.removeQueries({ queryKey: queryKeys.notifications })&#xa;queryClient.removeQueries({ queryKey: queryKeys.myProfile })&#xa;&#xa;→ refetch 없음 → 캐시만 업데이트" vertex="1">
+          <mxGeometry height="130" width="380" x="420" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="compare1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=10;" value="setQueryData: 캐시 값만 변경, refetch 없음&#xa;→ useUser().data = null 즉시 반영" vertex="1">
+          <mxGeometry height="50" width="340" x="40" y="214" as="geometry" />
+        </mxCell>
+        <mxCell id="compare2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;spacingLeft=10;" value="removeQueries: 캐시 제거, refetch 없음&#xa;→ enabled: !!user = false → 추가 요청 방지" vertex="1">
+          <mxGeometry height="50" width="380" x="420" y="214" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow" edge="1" parent="1" source="before" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="after" value="변경">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

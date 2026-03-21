@@ -1,0 +1,79 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.1">
+  <diagram id="workflow-overview" name="1. 워크플로우 개요">
+    <mxGraphModel dx="1213" dy="730" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Y2dwOW5o1KqICgnlh3Eg-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="400" width="840" x="20" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="section1" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="로그인 체크" vertex="1">
+          <mxGeometry height="100" width="400" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s1a" parent="section1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• getUser() - 서버(Supabase) 세션 확인" vertex="1">
+          <mxGeometry height="24" width="400" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s1b" parent="section1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• useUser() - getUser를 호출해 user 캐시 관리" vertex="1">
+          <mxGeometry height="24" width="400" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s1c" parent="section1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• Header: useGetMyProfile().data로 user 표시 여부 판단" vertex="1">
+          <mxGeometry height="24" width="400" y="74" as="geometry" />
+        </mxCell>
+        <mxCell id="section2" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="로그인 후 상태관리" vertex="1">
+          <mxGeometry height="100" width="400" x="40" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="s2a" parent="section2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• React Query 캐시 (queryKeys.user, myProfile, notifications)" vertex="1">
+          <mxGeometry height="24" width="400" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s2b" parent="section2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• useUser: user 있음 → useGetMyProfile, useGetNotifications enabled" vertex="1">
+          <mxGeometry height="24" width="400" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s2c" parent="section2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• profile, notifications 데이터가 캐시에 저장됨" vertex="1">
+          <mxGeometry height="24" width="400" y="74" as="geometry" />
+        </mxCell>
+        <mxCell id="section3" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;fillColor=#fff2cc;strokeColor=#d6b656;" value="로그아웃 시 상태관리" vertex="1">
+          <mxGeometry height="100" width="400" x="40" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="s3a" parent="section3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• logout() 실행 → Supabase signOut → 서버 세션 삭제" vertex="1">
+          <mxGeometry height="24" width="400" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s3b" parent="section3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• redirect(/) → useLogout onError 실행" vertex="1">
+          <mxGeometry height="24" width="400" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s3c" parent="section3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" value="• onError 내부: invalidateQueries / setQueryData+removeQueries 로 캐시 정리" vertex="1">
+          <mxGeometry height="24" width="400" y="74" as="geometry" />
+        </mxCell>
+        <mxCell id="flow" parent="1" style="swimlane;fontStyle=1;startSize=0;fillColor=#f5f5f5;strokeColor=#666666;" value="플로우 요약" vertex="1">
+          <mxGeometry height="340" width="360" x="480" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="f1" parent="flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="useUser&#xa;(getUser)" vertex="1">
+          <mxGeometry height="40" width="100" x="129" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="f2" parent="flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="user 체크&#xa;로그인 여부" vertex="1">
+          <mxGeometry height="40" width="100" x="129" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="f3" parent="flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="useGetMyProfile&#xa;useGetNotifications&#xa;enabled: !!user" vertex="1">
+          <mxGeometry height="50" width="130" x="114" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="f4" parent="flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="React Query 캐시&#xa;user, profile, notifications" vertex="1">
+          <mxGeometry height="40" width="120" x="119" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="f5" parent="flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="로그아웃 시&#xa;캐시 정리 필요" vertex="1">
+          <mxGeometry height="40" width="110" x="124" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="flow" source="f1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="flow" source="f2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="flow" source="f3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="flow" source="f4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="f5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

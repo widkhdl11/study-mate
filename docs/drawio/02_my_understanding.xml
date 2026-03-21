@@ -1,0 +1,73 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.1">
+  <diagram id="my-understanding" name="2. 내가 이해했던 플로우">
+    <mxGraphModel dx="1213" dy="730" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="loginTitle" parent="1" style="swimlane;fontStyle=1;fontSize=13;startSize=0;fillColor=#d5e8d4;strokeColor=#82b366;" value="로그인" vertex="1">
+          <mxGeometry height="560" width="830" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="Y_KZK4GfNmGAwYY_CQTw-2" parent="loginTitle" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="600" width="850" x="-20" y="-20" as="geometry" />
+        </mxCell>
+        <mxCell id="l1" parent="loginTitle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" value="1. 로그인 전" vertex="1">
+          <mxGeometry height="50" width="360" x="20" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="l1a" parent="loginTitle" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;" value="user = null → enabled: !!user = false&#xa;useGetMyProfile, useGetNotifications 실행 안 됨" vertex="1">
+          <mxGeometry height="35" width="340" x="30" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="l2" parent="loginTitle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="2. 로그인 후" vertex="1">
+          <mxGeometry height="40" width="360" x="20" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="l2a" parent="loginTitle" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;" value="user 있음 → enabled: true&#xa;useGetMyProfile, useGetNotifications 실행됨 → profile, notifications 로드" vertex="1">
+          <mxGeometry height="35" width="340" x="30" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="el1" edge="1" parent="loginTitle" source="l1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="l2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="logoutTitle" parent="1" style="swimlane;fontStyle=1;fontSize=13;startSize=0;fillColor=#fff2cc;strokeColor=#d6b656;" value="로그아웃" vertex="1">
+          <mxGeometry height="300" width="430" x="40" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="o1" parent="logoutTitle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="1. 로그아웃 버튼 클릭" vertex="1">
+          <mxGeometry height="35" width="360" x="20" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="o2" parent="logoutTitle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="2. logout() 실행 → 서버 세션 삭제" vertex="1">
+          <mxGeometry height="35" width="360" x="20" y="85" as="geometry" />
+        </mxCell>
+        <mxCell id="o2a" parent="logoutTitle" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;fontSize=11;" value="Supabase signOut → 서버에 로그인 정보 없어짐" vertex="1">
+          <mxGeometry height="25" width="340" x="30" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="o3" parent="logoutTitle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="3. invalidateQueries 실행 (onError)" vertex="1">
+          <mxGeometry height="35" width="360" x="20" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="o3a" parent="logoutTitle" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;fontSize=11;" value="캐시 초기화 → user, notifications 데이터 비워짐" vertex="1">
+          <mxGeometry height="25" width="340" x="30" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="o4" parent="logoutTitle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="4. redirect(/) → 정상 로그아웃 완료" vertex="1">
+          <mxGeometry height="35" width="360" x="20" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="o4a" parent="logoutTitle" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;fontSize=11;" value="Header가 로그인 전 UI로 표시됨" vertex="1">
+          <mxGeometry height="25" width="340" x="30" y="265" as="geometry" />
+        </mxCell>
+        <mxCell id="eo1" edge="1" parent="logoutTitle" source="o1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="o2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eo2" edge="1" parent="logoutTitle" source="o2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="o3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eo3" edge="1" parent="logoutTitle" source="o3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="o4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="summary" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;spacingLeft=12;verticalAlign=top;fontSize=11;" value="이해했던 흐름 요약&#xa;&#xa;• 로그인: enable로 제어 → user 없으면 실행 X, 있으면 실행 O&#xa;• 로그아웃: 서버 세션 삭제 + invalidate로 캐시 초기화 → 자연스럽게 로그아웃 UI" vertex="1">
+          <mxGeometry height="120" width="360" x="489" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="seq" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=12;" value="로그아웃 시퀀스 (이해했던 순서)" vertex="1">
+          <mxGeometry height="25" width="280" x="489" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="seq1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" value="클릭 → logout() → 세션삭제 → invalidate → 캐시비움 → redirect" vertex="1">
+          <mxGeometry height="40" width="360" x="489" y="205" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,79 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.1">
+  <diagram id="actual-flow" name="3. 실제 동작 플로우">
+    <mxGraphModel dx="1213" dy="730" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="WVCefcaYJa2shfnnIPW1-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="510" width="820" x="20" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=14;" value="로그아웃 버튼 클릭 시 실제 일어나는 일" vertex="1">
+          <mxGeometry height="30" width="400" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="step1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="1. mutate() → logout() 호출" vertex="1">
+          <mxGeometry height="40" width="300" x="40" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="step2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="2. Supabase signOut() → 서버 유저 세션 삭제" vertex="1">
+          <mxGeometry height="40" width="300" x="40" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="step3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="3. redirect(&quot;/&quot;) → onSuccess 대신 onError로 진입" vertex="1">
+          <mxGeometry height="40" width="300" x="40" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="step3a" parent="1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;fontSize=10;" value="(redirect는 throw하기 때문에 mutation이 error로 처리됨)" vertex="1">
+          <mxGeometry height="20" width="280" x="50" y="232" as="geometry" />
+        </mxCell>
+        <mxCell id="step4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="4. onError에서 invalidateQueries(user), invalidateQueries(notifications)" vertex="1">
+          <mxGeometry height="40" width="300" x="40" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="step5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="5. invalidate = stale 표시 + 즉시 refetch 트리거" vertex="1">
+          <mxGeometry height="40" width="300" x="40" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="step6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="6. getUser(), getNotifications() 서버 호출 (세션 이미 없음)" vertex="1">
+          <mxGeometry height="40" width="300" x="40" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="step7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="7. 500 에러 + Header UI는 여전히 로그인된 상태" vertex="1">
+          <mxGeometry height="40" width="300" x="40" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" edge="1" parent="1" source="step1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" edge="1" parent="1" source="step2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="step3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" edge="1" parent="1" source="step3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="step4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" edge="1" parent="1" source="step4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="step5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a5" edge="1" parent="1" source="step5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="step6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="a6" edge="1" parent="1" source="step6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="step7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="point" parent="1" style="swimlane;fontStyle=1;startSize=0;fillColor=#e1d5e7;strokeColor=#9673a6;" value="문제의 핵심" vertex="1">
+          <mxGeometry height="200" width="420" x="400" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="p1" parent="point" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="• invalidate는 캐시를 비우지 않음 → 기존 데이터 유지" vertex="1">
+          <mxGeometry height="24" width="400" x="10" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="p2" parent="point" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="• invalidate는 refetch를 즉시 트리거함" vertex="1">
+          <mxGeometry height="24" width="400" x="10" y="58" as="geometry" />
+        </mxCell>
+        <mxCell id="p3" parent="point" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="• 구독 중인 useUser, useGetNotifications가 refetch 실행" vertex="1">
+          <mxGeometry height="24" width="400" x="10" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="p4" parent="point" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="• 이때 useUser().data는 아직 구캐시(로그인 유저) → enabled: true" vertex="1">
+          <mxGeometry height="24" width="400" x="10" y="114" as="geometry" />
+        </mxCell>
+        <mxCell id="p5" parent="point" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontStyle=1;" value="• 서버에는 이미 세션 없음 → getUser, getNotifications 500" vertex="1">
+          <mxGeometry height="24" width="400" x="10" y="142" as="geometry" />
+        </mxCell>
+        <mxCell id="p6" parent="point" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;" value="• refetch 실패 → 캐시도 null로 안 바뀜 → UI 그대로" vertex="1">
+          <mxGeometry height="24" width="400" x="10" y="170" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

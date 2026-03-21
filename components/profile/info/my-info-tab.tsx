@@ -5,6 +5,7 @@ import { TabsContent } from "@/components/ui/tabs";
 import { ProfileResponse } from "@/types/profileType";
 
 export default function MyInfoTab({ currentUser }: { currentUser: ProfileResponse }) {
+  console.log(currentUser);
   return (
     <>
       <TabsContent value="info" className="space-y-6">
