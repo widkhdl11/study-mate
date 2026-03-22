@@ -1,8 +1,7 @@
 'use client'
 
 import { getProfileImageUrl } from '@/lib/supabase/storage'
-import { Avatar, AvatarImage } from '../ui/avatar'
-import { AvatarFallback } from '@radix-ui/react-avatar'
+import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar'
 import { Edit, Lock, LogOut, Settings } from 'lucide-react'
 import { ProfileResponse } from '@/types/profileType'
 import { Badge } from '../ui/badge'

@@ -3,9 +3,9 @@
 import { Card } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
 import { ProfileResponse } from "@/types/profileType";
+import { formatDateToInput, formatGender } from "@/utils/utils";
 
 export default function MyInfoTab({ currentUser }: { currentUser: ProfileResponse }) {
-  console.log(currentUser);
   return (
     <>
       <TabsContent value="info" className="space-y-6">
@@ -34,7 +34,7 @@ export default function MyInfoTab({ currentUser }: { currentUser: ProfileRespons
               <div className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">성별</p>
                 <p className="text-lg font-semibold text-foreground">
-                  {currentUser?.gender}
+                  {formatGender(currentUser?.gender || "")}
                 </p>
               </div>
             </div>
@@ -47,7 +47,7 @@ export default function MyInfoTab({ currentUser }: { currentUser: ProfileRespons
             <div className="p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground mb-1">가입일</p>
               <p className="text-lg font-semibold text-foreground">
-                {currentUser?.created_at}
+                {formatDateToInput(new Date(currentUser?.created_at || ""))}
               </p>
             </div>
             <div className="p-4 bg-muted/50 rounded-lg">

@@ -7,11 +7,24 @@ import { FieldErrors, Resolver } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import z from "zod";
 
+
+// 성별 포맷 함수
+export function formatGender(gender: string): string {
+  if (gender === "male") {
+    return "남자";
+  } else if (gender === "female") {
+    return "여자";
+  } else {
+    return "미지정";
+  }
+}
+
+// 클래스 병합 함수
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-
+// zod 검증 함수
 export function validateWithZod<T>(
   schema: z.ZodType<T>,
   data: unknown
@@ -37,7 +50,6 @@ export function isRedirect(error: Error): boolean {
 }
 
 // Date → "YYYY-MM-DD" (input type="date"용)
-
 export function formatDateToInput(date: Date | undefined): string {
   if (!date) return "";
   return date.toISOString().split('T')[0];
@@ -49,7 +61,7 @@ export function parseInputToDate(value: string): Date | undefined {
   return new Date(value);
 }
 
-
+// zodResolver 오류 처리 함수
 export function zodResolverFirstError<T extends z.ZodType>(schema: T) {
   const baseResolver = zodResolver(schema as any);
 
@@ -68,7 +80,7 @@ export function zodResolverFirstError<T extends z.ZodType>(schema: T) {
   };
 }
 
-  // 날짜 포맷 함수
+  // 날짜 포맷 함수(x일 전, x주 전, x개월 전, x년 전)
  export const formatDate = (dateString: string) => {
     return formatDistanceToNow(new Date(dateString), {
       addSuffix: true,
@@ -76,7 +88,7 @@ export function zodResolverFirstError<T extends z.ZodType>(schema: T) {
     });
   };
 
-
+// 날짜 포맷 함수(방금 전, x분 전, x시간 전, x일 전, x주 전, x개월 전, x년 전)
   export function formatTimeAgo(dateString: string): string {
   const date = new Date(dateString)
   const now = new Date()

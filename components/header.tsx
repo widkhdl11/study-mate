@@ -241,13 +241,6 @@ export const Header = () => {
                                         </DropdownMenuItem>
                                         <DropdownMenuItem className='cursor-pointer'>
                                             <Link
-                                                href='/profile2'
-                                                className='w-full'>
-                                                프로필2
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className='cursor-pointer'>
-                                            <Link
                                                 href='/profile'
                                                 className='w-full'>
                                                 내 스터디
