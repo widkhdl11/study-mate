@@ -133,7 +133,7 @@ export async function checkParticipantStatus(studyId: number): Promise<ActionRes
 }
 
 
-// 참여자 수락
+// 참여자 수락 
 export async function acceptParticipant(participantId: number): Promise<ActionResponse<ParticipantWithStudyResponse>> {
   const supabase = await createClient();
 
@@ -146,6 +146,33 @@ export async function acceptParticipant(participantId: number): Promise<ActionRe
 
   if (userProfileError) {
     throw new Error("사용자 정보를 찾을 수 없습니다");
+  }
+
+  // 참가 신청 정보 조회 (스터디 ID 확인)
+  const { data: participantInfo, error: participantError } = await supabase
+    .from("participants")
+    .select("study_id")
+    .eq("id", participantId)
+    .eq("status", "pending")
+    .single();
+
+  if (participantError || !participantInfo) {
+    throw new Error("참가 요청을 찾을 수 없습니다");
+  }
+
+  // 스터디 정원 확인
+  const { data: studyCapacity, error: studyError } = await supabase
+    .from("studies")
+    .select("max_participants, current_participants")
+    .eq("id", participantInfo.study_id)
+    .single();
+
+  if (studyError || !studyCapacity) {
+    throw new Error("스터디 정보를 찾을 수 없습니다");
+  }
+
+  if (studyCapacity.current_participants >= studyCapacity.max_participants) {
+    return { success: false, error: { message: "정원이 마감되었습니다" } };
   }
 
   const { data, error } = await supabase

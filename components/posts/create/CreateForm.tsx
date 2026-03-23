@@ -134,13 +134,14 @@ export default function CreateForm({ studies }: { studies: StudiesResponse }) {
                     </FormDescription>
                     {studies?.length > 0 ? (
                       <Select
-                        value={field.value?.toString()}
+                        value={ field.value === undefined || field.value === 0 ? undefined : field.value.toString()}
                         onValueChange={field.onChange}
                         disabled={isLoading}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="스터디를 선택해주세요" />
+                        <SelectTrigger >
+                          <SelectValue placeholder="선택" />
                         </SelectTrigger>
+                        
                         <SelectContent>
                           {studies?.map((study) => (
                             <SelectItem key={study.id} value={study.id.toString()}>

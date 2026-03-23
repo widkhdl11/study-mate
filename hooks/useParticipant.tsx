@@ -12,10 +12,12 @@ import { ParticipantResponse } from "@/types/participantType";
 import { isRedirect } from "@/utils/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useUser } from "./useUser";
 
 export function useParticipant(initialParticipant: ParticipantResponse | null, studyId: number) {
+  const { data: user } = useUser();
   return useQuery({
-    queryKey: queryKeys.participant(studyId),
+    queryKey: queryKeys.participant(studyId, user?.id),
     queryFn: async () => {
       const result = await checkParticipantStatus(studyId);
       if (result.success) {
@@ -24,25 +26,28 @@ export function useParticipant(initialParticipant: ParticipantResponse | null, s
         throw new Error(result.error?.message || "참여 상태를 조회하는데 실패했습니다");
       }
     },
-    enabled: studyId > 0,
+    enabled: studyId > 0 && !!user?.id,
     throwOnError: true,
     initialData: initialParticipant,
-    staleTime: 1000 * 60 * 5, // 5분간 refetch 안 함
+    staleTime: 1000 * 30, // 30초
+    refetchInterval: 1000 * 10, // 10초마다 폴링 (다른 사람이 수락할 수 있으므로)
   });
 }
 
 // 참가 신청
 export function useApplyParticipant(studyId: number) {
-  const queryClient = useQueryClient(); 
+  const queryClient = useQueryClient();
+  const { data: user } = useUser();
 
   return useMutation({
     mutationFn: async () => {
       return await applyParticipant(studyId);
     },
     onMutate: () => {
-      queryClient.cancelQueries({ queryKey: queryKeys.participant(studyId) });
-      const previousData = queryClient.getQueryData(queryKeys.participant(studyId));
-      queryClient.setQueryData(queryKeys.participant(studyId), (old: ParticipantResponse) => {
+      const key = queryKeys.participant(studyId, user?.id);
+      queryClient.cancelQueries({ queryKey: key });
+      const previousData = queryClient.getQueryData(key);
+      queryClient.setQueryData(key, (old: ParticipantResponse) => {
         return {
           ...old,
           status: "pending",
@@ -51,14 +56,13 @@ export function useApplyParticipant(studyId: number) {
       return { previousData };
     },
     onError: (error: any, variables, context) => {
-      queryClient.setQueryData(queryKeys.participant(studyId), context?.previousData);
+      queryClient.setQueryData(queryKeys.participant(studyId, user?.id), context?.previousData);
       toast.error(error.message || "참여 신청 중 오류가 발생했습니다");
     },
     onSuccess: (response) => {
       if (response?.success) {
-        // 캐시 무효화 - 참여 상태 다시 조회
         queryClient.invalidateQueries({
-          queryKey: queryKeys.participant(studyId),
+          queryKey: queryKeys.participant(studyId, user?.id),
         });
         queryClient.invalidateQueries({
           queryKey: queryKeys.studyDetail(studyId),
@@ -85,8 +89,9 @@ export function useAcceptParticipant(studyId: number) {
           queryClient.invalidateQueries({
             queryKey: queryKeys.studyDetail(studyId),
           });
+          // 수락된 사람을 포함해 해당 스터디의 모든 participant 캐시 무효화
           queryClient.invalidateQueries({
-            queryKey: queryKeys.participant(studyId),
+            queryKey: queryKeys.participantByStudy(studyId),
           });
           toast.success("참여자를 수락했습니다");
         }
@@ -109,6 +114,9 @@ export function useRejectParticipant(studyId: number) {
       if (response?.success) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.studyDetail(studyId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.participantByStudy(studyId),
         });
         toast.success("참여 신청을 거절했습니다");
       } else {
@@ -134,6 +142,9 @@ export function useRemoveParticipant(studyId: number) {
         queryClient.invalidateQueries({
           queryKey: queryKeys.studyDetail(studyId),
         });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.participantByStudy(studyId),
+        });
         toast.success("멤버를 강퇴했습니다");
       } else {
         toast.error(response?.error?.message || "강퇴에 실패했습니다");
@@ -144,6 +155,9 @@ export function useRemoveParticipant(studyId: number) {
         toast.success("멤버가 스터디에서 나갔습니다.");
         queryClient.invalidateQueries({
           queryKey: queryKeys.studyDetail(studyId),
+        });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.participantByStudy(studyId),
         });
         return;
       }

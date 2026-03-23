@@ -17,8 +17,10 @@ export const queryKeys = {
   like: (postId: number) => ["like", postId],
 
   // 참여자
-  // participants: (studyId: number) => ["participants", studyId],
-  participant: (studyId: number) => ["participant", "status", studyId],
+  participant: (studyId: number, userId?: string) =>
+    ["participant", "status", studyId, userId ?? ""],
+  /** 해당 스터디의 모든 참여자 상태 캐시 (accept/reject 시 prefix 매칭용) */
+  participantByStudy: (studyId: number) => ["participant", "status", studyId],
 
   // 채팅
   chat: (id: number) => ["chats", id],

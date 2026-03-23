@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { getImageUrl, getProfileImageUrl } from '@/lib/supabase/storage'
 import { PostDetailResponse, PostsResponse } from '@/types/postType'
+import { formatTimeAgo } from '@/utils/utils'
 
 export default function PostCard({
     post,
@@ -121,7 +122,7 @@ export default function PostCard({
                         <span>👍 {post.likes_count}</span>
                         <span>👁 {post.views_count}</span>
                     </div>
-                    <span>{post.created_at}</span>
+                    <span>{formatTimeAgo(post.created_at)}</span>
                 </div>
             </div>
         </Card>
