@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useDeletePost } from '@/hooks/usePost'
 import { useRouter } from 'next/navigation'
+import { formatTimeAgo } from '@/utils/utils'
 
 export default function MyPostTab({
     myPosts,
@@ -39,7 +40,6 @@ export default function MyPostTab({
 
         if (!window.confirm('정말 삭제하시겠습니까?')) return
 
-        console.log('handleDelete: ', postId)
         deleteMutation.mutate(postId)
     }
 
@@ -153,9 +153,9 @@ export default function MyPostTab({
 
                                     <div className='flex items-center justify-between text-xs text-muted-foreground mt-auto pt-2 border-t border-border'>
                                         <span>
-                                            {new Date(
+                                            {formatTimeAgo(new Date(
                                                 post.created_at
-                                            ).toLocaleDateString('ko-KR')}
+                                            ).toISOString())}
                                         </span>
                                         <div className='flex items-center gap-2'>
                                             <span className='flex items-center gap-1'>

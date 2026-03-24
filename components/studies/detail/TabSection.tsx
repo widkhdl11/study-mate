@@ -37,9 +37,11 @@ import { getCategoryPath } from "@/lib/constants/study-category";
 import { getRegionPath } from "@/lib/constants/region";
 import { getStudyStatusColor, studyStatusConversion } from "@/utils/conversion/study";
 import { formatDate } from "date-fns";
-import { getProfileImageUrl } from "@/lib/supabase/storage";
+import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
 import { ProfileResponse } from "@/types/profileType";
 import { UseMutationResult } from "@tanstack/react-query";
+import { formatTimeAgo } from "@/utils/utils";
+import { PostDetailResponse } from "@/types/postType";
 
 export default function TabSection(
     { study, user, deleteStudy }
@@ -353,7 +355,8 @@ export default function TabSection(
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {study.posts?.map((post) => (
+                  {study.posts?.map((post: any) => {
+                    return (
                     <Card
                       key={post.id}
                       className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer p-0 gap-0"
@@ -361,7 +364,7 @@ export default function TabSection(
                       <Link href={`/posts/${post.id}`}>
                         <div className="relative w-full h-40 bg-muted">
                           <img
-                            src={post.image_url || "/placeholder.svg"}
+                            src={getImageUrl(post.image_url?.[0]?.url || "/default-post-thumbnail.jpg")}
                             alt={post.title}
                             className="w-full h-full object-cover"
                           />
@@ -379,7 +382,7 @@ export default function TabSection(
                             {post.content}
                           </p>
                           <div className="flex items-center justify-between text-sm text-muted-foreground">
-                            <span>{post.created_at}</span>
+                            <span>{ formatTimeAgo(post.created_at)}</span>
                             <div className="flex items-center gap-3">
                               <span className="flex items-center gap-1">
                                 <ThumbsUp className="w-3 h-3" /> {post.likes_count}
@@ -410,7 +413,7 @@ export default function TabSection(
                         </Button>
                       </div>
                     </Card>
-                  ))}
+                  )})}
                 </div>
               </TabsContent>
             </Tabs>
