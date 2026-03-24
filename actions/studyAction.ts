@@ -244,7 +244,6 @@ export async function updateStudy(formData: FormData): Promise<ActionResponse> {
         .eq('study_id', id)
         .eq('status', 'accepted')
 
-    console.log(participantsCount)
     if (participantsError || participantsCount === null) {
         throw new Error('참여자 수정에 실패했습니다')
     }
@@ -280,6 +279,7 @@ export async function getMyCreatedStudiesSSR(): Promise<StudiesResponse> {
         .from('studies')
         .select('*')
         .eq('creator_id', user.id)
+        
     // 3. 없거나 권한 없으면
     if (error) {
         notFound()

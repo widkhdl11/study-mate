@@ -30,6 +30,7 @@ import { PostFormValues, postSchema } from '@/lib/zod/schemas/postSchema'
 import { useForm } from 'react-hook-form'
 import { useCreatePost } from '@/hooks/usePost'
 import { StudiesResponse } from '@/types/studiesType'
+import { studyStatusConversion } from '@/utils/conversion/study'
 
 export default function CreateForm({ studies }: { studies: StudiesResponse }) {
     const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([])
@@ -152,9 +153,16 @@ export default function CreateForm({ studies }: { studies: StudiesResponse }) {
                                                 key={study.id}
                                                 value={study.id.toString()}
                                                 disabled={
-                                                    study.status === 'closed'
+                                                    study.status === 'closed'|| 
+                                                    study.status === 'completed'
                                                 }>
-                                                {study.title}
+                                                {study.title} 
+                                                {study.status === 'closed'|| study.status === 'completed' ? 
+                                                <Badge variant='outline' className='m-1'>
+                                                    {studyStatusConversion(study.status)}
+                                                </Badge> : 
+                                                    null
+                                                }
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
