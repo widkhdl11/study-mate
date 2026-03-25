@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { useLogout } from '@/hooks/useAuth'
-import { useGetMyProfile, useUser } from '@/hooks/useUser'
+import { useGetMyProfile } from '@/hooks/useUser'
 import { getProfileImageUrl } from '@/lib/supabase/storage'
 import {
     useAllReadNotification,
@@ -30,11 +30,19 @@ export const Header = () => {
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [searchInput, setSearchInput] = useState('')
+    const [notificationOpen, setNotificationOpen] = useState(false)
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false)
 
     useEffect(() => {
         if (pathname === '/posts') {
             setSearchInput(searchParams.get('search') ?? '')
         }
+    }, [pathname, searchParams])
+
+    // 페이지 이동 시 드롭다운 닫기
+    useEffect(() => {
+        setNotificationOpen(false)
+        setProfileMenuOpen(false)
     }, [pathname, searchParams])
 
     const runSearch = () => {
@@ -118,7 +126,9 @@ export const Header = () => {
 
                         {user ? (
                             <>
-                                <DropdownMenu>
+                                <DropdownMenu
+                                    open={notificationOpen}
+                                    onOpenChange={setNotificationOpen}>
                                     <DropdownMenuTrigger asChild>
                                         <button className='relative p-2 text-foreground hover:bg-muted rounded-lg transition-colors'>
                                             🔔
@@ -241,7 +251,9 @@ export const Header = () => {
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
-                                <DropdownMenu>
+                                <DropdownMenu
+                                    open={profileMenuOpen}
+                                    onOpenChange={setProfileMenuOpen}>
                                     <DropdownMenuTrigger asChild>
                                         <div>
                                             <button className='flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer'>
@@ -280,9 +292,23 @@ export const Header = () => {
                                         </DropdownMenuItem>
                                         <DropdownMenuItem className='cursor-pointer'>
                                             <Link
-                                                href='/profile'
+                                                href='/profile?tab=studies'
                                                 className='w-full'>
                                                 내 스터디
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className='cursor-pointer'>
+                                            <Link
+                                                href='/profile?tab=posts'
+                                                className='w-full'>
+                                                내 게시글
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className='cursor-pointer'>
+                                            <Link
+                                                href='/profile?tab=chats'
+                                                className='w-full'>
+                                                내 채팅
                                             </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />

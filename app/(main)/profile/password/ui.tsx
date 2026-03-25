@@ -39,7 +39,7 @@ export function PasswordChangeUI() {
     },
   })
 
-  async function onSubmit(values: PasswordChangeFormValues) {
+  async function onSubmit() {
     setIsLoading(true)
     try {
       // TODO: 실제 비밀번호 변경 API 호출
