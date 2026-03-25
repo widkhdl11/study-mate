@@ -39,6 +39,21 @@ export const signupSchema = z.object({
   path: ["passwordConfirm"],
 });
 
+export const passwordChangeSchema = z.object({
+  currentPassword: z.string().min(6, "현재 비밀번호를 입력해주세요"),
+  newPassword: z.string().min(6, "새 비밀번호는 6자 이상이어야 합니다"),
+  newPasswordConfirm: z.string(),
+}).refine((data) => data.newPassword === data.newPasswordConfirm, {
+  message: "새 비밀번호가 일치하지 않습니다",
+  path: ["newPasswordConfirm"],
+})
+.refine((data) => data.currentPassword !== data.newPassword, {
+    message: "새 비밀번호는 현재 비밀번호와 달라야 합니다",
+    path: ["newPassword"],
+  })
+
+export type PasswordChangeFormValues = z.infer<typeof passwordChangeSchema>;
+
 // 타입 추출
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type SignupFormValues = z.infer<typeof signupSchema>;

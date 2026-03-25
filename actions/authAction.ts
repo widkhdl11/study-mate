@@ -4,9 +4,10 @@
   import { redirect } from "next/navigation";
   import { createClient } from "@/lib/supabase/server";
   import { createClientAdmin } from "@/lib/supabase/client-admin";
-  import { LoginFormValues, loginSchema, SignupFormValues, signupSchema } from "@/lib/zod/schemas/authSchema";
+  import { LoginFormValues, loginSchema, PasswordChangeFormValues, passwordChangeSchema, SignupFormValues, signupSchema } from "@/lib/zod/schemas/authSchema";
   import { ActionResponse } from "@/types/actionType";
   import { validateWithZod } from "@/utils/utils";
+import { CustomUserAuth } from "@/utils/auth";
 
   /**
    * 로그인
@@ -67,7 +68,6 @@
       birthDate: formData.get("birthDate") as string,
       gender: formData.get("gender") as string,
     };
-    console.log(rawData);
 
     const parseResult = validateWithZod(signupSchema, rawData);
     if (!parseResult.success) {
@@ -142,4 +142,31 @@
 
     revalidatePath("/", "layout");
     redirect("/");
+  }
+
+  export async function updatePassword(
+    formData: FormData
+  ): Promise<ActionResponse<void> > {
+    const supabase = await createClient();
+    const { user } = await CustomUserAuth(supabase);
+
+    const rawData = {
+      currentPassword: formData.get("currentPassword") as string,
+      newPassword: formData.get("newPassword") as string,
+      newPasswordConfirm: formData.get("newPasswordConfirm") as string,
+    };
+    const parseResult = validateWithZod(passwordChangeSchema, rawData);
+    if (!parseResult.success) {
+      return parseResult;
+    }
+
+    const { currentPassword, newPassword } = parseResult.data as PasswordChangeFormValues;
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) {
+      throw new Error("비밀번호 변경에 실패했습니다.");
+    }
+
+    return { success: true, data: undefined };
   }

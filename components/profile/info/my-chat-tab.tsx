@@ -7,27 +7,23 @@ import {Badge} from "@/components/ui/badge";
 import Link from "next/link";
 import { ChatRoom } from "@/types/chatType";
 import { formatTimeAgo } from "@/utils/utils";
+import { getProfileImageUrl } from "@/lib/supabase/storage";
 export default function MyChatTab({chatRooms} : {
     chatRooms : ChatRoom[]
 }) {
     return (<> {/* 채팅 탭 */}
         <TabsContent value="chats" className="space-y-4">
             <div className="space-y-3"> {
-                chatRooms.map((room) => (
+                chatRooms.map((room : ChatRoom) => (
                 <Card key={room.chat.id}
                     className="group overflow-hidden hover:shadow-md transition-all h-full flex flex-col p-0 gap-0 min-h-[100px]">
                     <Link href={`/chat/${room.chat.id}`}>
                     <div className="flex items-start gap-4 p-4">
                         <Avatar className="h-12 w-12 flex-shrink-0">
                             <AvatarImage src={
-                                    room.profile.avatar_url || "/placeholder.svg"
-                                }
-                                alt={
-                                    room.name
-                                }/>
-                            <AvatarFallback className="bg-blue-600 text-white"> {
-                                room?.name|| "??"
-                            } </AvatarFallback>
+                                    getProfileImageUrl(room.profile.avatar_url || "/default-profile-image.jpg")
+                                } alt={room.name} />
+                            <AvatarFallback className="bg-blue-600 text-white"> {room?.name|| "??"} </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2 mb-1">
@@ -45,7 +41,7 @@ export default function MyChatTab({chatRooms} : {
                                 room.chat.last_message
                             } </p>
                             <p className="text-xs text-muted-foreground mt-1"> {
-                                formatTimeAgo(room.chat.last_message_at)
+                                room.chat.last_message_at ? formatTimeAgo(room.chat.last_message_at) : room.created_at ? formatTimeAgo(room.created_at) : ""
                             } </p>
                         </div>
                     </div>

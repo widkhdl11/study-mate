@@ -210,7 +210,7 @@ export async function getMyChatRoomsSSR(): Promise<ChatRoom[]> {
       profile:profiles!chat_participants_user_id_fkey(username, avatar_url)
     `)
     .eq("user_id", user.id)
-    .order("chat(last_message_at)", { ascending: false });
+    .order("chat(last_message_at)", { ascending: true });
 
   if (error) {
     notFound();

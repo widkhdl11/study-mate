@@ -4,35 +4,31 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import Link from "next/link"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft, Lock } from "lucide-react"
+import { useUpdatePassword } from "@/hooks/useAuth"
+import { passwordChangeSchema } from "@/lib/zod/schemas/authSchema"
 
-const passwordChangeSchema = z
-  .object({
-    currentPassword: z.string().min(6, "현재 비밀번호를 입력해주세요"),
-    newPassword: z.string().min(6, "새 비밀번호는 6자 이상이어야 합니다"),
-    newPasswordConfirm: z.string(),
-  })
-  .refine((data) => data.newPassword === data.newPasswordConfirm, {
-    message: "새 비밀번호가 일치하지 않습니다",
-    path: ["newPasswordConfirm"],
-  })
-  .refine((data) => data.currentPassword !== data.newPassword, {
-    message: "새 비밀번호는 현재 비밀번호와 달라야 합니다",
-    path: ["newPassword"],
-  })
 
 type PasswordChangeFormValues = z.infer<typeof passwordChangeSchema>
 
 export function PasswordChangeUI() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+
+
+  const { mutate: updatePasswordMutation } = useUpdatePassword((field, message) => {
+        form.setError(field as keyof PasswordChangeFormValues, {
+            type: 'server',
+            message,
+        })
+    })
 
   const form = useForm<PasswordChangeFormValues>({
     resolver: zodResolver(passwordChangeSchema),
@@ -46,9 +42,12 @@ export function PasswordChangeUI() {
   async function onSubmit(values: PasswordChangeFormValues) {
     setIsLoading(true)
     try {
-      console.log("비밀번호 변경:", values)
       // TODO: 실제 비밀번호 변경 API 호출
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      if (!formRef.current) {
+        return
+      }
+      const formData = new FormData(formRef.current)
+      updatePasswordMutation(formData)
       router.push("/profile")
     } finally {
       setIsLoading(false)
@@ -80,7 +79,7 @@ export function PasswordChangeUI() {
         {/* 비밀번호 변경 폼 카드 */}
         <Card className="p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" >
               {/* 현재 비밀번호 필드 */}
               <FormField
                 control={form.control}

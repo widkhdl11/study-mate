@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -34,13 +34,20 @@ import { getStudyStatusExistValue, studyStatusConversion } from "@/utils/convers
 export default function MainSection(
     { 
         allPosts,
-        getStatusColor 
+        getStatusColor,
+        search
+
     }: { 
         allPosts: PostsResponse, 
         getStatusColor: (status: string) => string 
+        search: string
     }
 ) {
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState(search);
+
+    useEffect(() => {
+        setSearchQuery(search);
+    }, [search]);
 
   const [selectedStatus, setSelectedStatus] = useState("전체 상태");
   const [mainCategoryValue, setMainCategoryValue] = useState("");

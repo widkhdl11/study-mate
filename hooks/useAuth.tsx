@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { login, signup, logout } from '@/actions/authAction'
+import { login, signup, logout, updatePassword } from '@/actions/authAction'
 import { queryKeys } from '@/lib/reactQuery/queryKeys'
 import { isRedirect } from '@/utils/utils'
 
@@ -92,6 +92,31 @@ export function useLogout() {
             }
             toast.error('로그아웃 중 오류가 발생했습니다')
         },
+    })
+}
+
+export function useUpdatePassword(onFieldError?: (field: string, message: string) => void) {
+    return useMutation({
+        mutationFn: async (formData: FormData) => {
+            return await updatePassword(formData)
+        },
+        onSuccess: (response) => {
+            if (!response.success) {
+                toast.error(response.error.message)
+                if (response.error.field && onFieldError) {
+                    onFieldError(response.error.field, response.error.message)
+                }
+            } else {
+                toast.success('비밀번호 변경 성공')
+            }
+        },
+        onError: (error: Error) => {
+            if (isRedirect(error)) {
+                toast.success('비밀번호 변경 성공')
+                return
+            }
+            toast.error(error.message)
+        }
     })
 }
 

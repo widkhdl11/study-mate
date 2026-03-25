@@ -3,9 +3,12 @@
 import { PostsResponse } from "@/types/postType";
 import HeaderSection from "@/components/posts/HeaderSection";
 import MainSection from "@/components/posts/MainSection";
+import { useSearchParams } from "next/navigation";
 
 export default function PostsUI({ allPosts }: { allPosts: PostsResponse }) {
   
+  const searchParams = useSearchParams()
+  const search = searchParams.get("search")?.trim() ?? "";
   const getStatusColor = (status: string) => {
     switch (status) {
       case "모집중":
@@ -30,6 +33,7 @@ export default function PostsUI({ allPosts }: { allPosts: PostsResponse }) {
         <MainSection
           allPosts={allPosts}
           getStatusColor={getStatusColor}
+          search={search}
         />
       </main>
 

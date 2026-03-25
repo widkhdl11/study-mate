@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
 
@@ -8,7 +9,9 @@ export default function MainLayout({
 }) {
     return (
         <>
-            <Header />
+            <Suspense fallback={null}>
+                <Header />
+            </Suspense>
             {children}
             <Footer />
         </>
