@@ -22,7 +22,6 @@ export default function PostDetailUI({ initialPost, user, participant }: PostDet
   const { data: participantData } = useParticipant(participant, post.study.id);
   const status = STATUS_MAP[participantData?.status || ""] || "모집중";
 
-  console.log("participantData : ", participantData);
   const relatedPosts: PostsResponse = [];
 
   return (

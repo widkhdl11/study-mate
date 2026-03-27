@@ -16,6 +16,7 @@ export default function PostCard({
     getCategoryColor: (category: string) => string
     getStatusColor: (status: string) => string
 }) {
+    console.log("post : ", post);
     return (
         <Card className='overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col cursor-pointer hover:border-accent/50'>
             {/* Thumbnail Image */}

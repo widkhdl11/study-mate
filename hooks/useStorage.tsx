@@ -8,10 +8,8 @@ export function useDeleteImage() {
       return await deleteImage(path);
     },
     onSuccess: (data) => {
-      console.log("data: ", data);
     },
     onError: (error: Error) => {
-      console.log("error: ", error);
     }
   });
 }
