@@ -7,6 +7,7 @@ import { ThumbsUp } from "lucide-react";
 import { PostDetailResponse } from "@/types/postType";
 import { ProfileResponse } from "@/types/profileType";
 import { formatDate } from "@/utils/utils";
+import { getProfileImageUrl } from "@/lib/supabase/storage";
 import { useRef } from "react";
 import { useTrackPostView } from "@/hooks/useTrackPostView";
 
@@ -41,7 +42,7 @@ export default function MainSection({ post,user }: { post: PostDetailResponse, u
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
                     <AvatarImage
-                      src={post.author?.avatar_url || "/placeholder.svg"}
+                      src={post.author?.avatar_url ? getProfileImageUrl(post.author.avatar_url) : "/placeholder.svg"}
                       alt={post.author?.username || ""}
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground">

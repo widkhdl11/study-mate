@@ -11,10 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import {
   Users,
-  MapPin,
-  Calendar,
-  Clock,
-  Settings,
   MessageSquare,
   FileText,
   ThumbsUp,
@@ -42,6 +38,7 @@ import { ProfileResponse } from "@/types/profileType";
 import { UseMutationResult } from "@tanstack/react-query";
 import { formatTimeAgo } from "@/utils/utils";
 import { PostDetailResponse } from "@/types/postType";
+import Image from "next/image";
 
 export default function TabSection(
     { study, user, deleteStudy }
@@ -363,7 +360,8 @@ export default function TabSection(
                     >
                       <Link href={`/posts/${post.id}`}>
                         <div className="relative w-full h-40 bg-muted">
-                          <img
+                          <Image
+                            fill
                             src={getImageUrl(post.image_url?.[0]?.url || "/default-post-thumbnail.jpg")}
                             alt={post.title}
                             className="w-full h-full object-cover"

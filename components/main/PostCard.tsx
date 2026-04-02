@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card'
 import { getImageUrl, getProfileImageUrl } from '@/lib/supabase/storage'
 import { PostDetailResponse, PostsResponse } from '@/types/postType'
 import { formatTimeAgo } from '@/utils/utils'
+import Image from 'next/image'
 
 export default function PostCard({
     post,
@@ -16,17 +17,18 @@ export default function PostCard({
     getCategoryColor: (category: string) => string
     getStatusColor: (status: string) => string
 }) {
-    console.log("post : ", post);
     return (
         <Card className='overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col cursor-pointer hover:border-accent/50'>
             {/* Thumbnail Image */}
             <div className='relative w-full h-48 bg-muted overflow-hidden'>
-                <img
+                <Image
                     src={getImageUrl(
                         post.image_url?.[0]?.url ||
                             '/default-post-thumbnail.jpg'
                     )}
                     alt={post.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 424px"
                     className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
                 />
             </div>

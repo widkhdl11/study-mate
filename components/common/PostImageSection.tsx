@@ -19,7 +19,10 @@ export default function PostImageSection({ post }: { post: PostDetailResponse })
                           src={getImageUrl(image.url)}
                           alt={`${post.title} - 이미지 ${index + 1}`}
                           fill
-                          className="object-cover"
+                          className="object-cover rounded-lg"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          priority={index === 0}
+                          fetchPriority={index === 0 ? "high" : "auto"}
                           />
                       </div>
                     </CarouselItem>

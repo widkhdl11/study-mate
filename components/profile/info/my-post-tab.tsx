@@ -21,6 +21,7 @@ import {
 import { useDeletePost } from '@/hooks/usePost'
 import { useRouter } from 'next/navigation'
 import { formatTimeAgo } from '@/utils/utils'
+import Image from 'next/image'
 
 export default function MyPostTab({
     myPosts,
@@ -54,16 +55,19 @@ export default function MyPostTab({
         <TabsContent value='posts' className='space-y-4'>
             {myPosts && myPosts?.length > 0 ? (
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                    {myPosts.map((post) => (
+                    {myPosts.map((post, index) => (
                         <div key={post.id} className='relative'>
                             <Card className='group overflow-hidden hover:shadow-md transition-all h-full flex flex-col p-0 gap-0'>
                                 <Link href={`/posts/${post.id}`}>
                                     <div className='relative w-full h-40 bg-muted overflow-hidden cursor-pointer'>
-                                        <img
-                                            src={getImageUrl(
-                                                post.image_url?.[0]?.url ||
-                                                    '/default-post-thumbnail.jpg'
-                                            )}
+                                        <Image
+                                            fill
+                                            priority={index === 0}
+                                            fetchPriority={index === 0 ? "high" : "auto"}
+                                            sizes="(max-width: 640px) 100vw, 424px"
+                                            src={
+                                                post.image_url?.[0]?.url ? getImageUrl(post.image_url?.[0]?.url) : '/default-post-thumbnail.jpg'
+                                            }
                                             alt={post.title}
                                             className='w-full h-full object-cover group-hover:scale-105 transition-transform'
                                         />

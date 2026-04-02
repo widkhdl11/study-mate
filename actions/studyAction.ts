@@ -30,7 +30,6 @@ export async function createStudy(formData: FormData): Promise<ActionResponse> {
         maxParticipants: Number(formData.get('maxParticipants')) as number,
         description: formData.get('description') as string,
     }
-    console.log(rawData)
 
     const parseResult = validateWithZod(studyCreateSchema, rawData)
     if (parseResult.success === false) {

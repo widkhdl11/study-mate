@@ -32,5 +32,6 @@ export function useGetMyProfile() {
         },
         throwOnError: true,
         enabled: !!user,
+        staleTime: 1000 * 60 * 5, // 5분
     })
 }

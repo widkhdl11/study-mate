@@ -121,7 +121,6 @@ ${i + 1}. [ID: ${s.id}] ${s.title}
 
     return { success: true, data: result };
   } catch (error: any) {
-    console.error("AI 추천 에러:", error);
     return {
       success: false,
       error: { message: "AI 추천 중 오류가 발생했습니다" },

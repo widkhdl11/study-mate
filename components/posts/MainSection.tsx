@@ -29,6 +29,7 @@ import {
 import { getMainRegion, getRegionCodeByValue, getRegionPath, getSubRegion } from "@/lib/constants/region";
 import { STUDY_STATUS } from "@/lib/constants/study-status";
 import { getStudyStatusExistValue, studyStatusConversion } from "@/utils/conversion/study";
+import Image from "next/image";
 
 
 export default function MainSection(
@@ -136,7 +137,6 @@ export default function MainSection(
                       </label>
                       <Select
                         value={mainCategoryValue}
-
                         onValueChange={(value) => {
                           setMainCategoryValue(value);
                           setSubCategoryValue("");
@@ -351,11 +351,13 @@ export default function MainSection(
                         <Card className="group overflow-hidden hover:shadow-md transition-all duration-300 h-full flex flex-col cursor-pointer border-border/60 hover:border-primary/50 p-0 gap-0">
                           {/* Thumbnail Image */}
                           <div className="relative w-full h-48 bg-muted overflow-hidden">
-                            <img
+                            <Image
                               src={
                                 getImageUrl(post.image_url?.[0]?.url || "/default-post-thumbnail.jpg")
                               }
                               alt={post.title}
+                              fill
+                              sizes="(max-width: 640px) 100vw, 424px"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                             <div className="absolute top-3 right-3">

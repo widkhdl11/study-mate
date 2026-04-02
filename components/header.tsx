@@ -24,6 +24,7 @@ import {
 import { formatTimeAgo } from '@/utils/utils'
 import { NotificationResponse } from '@/types/notificationType'
 import { ProfileResponse } from '@/types/profileType'
+import Image from 'next/image'
 
 export const Header = () => {
     const router = useRouter()
@@ -259,16 +260,18 @@ export const Header = () => {
                                             <button className='flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer'>
                                                 <Avatar className='h-8 w-8'>
                                                     <AvatarImage
-                                                        src={
-                                                            getProfileImageUrl(
-                                                                user.avatar_url ||
-                                                                    ''
-                                                            ) ||
-                                                            '/placeholder.svg'
-                                                        }
-                                                        alt={
-                                                            user.username || ''
-                                                        }
+                                                        asChild
+                                                        // src={getProfileImageUrl(user.avatar_url || '') || '/placeholder.svg'}
+                                                        // alt={user.username || ''}
+                                                    />
+                                                    <Image
+                                                        src={getProfileImageUrl(user.avatar_url || '') || '/placeholder.svg'}
+                                                        alt={user.username || ''}
+                                                        width={32}
+                                                        height={32}
+                                                        className='object-cover'
+                                                        fetchPriority='high'
+                                                        priority
                                                     />
                                                     <AvatarFallback className='bg-primary text-primary-foreground text-xs font-semibold'>
                                                         {user.email?.[0]}

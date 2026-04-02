@@ -8,6 +8,7 @@ import { StudyActionButton } from "./RenderActionButton"
 import { PostDetailResponse } from "@/types/postType"
 import { getRegionPath } from "@/lib/constants/region"
 import { useApplyParticipant } from "@/hooks/useParticipant"
+import { getProfileImageUrl } from "@/lib/supabase/storage"
 
 export default function SidebarSection({ post, status }: { post: PostDetailResponse, status: string }) {
   
@@ -81,7 +82,7 @@ export default function SidebarSection({ post, status }: { post: PostDetailRespo
                 <div className="flex items-center gap-3 p-3 bg-muted rounded-lg mb-6">
                   <Avatar className="h-8 w-8">
                     <AvatarImage
-                      src={post.author?.avatar_url || "/placeholder.svg"}
+                      src={post.author?.avatar_url ? getProfileImageUrl(post.author?.avatar_url) : "/placeholder.svg"}
                       alt={post.author?.username}
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground text-xs">

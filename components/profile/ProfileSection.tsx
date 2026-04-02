@@ -32,9 +32,7 @@ export default function ProfileSection({
                         <Avatar className='h-24 w-24 ring-4 ring-primary/20'>
                             <AvatarImage
                                 src={
-                                    getProfileImageUrl(
-                                        currentUser?.avatar_url || ''
-                                    ) || '/placeholder.svg'
+                                    currentUser?.avatar_url ? getProfileImageUrl(currentUser?.avatar_url) : '/placeholder.svg'
                                 }
                                 alt={currentUser.username || ''}
                             />

@@ -1,32 +1,11 @@
 'use client'
 
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-    User,
-    MessageSquare,
-    FileText,
-    BookOpen,
-    Edit,
-    Lock,
-    LogOut,
-    Settings,
-} from 'lucide-react'
-import MyChatTab from '@/components/profile/info/my-chat-tab'
-import MyPostTab from '@/components/profile/info/my-post-tab'
-import MyStudiesTab from '@/components/profile/info/my-studies-tab'
-import MyInfoTab from '@/components/profile/info/my-info-tab'
 import { PostsResponse } from '@/types/postType'
 import { StudiesResponse } from '@/types/studiesType'
 import { useEffect, useState } from 'react'
 import { useUpdateProfileImage } from '@/hooks/useProfile'
-import { getProfileImageUrl } from '@/lib/supabase/storage'
 import { ProfileResponse } from '@/types/profileType'
 import { useLogout } from '@/hooks/useAuth'
-import { useGetMyChatRooms } from '@/hooks/useChat'
 import { useSearchParams } from 'next/navigation'
 import { ChatRoom } from '@/types/chatType'
 import ProfileSection from '@/components/profile/ProfileSection'

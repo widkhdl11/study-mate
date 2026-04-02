@@ -118,7 +118,6 @@ import { CustomUserAuth } from "@/utils/auth";
           error: { message: "이미 가입된 아이디입니다.", field: "username" },
         };
       }
-      console.error(profileError);
       throw new Error("회원가입에 실패했습니다. 다시 시도해주세요.");
     }
 

@@ -31,6 +31,7 @@ import { useForm } from 'react-hook-form'
 import { useCreatePost } from '@/hooks/usePost'
 import { StudiesResponse } from '@/types/studiesType'
 import { studyStatusConversion } from '@/utils/conversion/study'
+import Image from 'next/image'
 
 export default function CreateForm({ studies }: { studies: StudiesResponse }) {
     const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([])

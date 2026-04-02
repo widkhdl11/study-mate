@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PostDetailResponse } from "@/types/postType";
+import Image from "next/image";
 
 
 export default function EditForm(
@@ -230,7 +231,7 @@ export default function EditForm(
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                             {imagePreviewUrls.map((url, index) => (
                               <div key={index} className="relative group">
-                                <img
+                                <Image
                                   src={url || "/placeholder.svg"}
                                   alt={`미리보기 ${index + 1}`}
                                   className="w-full h-24 object-cover rounded-lg"
