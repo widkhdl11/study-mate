@@ -90,7 +90,7 @@ export function ChatRoomUI({ chatParticipants, chatRoom }:
                   <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
                     <Avatar className="h-10 w-10 flex-shrink-0">
                       <AvatarImage 
-                        src={getProfileImageUrl(member.profile?.avatar_url) || "/placeholder.svg"} 
+                        src={getProfileImageUrl(member.profile?.avatar_url)}
                         alt={member.profile?.username || "사용자"} 
                       />
                       <AvatarFallback className="bg-blue-600 text-white">
@@ -122,7 +122,7 @@ export function ChatRoomUI({ chatParticipants, chatRoom }:
               {!isMe && (
                 <Avatar className="h-8 w-8 flex-shrink-0">
                   <AvatarImage 
-                    src={getProfileImageUrl(message.profile?.avatar_url) || "/placeholder.svg"} 
+                    src={getProfileImageUrl(message.profile?.avatar_url)}
                     alt={message.profile?.username || "사용자"} 
                   />
                   <AvatarFallback className="bg-blue-600 text-white text-xs">

@@ -104,10 +104,7 @@ export default function PostCard({
                 <div className='flex items-center gap-2 border-t border-border pt-3'>
                     <Avatar className='h-7 w-7'>
                         <AvatarImage
-                            src={
-                                getProfileImageUrl(post.author.avatar_url) ||
-                                '/placeholder.svg'
-                            }
+                            src={getProfileImageUrl(post.author.avatar_url)}
                             alt={post.author.username}
                         />
                         <AvatarFallback className='text-xs bg-primary text-primary-foreground'>

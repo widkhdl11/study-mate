@@ -132,7 +132,7 @@ export default function MainSection(
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
+                      <label htmlFor="main-category" className="text-sm font-medium text-foreground">
                         카테고리
                       </label>
                       <Select
@@ -143,7 +143,7 @@ export default function MainSection(
                           setDetailCategoryValue("");
                         }}
                       >
-                        <SelectTrigger className="w-full bg-background">
+                        <SelectTrigger id="main-category" className="w-full bg-background">
                           <SelectValue placeholder="대분류 선택" />
                         </SelectTrigger>
                         <SelectContent>
@@ -162,7 +162,7 @@ export default function MainSection(
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
+                      <label htmlFor="sub-category" className="text-sm font-medium text-foreground">
                         중분류
                       </label>
                       <Select
@@ -172,7 +172,7 @@ export default function MainSection(
                           setDetailCategoryValue("");
                         }}
                       >
-                        <SelectTrigger className="w-full bg-background">
+                        <SelectTrigger id="sub-category" className="w-full bg-background">
                           <SelectValue placeholder="중분류 선택" />
                         </SelectTrigger>
                         <SelectContent>
@@ -192,7 +192,7 @@ export default function MainSection(
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
+                      <label htmlFor="detail-category" className="text-sm font-medium text-foreground">
                         소분류
                       </label>
                       <Select
@@ -201,7 +201,7 @@ export default function MainSection(
                           setDetailCategoryValue(value);
                         }}
                       >
-                        <SelectTrigger className="w-full bg-background">
+                        <SelectTrigger id="detail-category" className="w-full bg-background">
                           <SelectValue placeholder="소분류 선택" />
                         </SelectTrigger>
                         <SelectContent>
@@ -220,7 +220,7 @@ export default function MainSection(
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
+                      <label htmlFor="main-region" className="text-sm font-medium text-foreground">
                         지역 (시/도)
                       </label>
                       <Select
@@ -230,7 +230,7 @@ export default function MainSection(
                           setDetailRegionValue("");
                         }}
                       >
-                        <SelectTrigger className="w-full bg-background">
+                        <SelectTrigger id="main-region" className="w-full bg-background">
                           <SelectValue placeholder="전체 지역" />
                         </SelectTrigger>
                         <SelectContent>
@@ -245,7 +245,7 @@ export default function MainSection(
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
+                      <label htmlFor="detail-region" className="text-sm font-medium text-foreground">
                         지역 (시/군/구)
                       </label>
                       <Select
@@ -254,7 +254,7 @@ export default function MainSection(
                           setDetailRegionValue(value);
                         }}
                       >
-                        <SelectTrigger className="w-full bg-background">
+                        <SelectTrigger id="detail-region" className="w-full bg-background">
                           <SelectValue placeholder="전체" />
                         </SelectTrigger>
                         <SelectContent>
@@ -271,14 +271,14 @@ export default function MainSection(
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">
+                      <label htmlFor="recruit-status" className="text-sm font-medium text-foreground">
                         모집 상태
                       </label>
                       <Select
                         value={selectedStatus}
                         onValueChange={setSelectedStatus}
                       >
-                        <SelectTrigger className="w-full bg-background">
+                        <SelectTrigger id="recruit-status" className="w-full bg-background">
                           <SelectValue placeholder="전체 상태" />
                         </SelectTrigger>
                         <SelectContent>
@@ -388,9 +388,9 @@ export default function MainSection(
                                   ))}
                                 </span>
                               </div>
-                              <h3 className="font-bold text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors mb-1">
+                              <h1 className="font-bold text-lg text-foreground line-clamp-1 group-hover:text-primary transition-colors mb-1">
                                 {post.title}
-                              </h3>
+                              </h1>
                               <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                                 {post.study?.description || ""}
                               </p>
@@ -443,7 +443,7 @@ export default function MainSection(
                               <div className="flex items-center gap-2">
                                 <Avatar className="h-6 w-6 ring-1 ring-border">
                                   <AvatarImage
-                                    src={getProfileImageUrl(post.author?.avatar_url) || "/placeholder.svg"}
+                                    src={getProfileImageUrl(post.author?.avatar_url)}
                                     alt={post.author?.email || ""}
                                   />
                                   <AvatarFallback className="text-[10px] bg-secondary">
@@ -475,9 +475,9 @@ export default function MainSection(
                     <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                       <Search className="w-8 h-8 text-muted-foreground" />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-1">
+                    <h1 className="text-lg font-semibold text-foreground mb-1">
                       검색 결과가 없습니다
-                    </h3>
+                    </h1>
                     <p className="text-muted-foreground mb-6 text-center max-w-xs">
                       다른 키워드로 검색하거나 필터를 초기화해보세요.
                     </p>

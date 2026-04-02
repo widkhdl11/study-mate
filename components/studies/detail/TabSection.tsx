@@ -86,7 +86,7 @@ export default function TabSection(
                   <div className="flex items-center gap-4">
                     <Avatar className="h-14 w-14">
                       <AvatarImage
-                        src={study.creator.avatar_url || "/placeholder.svg"}
+                        src={getProfileImageUrl(study.creator.avatar_url)}
                         alt={study.creator.email}
                       />
                       <AvatarFallback className="bg-blue-600 text-white text-lg">
@@ -159,7 +159,7 @@ export default function TabSection(
                         <div className="flex items-center gap-4">
                           <Avatar className="h-10 w-10">
                             <AvatarImage
-                              src={getProfileImageUrl(member?.avatar_url || "")}
+                              src={getProfileImageUrl(member?.avatar_url)}
                               alt={member?.username || ""}
                             />
                             <AvatarFallback className="bg-blue-600 text-white text-lg">

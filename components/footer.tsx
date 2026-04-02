@@ -25,9 +25,9 @@ export function Footer() {
 
           {/* Product */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-foreground text-sm uppercase tracking-wider">
+            <h1 className="font-semibold text-foreground text-sm uppercase tracking-wider">
               제품
-            </h4>
+            </h1>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
@@ -58,9 +58,9 @@ export function Footer() {
 
           {/* Company */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-foreground text-sm uppercase tracking-wider">
+            <h1 className="font-semibold text-foreground text-sm uppercase tracking-wider">
               회사
-            </h4>
+            </h1>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
@@ -91,9 +91,9 @@ export function Footer() {
 
           {/* Legal */}
           <div className="space-y-3">
-            <h4 className="font-semibold text-foreground text-sm uppercase tracking-wider">
+            <h1 className="font-semibold text-foreground text-sm uppercase tracking-wider">
               정책
-            </h4>
+            </h1>
             <ul className="space-y-2 text-sm">
               <li>
                 <a

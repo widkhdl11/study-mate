@@ -20,9 +20,7 @@ export default function MyChatTab({chatRooms} : {
                     <Link href={`/chat/${room.chat.id}`}>
                     <div className="flex items-start gap-4 p-4">
                         <Avatar className="h-12 w-12 flex-shrink-0">
-                            <AvatarImage src={
-                                    getProfileImageUrl(room.profile.avatar_url || "/default-profile-image.jpg")
-                                } alt={room.name} />
+                            <AvatarImage src={getProfileImageUrl(room.profile.avatar_url)} alt={room.name} />
                             <AvatarFallback className="bg-blue-600 text-white"> {room?.name|| "??"} </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">

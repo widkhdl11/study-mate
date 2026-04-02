@@ -11,7 +11,6 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { useLogout } from '@/hooks/useAuth'
 import { useGetMyProfile } from '@/hooks/useUser'
@@ -25,6 +24,7 @@ import { formatTimeAgo } from '@/utils/utils'
 import { NotificationResponse } from '@/types/notificationType'
 import { ProfileResponse } from '@/types/profileType'
 import Image from 'next/image'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 
 export const Header = () => {
     const router = useRouter()
@@ -256,32 +256,23 @@ export const Header = () => {
                                     open={profileMenuOpen}
                                     onOpenChange={setProfileMenuOpen}>
                                     <DropdownMenuTrigger asChild>
-                                        <div>
-                                            <button className='flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer'>
-                                                <Avatar className='h-8 w-8'>
-                                                    <AvatarImage
-                                                        asChild
-                                                        // src={getProfileImageUrl(user.avatar_url || '') || '/placeholder.svg'}
-                                                        // alt={user.username || ''}
-                                                    />
-                                                    <Image
-                                                        src={getProfileImageUrl(user.avatar_url || '') || '/placeholder.svg'}
-                                                        alt={user.username || ''}
-                                                        width={32}
-                                                        height={32}
-                                                        className='object-cover'
-                                                        fetchPriority='high'
-                                                        priority
-                                                    />
-                                                    <AvatarFallback className='bg-primary text-primary-foreground text-xs font-semibold'>
-                                                        {user.email?.[0]}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <span className='hidden sm:inline text-sm font-medium text-foreground'>
-                                                    {user.username}
-                                                </span>
-                                            </button>
-                                        </div>
+                                        <button className='flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer'>
+                                            <Avatar className='h-8 w-8'>
+                                                <AvatarImage
+                                                    src={getProfileImageUrl(user.avatar_url)}
+                                                    alt={user.username || ''}
+                                                    width={32}
+                                                    height={32}
+                                                    fetchPriority='high'
+                                                />
+                                                <AvatarFallback className='bg-primary text-primary-foreground text-xs font-semibold'>
+                                                    {user.username?.[0]}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <span className='hidden sm:inline text-sm font-medium text-foreground'>
+                                                {user.username}
+                                            </span>
+                                        </button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent
                                         align='end'

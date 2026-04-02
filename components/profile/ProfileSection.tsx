@@ -10,6 +10,7 @@ import { Button } from '../ui/button'
 import { StudiesResponse } from '@/types/studiesType'
 import { PostsResponse } from '@/types/postType'
 import { UseMutationResult } from '@tanstack/react-query'
+import Image from 'next/image'
 
 export default function ProfileSection({
     currentUser,
@@ -31,10 +32,11 @@ export default function ProfileSection({
                     <div className='relative shrink-0'>
                         <Avatar className='h-24 w-24 ring-4 ring-primary/20'>
                             <AvatarImage
-                                src={
-                                    currentUser?.avatar_url ? getProfileImageUrl(currentUser?.avatar_url) : '/placeholder.svg'
-                                }
+                                src={getProfileImageUrl(currentUser?.avatar_url)}
                                 alt={currentUser.username || ''}
+                                width={96}
+                                height={96}
+                                fetchPriority='high'
                             />
                             <AvatarFallback className='bg-primary text-primary-foreground text-2xl font-bold'>
                                 {currentUser.username?.[0]}

@@ -4,7 +4,6 @@ import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/utils/utils"
-
 function Avatar({
   className,
   ...props
@@ -27,7 +26,6 @@ function AvatarImage({
 }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
   return (
     <AvatarPrimitive.Image
-      asChild
       data-slot="avatar-image"
       className={cn("aspect-square size-full", className)}
       {...props}
