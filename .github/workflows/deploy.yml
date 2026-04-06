@@ -49,6 +49,7 @@ jobs:
                   key: ${{ secrets.EC2_SSH_KEY }}
                   script: |
                       cd ~/project/study-mate
+                      git pull origin main
                       docker pull ${{ env.DOCKER_IMAGE }}:latest
                       docker compose up -d --force-recreate app
                       docker image prune -f
