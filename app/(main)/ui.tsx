@@ -44,6 +44,7 @@ export default function HomeUI() {
 
     return (
         <div className='min-h-screen flex flex-col bg-background'>
+            <p>CI CD 배포 자동화 완료</p>
             <main className='flex-1'>
                 {/* Hero Section */}
                 <HeroSection />
