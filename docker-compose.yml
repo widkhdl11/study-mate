@@ -6,6 +6,7 @@ services:
         env_file: .env
         environment:
             - NODE_ENV=production
+    # 배포 자동화 전까지 사용
     # build:
     #     context: .
     #     dockerfile: Dockerfile
