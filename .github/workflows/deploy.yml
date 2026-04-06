@@ -48,7 +48,7 @@ jobs:
                   username: ${{ secrets.EC2_USERNAME }}
                   key: ${{ secrets.EC2_SSH_KEY }}
                   script: |
-                      cd ~/study-mate
+                      cd ~/project/study-mate
                       docker pull ${{ env.DOCKER_IMAGE }}:latest
                       docker compose up -d --force-recreate app
                       docker image prune -f
