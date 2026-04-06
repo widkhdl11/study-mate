@@ -1,0 +1,54 @@
+name: Deploy to EC2
+
+on:
+    push:
+        branches: [main]
+
+env:
+    DOCKER_IMAGE: jeongjaewon1/study-mate
+
+jobs:
+    build-and-push:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build and Push
+              uses: docker/build-push-action@v6
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ env.DOCKER_IMAGE }}:latest,${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+                  build-args: |
+                      NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+                      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+                      NEXT_PUBLIC_STORAGE_BUCKET_POST=${{ secrets.NEXT_PUBLIC_STORAGE_BUCKET_POST }}
+                      NEXT_PUBLIC_STORAGE_BUCKET_PROFILE=${{ secrets.NEXT_PUBLIC_STORAGE_BUCKET_PROFILE }}
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+
+    deploy:
+        needs: build-and-push
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to EC2
+              uses: appleboy/ssh-action@v1
+              with:
+                  host: ${{ secrets.EC2_HOST }}
+                  username: ${{ secrets.EC2_USERNAME }}
+                  key: ${{ secrets.EC2_SSH_KEY }}
+                  script: |
+                      cd ~/study-mate
+                      docker pull ${{ env.DOCKER_IMAGE }}:latest
+                      docker compose up -d --force-recreate app
+                      docker image prune -f

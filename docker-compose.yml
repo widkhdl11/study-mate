@@ -1,18 +1,24 @@
 services:
     app:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            args:
-                NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-                NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
-                NEXT_PUBLIC_STORAGE_BUCKET_POST: ${NEXT_PUBLIC_STORAGE_BUCKET_POST}
-                NEXT_PUBLIC_STORAGE_BUCKET_PROFILE: ${NEXT_PUBLIC_STORAGE_BUCKET_PROFILE}
+        image: jeongjaewon1/study-mate:latest
         container_name: study-mate-app
         restart: unless-stopped
         env_file: .env
         environment:
             - NODE_ENV=production
+    # build:
+    #     context: .
+    #     dockerfile: Dockerfile
+    #     args:
+    #         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+    #         NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
+    #         NEXT_PUBLIC_STORAGE_BUCKET_POST: ${NEXT_PUBLIC_STORAGE_BUCKET_POST}
+    #         NEXT_PUBLIC_STORAGE_BUCKET_PROFILE: ${NEXT_PUBLIC_STORAGE_BUCKET_PROFILE}
+    # container_name: study-mate-app
+    # restart: unless-stopped
+    # env_file: .env
+    # environment:
+    #     - NODE_ENV=production
 
     nginx:
         image: nginx:alpine
