@@ -2,6 +2,7 @@
 
 import { getMyProfile, getUser } from '@/actions/profileAction'
 import { queryKeys } from '@/lib/reactQuery/queryKeys'
+import { ProfileResponse } from '@/types/profileType'
 import { convertUser } from '@/utils/conversion/user'
 import { User, UserResponse } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
@@ -19,7 +20,7 @@ export function useUser() {
     })
 }
 
-export function useGetMyProfile() {
+export function useGetMyProfile({myProfile}: {myProfile: ProfileResponse}) {
     const { data: user } = useUser()
     return useQuery({
         queryKey: queryKeys.myProfile,
@@ -28,8 +29,9 @@ export function useGetMyProfile() {
             if (profile?.success && profile.data) {
                 return profile
             }
-            return null
+            return myProfile
         },
+        initialData: myProfile,
         throwOnError: true,
         enabled: !!user,
         staleTime: 1000 * 60 * 5, // 5분
