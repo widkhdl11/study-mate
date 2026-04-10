@@ -120,7 +120,7 @@ export async function getMyProfileSSR(): Promise<ProfileResponse> {
         .eq('id', id)
         .single()
 
-    if (error || !data) {
+    if (error) {
         notFound()
     }
     return data as unknown as ProfileResponse

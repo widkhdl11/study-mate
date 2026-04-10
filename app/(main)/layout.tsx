@@ -10,8 +10,6 @@ export default async function MainLayout({
 }) {
 
     const myProfile = await getMyProfileSSR();
-
-
     
     return (
         <>
