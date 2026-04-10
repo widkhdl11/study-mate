@@ -1,9 +1,17 @@
 'use client'
 
 import { getImageUrl } from "@/lib/supabase/storage"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel"
+// import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel"
 import { PostDetailResponse } from "@/types/postType"
 import Image from "next/image"
+
+import dynamic from 'next/dynamic'
+
+const Carousel = dynamic(() => import('../ui/carousel').then(mod => mod.Carousel))
+const CarouselContent = dynamic(() => import('../ui/carousel').then(mod => mod.CarouselContent))
+const CarouselItem = dynamic(() => import('../ui/carousel').then(mod => mod.CarouselItem))
+const CarouselNext = dynamic(() => import('../ui/carousel').then(mod => mod.CarouselNext))
+const CarouselPrevious = dynamic(() => import('../ui/carousel').then(mod => mod.CarouselPrevious))
 
 export default function PostImageSection({ post }: { post: PostDetailResponse }) {
     return (
