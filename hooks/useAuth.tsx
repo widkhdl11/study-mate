@@ -12,6 +12,7 @@ export function useLogin(
     onFieldError?: (field: string, message: string) => void
 ) {
     const queryClient = useQueryClient()
+    const router = useRouter()
     return useMutation({
         mutationFn: login,
         onSuccess: (response) => {
@@ -25,9 +26,11 @@ export function useLogin(
         onError: (error: Error) => {
             if (isRedirect(error)) {
                 queryClient.invalidateQueries({ queryKey: queryKeys.user })
+                queryClient.invalidateQueries({ queryKey: queryKeys.myProfile })
                 queryClient.invalidateQueries({
                     queryKey: queryKeys.notifications,
                 })
+                router.refresh()
                 toast.success('로그인 성공했습니다.')
                 return
             }
@@ -68,6 +71,7 @@ export function useSignup(
 // 로그아웃
 export function useLogout() {
     const queryClient = useQueryClient()
+    const router = useRouter()
     return useMutation({
         mutationFn: logout,
         onSuccess: (response) => {
@@ -88,6 +92,7 @@ export function useLogout() {
                 queryClient.setQueryData(queryKeys.user, null)
                 queryClient.removeQueries({ queryKey: queryKeys.notifications })
                 queryClient.removeQueries({ queryKey: queryKeys.myProfile })
+                router.refresh()
                 return
             }
             toast.error('로그아웃 중 오류가 발생했습니다')

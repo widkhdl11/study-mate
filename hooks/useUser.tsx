@@ -20,20 +20,18 @@ export function useUser() {
     })
 }
 
-export function useGetMyProfile({myProfile}: {myProfile: ProfileResponse}) {
+export function useGetMyProfile() {
     const { data: user } = useUser()
     return useQuery({
         queryKey: queryKeys.myProfile,
         queryFn: async () => {
             const profile = await getMyProfile()
             if (profile?.success && profile.data) {
-                return profile
+                return profile.data as ProfileResponse
             }
-            return myProfile
+            return null
         },
-        initialData: myProfile,
-        throwOnError: true,
         enabled: !!user,
-        staleTime: 1000 * 60 * 5, // 5분
+        staleTime: 1000 * 60 * 5,
     })
 }

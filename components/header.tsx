@@ -23,10 +23,10 @@ import {
 import { formatTimeAgo } from '@/utils/utils'
 import { NotificationResponse } from '@/types/notificationType'
 import { ProfileResponse } from '@/types/profileType'
-import Image from 'next/image'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+    
+export const Header = ({ myProfile }: { myProfile: ProfileResponse | null }) => {
 
-export const Header = ({ myProfile }: { myProfile: ProfileResponse }) => {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -55,8 +55,8 @@ export const Header = ({ myProfile }: { myProfile: ProfileResponse }) => {
         }
     }
 
-    const { data: profile } = useGetMyProfile({myProfile})
-    const user = profile as ProfileResponse
+    const { data: profile } = useGetMyProfile()
+    const user = profile ?? myProfile
     const logoutMutation = useLogout()
     const { data: notifications } = useGetNotifications()
     const readNotificationMutation = useReadNotification()

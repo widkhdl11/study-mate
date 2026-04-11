@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import Header from '@/components/header'
 import Footer from '@/components/footer'
 import { getMyProfileSSR } from '@/actions/profileAction';
+import { notFound } from 'next/navigation';
 
 export default async function MainLayout({
     children,
@@ -10,7 +11,7 @@ export default async function MainLayout({
 }) {
 
     const myProfile = await getMyProfileSSR();
-    
+  
     return (
         <>
             <Suspense fallback={null}>

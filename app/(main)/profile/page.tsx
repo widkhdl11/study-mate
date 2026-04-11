@@ -13,6 +13,9 @@ export default async function UserProfilePage() {
     getMyStudiesSSR(),
     getMyChatRoomsSSR(),
   ]);
+  if (!profileData) {
+    notFound()
+  }
   return (
     <div>
       <UserProfileUI user={profileData} posts={postsData} studies={studiesData} chatRooms={chatRoomsData} />

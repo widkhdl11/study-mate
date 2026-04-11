@@ -107,11 +107,11 @@ export async function updateMyProfile(
 
 // =================ssr ======================
 
-export async function getMyProfileSSR(): Promise<ProfileResponse> {
+export async function getMyProfileSSR(): Promise<ProfileResponse | null> {
     const supabase = await createClient()
     const { data: user, error: userError } = await supabase.auth.getUser()
     if (userError) {
-        notFound()
+        return null
     }
     const id = user.user.id
     const { data, error } = await supabase
@@ -121,7 +121,7 @@ export async function getMyProfileSSR(): Promise<ProfileResponse> {
         .single()
 
     if (error) {
-        notFound()
+        return null
     }
     return data as unknown as ProfileResponse
 }
