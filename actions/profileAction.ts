@@ -5,7 +5,7 @@ import profileEditSchema, {
 } from '@/lib/zod/schemas/profileSchema'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { ProfileResponse } from '@/types/profileType'
+import { MyProfileCountResponse, ProfileResponse } from '@/types/profileType'
 import { CustomUserAuth } from '@/utils/auth'
 import { ActionResponse } from '@/types/actionType'
 import { validateWithZod } from '@/utils/utils'
@@ -125,3 +125,37 @@ export async function getMyProfileSSR(): Promise<ProfileResponse | null> {
     }
     return data as unknown as ProfileResponse
 }
+
+export async function getMyProfilesCountSSR(): Promise<MyProfileCountResponse> {
+    const supabase = await createClient()
+    const { data: user, error: userError } = await supabase.auth.getUser()
+    if (userError) {
+        return {
+            my_posts_count: 0,
+            my_participated_studies_count: 0,
+            my_participated_chat_rooms_count: 0
+        }
+    }
+    const id = user.user.id
+    const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+            posts!posts_author_id_fkey(count),
+            participants!participants_user_id_fkey(count),
+            chat_participants!chat_participants_user_id_fkey(count)
+        `)
+        .eq('id', id)
+        .single()
+    if (error) {
+        return {
+            my_posts_count: 0,
+            my_participated_studies_count: 0,
+            my_participated_chat_rooms_count: 0
+        }
+    }
+    return {
+        my_posts_count: data.posts?.[0]?.count ?? 0,
+        my_participated_studies_count: data.participants?.[0]?.count ?? 0,
+        my_participated_chat_rooms_count: data.chat_participants?.[0]?.count ?? 0,
+    }
+}   

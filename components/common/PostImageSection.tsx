@@ -17,12 +17,12 @@ export default function PostImageSection({ post }: { post: PostDetailResponse })
     return (
         <div className="relative w-full mb-8">
             <Carousel className="w-full">
-              <CarouselContent>
+              <CarouselContent >
                 {post.image_url.length > 0 ? (
                   <>
                   {post.image_url.map((image: { url: string }, index: number) => (
                     <CarouselItem key={index}>
-                      <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
+                      <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg" >
                         <Image
                           src={getImageUrl(image.url)}
                           alt={`${post.title} - 이미지 ${index + 1}`}

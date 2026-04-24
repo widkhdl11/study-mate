@@ -6,7 +6,8 @@ import { useCheckIsLiked, useToggleLike,  } from "@/hooks/usePost";
 import { ThumbsUp } from "lucide-react";
 import { PostDetailResponse } from "@/types/postType";
 import { ProfileResponse } from "@/types/profileType";
-import { formatDate } from "@/utils/utils";
+// import { formatDate } from "@/utils/utils";
+import { TimeAgo } from "@/components/common/formatTimeAgo";
 import { getProfileImageUrl } from "@/lib/supabase/storage";
 import { useRef } from "react";
 import { useTrackPostView } from "@/hooks/useTrackPostView";
@@ -54,7 +55,7 @@ export default function MainSection({ post,user }: { post: PostDetailResponse, u
                       {post.author?.username}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {formatDate(post.created_at)}
+                      <TimeAgo date={post.created_at} />
                     </p>
                   </div>
                 </div>
