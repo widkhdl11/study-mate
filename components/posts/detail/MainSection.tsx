@@ -45,6 +45,8 @@ export default function MainSection({ post,user }: { post: PostDetailResponse, u
                     <AvatarImage
                       src={getProfileImageUrl(post.author?.avatar_url)}
                       alt={post.author?.username || ""}
+                      width={60}
+                      height={60}
                     />
                     <AvatarFallback className="bg-primary text-primary-foreground">
                       {post.author?.email[0].toUpperCase()}

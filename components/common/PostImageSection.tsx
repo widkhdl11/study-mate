@@ -28,7 +28,7 @@ export default function PostImageSection({ post }: { post: PostDetailResponse })
                           alt={`${post.title} - 이미지 ${index + 1}`}
                           fill
                           className="object-cover rounded-lg"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, 33vw"
                           priority={index === 0}
                           fetchPriority={index === 0 ? "high" : "auto"}
                           />
