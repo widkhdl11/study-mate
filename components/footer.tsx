@@ -47,7 +47,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/chats"
+                  href="/profile?tab=chats"
                   className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   채팅

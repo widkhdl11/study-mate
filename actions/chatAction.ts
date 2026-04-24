@@ -185,7 +185,6 @@ export async function getChatSSR(ChatId : number) {
     .select(`* , profile:profiles!chats_creator_id_fkey(username, avatar_url)`)
     .eq("id", ChatId)
     .maybeSingle();
-    
     if (error || !data) {
         notFound();
     }

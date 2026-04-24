@@ -8,5 +8,6 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
     const { id } = await params;
     const chatParticipants = await getChatParticipantsSSR(Number(id));
     const chatRoom = await getChatSSR(Number(id));
+
     return <ChatRoomUI chatParticipants={chatParticipants} chatRoom={chatRoom} />
 }
