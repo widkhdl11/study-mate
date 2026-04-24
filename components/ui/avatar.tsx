@@ -4,6 +4,16 @@ import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/utils/utils"
+import Image, { ImageProps } from "next/image"
+
+
+// AvatarImage 컴포넌트의 props 타입 정의
+type AvatarImageProps = Omit<ImageProps, 'src'> & {
+  src?: string
+  className?: string
+}
+
+
 function Avatar({
   className,
   ...props
@@ -20,16 +30,46 @@ function Avatar({
   )
 }
 
+
+
+// 기존 코드
+// function AvatarImage({
+//   className,
+//   ...props
+// }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+//   return (
+//     <AvatarPrimitive.Image
+//       data-slot="avatar-image"
+//       className={cn("aspect-square size-full", className)}
+//       {...props}
+//     />
+//   )
+// }
+
+
+// Next.js Image 사용 코드로 변경
 function AvatarImage({
   className,
+  src,
+  alt,
+  width = 96,      // 기본값 추가
+  height = 96,     // 기본값 추가
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+}: AvatarImageProps) {
+  if (!src) return null   // src 없으면 바로 null (Fallback 뜸)
+
   return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
-      {...props}
-    />
+    <AvatarPrimitive.Image asChild>
+      <Image
+        data-slot="avatar-image"
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        className={cn("aspect-square size-full object-cover", className)}
+        {...props}
+      />
+    </AvatarPrimitive.Image>
   )
 }
 
