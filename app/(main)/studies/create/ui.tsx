@@ -32,7 +32,7 @@ import {
   getSubcategories,
 } from "@/lib/constants/study-category";
 import { getMainRegion, getRegionCodeByValue, getSubRegion } from "@/lib/constants/region";
-import { zodResolverFirstError } from "@/utils/utils";
+import { zodResolverFirstError } from "@/utils/validation";
 
 export default function StudyCreateUI() {
   const formRef = useRef<HTMLFormElement>(null);

@@ -2,7 +2,6 @@
 import z from "zod";
 
 
-
 export const postSchema = z.object({
   title: z.string().min(1, "제목을 입력해주세요"),
   studyId: z.coerce.number<number>().min(1, "스터디를 선택해주세요"),

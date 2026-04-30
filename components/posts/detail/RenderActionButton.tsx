@@ -2,20 +2,22 @@
 
 import { Button } from "../../ui/button";
 import { Badge } from "../../ui/badge";
+import { useApplyParticipant } from "@/hooks/useParticipant";
 
 type Props = {
   status: string;
-  isApplying: boolean;
-  onApply: () => void | Promise<void>;
+  studyId: number;
 };
   // 상태별 액션 버튼 렌더링
-export function StudyActionButton({ status, isApplying, onApply }: Props) {
+export function StudyActionButton({ status, studyId }: Props) {
+    const { mutate: applyMutation, isPending: isApplying } = useApplyParticipant(studyId);
+
     switch (status) {
       case "모집중":
         return (
           <Button
             className="w-full py-6 text-lg bg-blue-600 hover:bg-blue-700"
-            onClick={onApply}
+            onClick={() => applyMutation()}
             disabled={isApplying}
           >
             {isApplying ? "신청 중..." : "참여 신청"}

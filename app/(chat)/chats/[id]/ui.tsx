@@ -1,20 +1,20 @@
 "use client"
 
-import React from "react"
-import { useState, useRef, useEffect } from "react"
-import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { ArrowLeft, Menu, Send, ImageIcon as ImageIconComponent, Smile } from "lucide-react"
-import { ChatParticipant, ChatRoom } from "@/types/chatType"
-import { getProfileImageUrl } from "@/lib/supabase/storage"
-import { useGetChatMessages, useSendMessage } from "@/hooks/useChat"
-import { ChatMessage } from "@/hooks/use-realtime-chat"
 import { useChatScroll } from "@/hooks/use-chat-scroll"
+import { ChatMessage } from "@/hooks/use-realtime-chat"
+import { useGetChatMessages, useSendMessage } from "@/hooks/useChat"
 import { useUser } from "@/hooks/useUser"
+import { getProfileImageUrl } from "@/lib/supabase/storage"
+import { ChatParticipant, ChatRoom } from "@/types/chatType"
+import { ArrowLeft, ImageIcon as ImageIconComponent, Menu, Send, Smile } from "lucide-react"
+import Link from "next/link"
+import React, { useEffect, useRef, useState } from "react"
 
-export function ChatRoomUI({ chatParticipants, chatRoom }: 
+
+export default function ChatRoomUI({ chatParticipants, chatRoom }: 
   { chatParticipants: ChatParticipant[], chatRoom: ChatRoom }) {
 
     const { data: user } = useUser();

@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
 import { ProfileResponse } from "@/types/profileType";
-import { formatDateToInput, formatGender } from "@/utils/utils";
+import { formatDateToInput, formatGender } from "@/utils/format";
 
 export default function MyInfoTab({ currentUser }: { currentUser: ProfileResponse }) {
   return (

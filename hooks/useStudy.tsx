@@ -11,13 +11,10 @@ import {
 } from '@/actions/studyAction'
 import { queryClient } from '@/config/ReactQueryClientProvider'
 import { queryKeys } from '@/lib/reactQuery/queryKeys'
-import { StudyFormValues } from '@/lib/zod/schemas/studySchema'
-import { createClient } from '@/lib/supabase/client'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
 import { StudiesResponse } from '@/types/studiesType'
-import { isRedirect } from '@/utils/utils'
+import { isRedirect } from '@/utils/format'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 export function useCreateStudy(
     onFieldError?: (field: string, message: string) => void

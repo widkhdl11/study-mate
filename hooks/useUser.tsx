@@ -4,7 +4,7 @@ import { getMyProfile, getUser } from '@/actions/profileAction'
 import { queryKeys } from '@/lib/reactQuery/queryKeys'
 import { ProfileResponse } from '@/types/profileType'
 import { convertUser } from '@/utils/conversion/user'
-import { User, UserResponse } from '@supabase/supabase-js'
+import { User } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
 
 export function useUser() {

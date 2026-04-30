@@ -1,12 +1,12 @@
-import {createChat, getChatMessages, getChatParticipants, getMyChatRooms, sendMessage} from "@/actions/chatAction";
-import {queryKeys} from "@/lib/reactQuery/queryKeys";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
-import { ChatMessage } from "./use-realtime-chat";
+import { createChat, getChatMessages, getChatParticipants, getMyChatRooms, sendMessage } from "@/actions/chatAction";
+import { queryKeys } from "@/lib/reactQuery/queryKeys";
+import { createClient } from "@/lib/supabase/client";
+import { ChatParticipant, ChatRoom } from "@/types/chatType";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import type { ChatMessage } from "./use-realtime-chat";
 import { useUser } from "./useUser";
-import { ChatParticipant, ChatRoom } from "@/types/chatType";
 
 
 // 채팅방 생성(아직 사용처 없음)

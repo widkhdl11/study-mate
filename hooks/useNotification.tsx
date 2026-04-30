@@ -4,20 +4,19 @@ import {
     readNotification,
 } from '@/actions/notificationAction'
 import { queryKeys } from '@/lib/reactQuery/queryKeys'
-import { NotificationResponse } from '@/types/notificationType'
 import { createClient } from '@/lib/supabase/client'
+import { NotificationResponse } from '@/types/notificationType'
+import { ProfileResponse } from '@/types/profileType'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { useUser } from './useUser'
 import { toast } from 'sonner'
 
 // is_deleted = false 인것 가져오기
-export function useGetNotifications() {
+export function useGetNotifications(user: ProfileResponse) {
     const queryClient = useQueryClient()
     const supabase = createClient()
-    const { data: user } = useUser()
     const query = useQuery({
-        queryKey: queryKeys.notifications,
+        queryKey: [queryKeys.notifications, user?.id],
         queryFn: async () => {
             const result = await getNotifications()
             if (result.success) {
@@ -29,7 +28,7 @@ export function useGetNotifications() {
                 )
             }
         },
-        enabled: !!user,
+        enabled: !!user?.id,
     })
 
     useEffect(() => {

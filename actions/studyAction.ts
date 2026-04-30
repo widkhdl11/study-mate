@@ -1,18 +1,18 @@
 'use server'
 
+import { createClient } from '@/lib/supabase/server'
 import {
     StudyCreateFormValues,
     studyCreateSchema,
     StudyFormValues,
     studySchema,
 } from '@/lib/zod/schemas/studySchema'
-import { createClient } from '@/lib/supabase/server'
 import type { ActionResponse } from '@/types/actionType'
-import { notFound, redirect } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
-import { validateWithZod } from '@/utils/utils'
 import { StudiesResponse, StudyResponse } from '@/types/studiesType'
 import { CustomUserAuth } from '@/utils/auth'
+import { validateWithZod } from '@/utils/validation'
+import { revalidatePath } from 'next/cache'
+import { notFound, redirect } from 'next/navigation'
 
 // 로그인 유저가 스터디 생성
 export async function createStudy(formData: FormData): Promise<ActionResponse> {

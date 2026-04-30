@@ -1,12 +1,30 @@
-import { Suspense } from "react";
+import HeaderSection from "@/components/posts/HeaderSection";
+import MainSection from "@/components/posts/MainSection";
 import { getAllPostsSSR } from "@/actions/postAction";
-import PostsUI from "./ui";
+import { Suspense } from "react";
 
-export default async function PostsPage() {
-  const allPosts = await getAllPostsSSR();
+export default async function PostsPage(
+  {searchParams}: {searchParams: Promise<{ [key: string]: string | string[] | undefined }>}
+) {
+  const search = (await searchParams).search
   return (
-    <Suspense fallback={null}>
-      <PostsUI allPosts={allPosts} />
-    </Suspense>
+      <div className="min-h-screen flex flex-col bg-background">
+      <main className="flex-1">
+        <HeaderSection />
+        <Suspense fallback={null}>
+          <MainSectionLoader search={search as string} />
+        </Suspense>
+      </main>
+    
+    </div>
   );
+}
+async function MainSectionLoader({search}: 
+  {
+    search: string
+  }) {
+  const allPosts = await getAllPostsSSR()
+
+
+  return <MainSection allPosts={allPosts} search={search as string} />
 }

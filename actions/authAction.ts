@@ -1,13 +1,13 @@
   "use server";
 
-  import { revalidatePath } from "next/cache";
-  import { redirect } from "next/navigation";
-  import { createClient } from "@/lib/supabase/server";
   import { createClientAdmin } from "@/lib/supabase/client-admin";
-  import { LoginFormValues, loginSchema, PasswordChangeFormValues, passwordChangeSchema, SignupFormValues, signupSchema } from "@/lib/zod/schemas/authSchema";
-  import { ActionResponse } from "@/types/actionType";
-  import { validateWithZod } from "@/utils/utils";
+import { createClient } from "@/lib/supabase/server";
+import { LoginFormValues, loginSchema, PasswordChangeFormValues, passwordChangeSchema, SignupFormValues, signupSchema } from "@/lib/zod/schemas/authSchema";
+import { ActionResponse } from "@/types/actionType";
 import { CustomUserAuth } from "@/utils/auth";
+import { validateWithZod } from "@/utils/validation";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
   /**
    * 로그인
@@ -59,7 +59,7 @@ import { CustomUserAuth } from "@/utils/auth";
   ): Promise<ActionResponse > {
     const supabase = await createClient();
     const supabaseAdmin = createClientAdmin();
-
+   
     const rawData = {
       username: formData.get("username") as string,
       email: formData.get("email") as string,

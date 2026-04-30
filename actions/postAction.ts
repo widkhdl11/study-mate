@@ -1,13 +1,13 @@
 "use server";
 
-import { postSchema, updatePostSchema, PostFormValues, UpdatePostFormValues } from "@/lib/zod/schemas/postSchema";
+import { createClient } from "@/lib/supabase/server";
+import { PostFormValues, postSchema, UpdatePostFormValues, updatePostSchema } from "@/lib/zod/schemas/postSchema";
 import { ActionResponse } from "@/types/actionType";
 import { PostDetailResponse, PostsResponse } from "@/types/postType";
-import { createClient } from "@/lib/supabase/server";
+import { CustomUserAuth } from "@/utils/auth";
+import { validateWithZod } from "@/utils/validation";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
-import { validateWithZod } from "@/utils/utils";
-import { CustomUserAuth } from "@/utils/auth";
 
 // 게시글 상세 조회
 export async function getPostDetail(id: number): Promise<ActionResponse<PostDetailResponse>> {
@@ -338,7 +338,9 @@ export async function updatePost(formData: FormData): Promise<ActionResponse<Pos
   revalidatePath("/posts", "layout");
   redirect(`/posts/${id}`);
 }
+
 // =================ssr ======================
+
 export async function getMyPostsSSR(): Promise<PostsResponse> {
   const supabase = await createClient();
   const { data: user, error: userError } = await supabase.auth.getUser();
@@ -381,8 +383,6 @@ export async function getMyPostsSSR(): Promise<PostsResponse> {
   return data as unknown as PostsResponse;
 }
 
-
-// 게시글 상세 가져오기
 export async function getPostDetailSSR(id: number): Promise<PostDetailResponse> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -422,8 +422,6 @@ export async function getPostDetailSSR(id: number): Promise<PostDetailResponse> 
   return data as unknown as PostDetailResponse;
 }
 
-
-// 모든 게시글 가져오기
 export async function getAllPostsSSR(): Promise<
   PostsResponse | never
 > {

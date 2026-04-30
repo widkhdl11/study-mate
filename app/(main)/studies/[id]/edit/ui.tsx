@@ -37,7 +37,7 @@ import {
   getSubRegion,
 } from "@/lib/constants/region";
 import { useUpdateStudy } from "@/hooks/useStudy";
-import { zodResolverFirstError } from "@/utils/utils";
+import { zodResolverFirstError } from "@/utils/validation";
 import { StudyWithAllCategoriesAndRegions } from "@/types/studiesType";
 
 

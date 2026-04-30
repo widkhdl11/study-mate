@@ -1,27 +1,25 @@
+'use client'
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuTrigger,
     DropdownMenuItem,
-    DropdownMenuSeparator,
+    DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { NotificationResponse } from '@/types/notificationType'
-import { Badge } from '../ui/badge'
-import { formatTimeAgo } from '@/utils/utils'
-import Link from 'next/link'
-import { UseMutationResult } from '@tanstack/react-query'
-import { ActionResponse } from '@/types/actionType'
-import { useEffect, useMemo, useState } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
 import { useAllReadNotification, useGetNotifications, useReadNotification } from '@/hooks/useNotification'
+import { NotificationResponse } from '@/types/notificationType'
+import { ProfileResponse } from '@/types/profileType'
+import { formatTimeAgo } from '@/utils/date'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useEffect, useMemo, useState } from 'react'
+import { Badge } from '../ui/badge'
 
-export const NotificationDropdown = (
-
-
-) => {
+export default function NotificationDropdown (
+    { user }: { user: ProfileResponse }
+) {
     const [notificationOpen, setNotificationOpen] = useState(false)
     const pathname = usePathname()
-    const { data: notifications } = useGetNotifications()
+    const { data: notifications } = useGetNotifications(user)
     const readNotificationMutation = useReadNotification()
     const { mutate: allReadNotification } = useAllReadNotification()
      // 페이지 이동 시 드롭다운 닫기

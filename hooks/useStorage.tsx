@@ -1,3 +1,4 @@
+'use client'
 import { deleteImage } from "@/actions/storageAction";
 import { useMutation } from "@tanstack/react-query";
 

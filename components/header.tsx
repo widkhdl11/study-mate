@@ -1,50 +1,12 @@
-'use client'
-
-import Link from 'next/link'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { getMyProfileSSR } from '@/actions/profileAction'
 import { Button } from '@/components/ui/button'
-import { useLogout } from '@/hooks/useAuth'
-import { useGetMyProfile } from '@/hooks/useUser'
-import { ProfileResponse } from '@/types/profileType'
-import { NotificationDropdown } from './header/NotificationDropdown'
-import { LoginDropdown } from './header/LoginDropdown'
-    
-export const Header = ({ myProfile }: { myProfile: ProfileResponse | null }) => {
+import Link from 'next/link'
+import CreateStudyButton from './header/CreateStudyButton'
+import SearchBox from './header/SearchBox'
+import UserMenu from './header/UserMenu'
 
-    const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
-    const [searchInput, setSearchInput] = useState('')
-
-    useEffect(() => {
-        if (pathname === '/posts') {
-            setSearchInput(searchParams.get('search') ?? '')
-        }
-    }, [pathname, searchParams])
-
-   
-
-    const runSearch = () => {
-        const search = searchInput.trim()
-        if (search) {
-            router.push(`/posts?search=${encodeURIComponent(search)}`)
-        } else {
-            router.push('/posts')
-        }
-    }
-
-    const { data: profile } = useGetMyProfile()
-    const user = profile ?? myProfile
-
-    const handleCreateStudy = () => {
-        if (!user) {
-            router.push('/auth/login')
-            return
-        }
-        router.push('/studies/create')
-    }
-
+export const Header = async () => {
+    const myProfile = await getMyProfileSSR();
     return (
         <header className='sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -64,52 +26,14 @@ export const Header = ({ myProfile }: { myProfile: ProfileResponse | null }) => 
                             className='text-foreground hover:text-accent transition-colors font-medium'>
                             모집글
                         </Link>
-                        <button
-                            onClick={handleCreateStudy}
-                            className='text-foreground hover:text-accent transition-colors font-medium'>
-                            스터디 만들기
-                        </button>
+                        <CreateStudyButton isLoggedIn={!!myProfile} />
                     </nav>
 
                     <div className='flex items-center gap-4'>
-                        <div className='hidden lg:flex items-center gap-1 bg-muted rounded-lg px-2 py-1.5 w-72'>
-                            <span className='text-muted-foreground pl-1 shrink-0'>
-                                🔍
-                            </span>
-                            <input
-                                type='search'
-                                value={searchInput}
-                                onChange={(e) => setSearchInput(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        e.preventDefault()
-                                        runSearch()
-                                    }
-                                }}
-                                placeholder='스터디·모집글 검색...'
-                                className='bg-muted text-foreground placeholder-muted-foreground outline-none flex-1 min-w-0 text-sm'
-                                aria-label='검색어'
-                            />
-                            <Button
-                                type='button'
-                                size='sm'
-                                variant='secondary'
-                                className='h-8 shrink-0'
-                                onClick={runSearch}>
-                                검색
-                            </Button>
-                        </div>
+                        <SearchBox />
 
-                        {user ? (
-                            <>
-                                <NotificationDropdown
-                                />
-
-                                <LoginDropdown
-                                    user={user}
-                                />
-                              
-                            </>
+                        {myProfile ? (
+                            <UserMenu user={myProfile} />
                         ) : (
                             <Button asChild>
                                 <Link href='/auth/login'>로그인</Link>

@@ -1,9 +1,10 @@
 'use server';
 
+import { createClient } from "@/lib/supabase/server";
 import { ActionResponse } from "@/types/actionType";
 import { NotificationInsert, NotificationResponse } from "@/types/notificationType";
-import { createClient } from "@/lib/supabase/server";
 import { CustomUserAuth } from "@/utils/auth";
+import { notFound } from "next/navigation";
 
 
 
@@ -92,4 +93,23 @@ export async function allReadNotification(): Promise<ActionResponse<Notification
         throw new Error("모든 알람 읽기 중 오류가 발생했습니다");
     }
     return { success: true, data: data as unknown as NotificationResponse[] };
+}
+
+
+// ===================ssr===================
+
+// 알람 가져오기(is_deleted = false 인것 가져오기)
+export async function getNotificationsSSR(): Promise<NotificationResponse[]> {
+    const supabase = await createClient();
+    const { user } = await CustomUserAuth(supabase);
+    const { data, error } = await supabase
+        .from("notifications")
+        .select("*, profile:profiles!notifications_sender_id_fkey(username, avatar_url)")
+        .eq("user_id", user.id)
+        .eq("is_deleted", false)
+        .order("created_at", { ascending: false });
+    if (error) {
+        return notFound();
+    }
+    return data as unknown as NotificationResponse[];
 }

@@ -1,12 +1,9 @@
 'use client'
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,10 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Search, MapPin, Users, Calendar, ThumbsUp, Eye } from "lucide-react";
-import { PostsResponse } from "@/types/postType";
-import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
+import { getMainRegion, getRegionCodeByValue, getRegionPath, getSubRegion } from "@/lib/constants/region";
 import {
   getCategoryCodeByValue,
   getCategoryPath,
@@ -26,28 +20,37 @@ import {
   getMainCategories,
   getSubcategories,
 } from "@/lib/constants/study-category";
-import { getMainRegion, getRegionCodeByValue, getRegionPath, getSubRegion } from "@/lib/constants/region";
 import { STUDY_STATUS } from "@/lib/constants/study-status";
+import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
+import { PostsResponse } from "@/types/postType";
 import { getStudyStatusExistValue, studyStatusConversion } from "@/utils/conversion/study";
+import { Calendar, Eye, MapPin, Search, ThumbsUp, Users } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 
 export default function MainSection(
-    { 
-        allPosts,
-        getStatusColor,
-        search
-
-    }: { 
-        allPosts: PostsResponse, 
-        getStatusColor: (status: string) => string 
-        search: string
-    }
+    { allPosts, search }: { allPosts: PostsResponse, search?: string }
 ) {
-    const [searchQuery, setSearchQuery] = useState(search);
+
+    const [searchQuery, setSearchQuery] = useState(search ?? "");
+
+    const getStatusColor = (status: string) => {
+    switch (status) {
+      case "모집중":
+        return "bg-green-500 hover:bg-green-600 text-white";
+      case "마감":
+        return "bg-red-500 hover:bg-red-600 text-white";
+      case "수락 대기중":
+        return "bg-yellow-500 hover:bg-yellow-600 text-white";
+      default:
+        return "bg-slate-500 text-white";
+    }
+  };
 
     useEffect(() => {
-        setSearchQuery(search);
+        setSearchQuery(search ?? "");
     }, [search]);
 
   const [selectedStatus, setSelectedStatus] = useState("전체 상태");

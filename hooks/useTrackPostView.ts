@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { increaseViewCount } from "@/actions/postAction";
 import { useViewCountStore } from "@/lib/zustand/stores/viewCountStore";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * 포스트 상세 페이지에서 조회수 증가를 한 번만 호출하도록 관리

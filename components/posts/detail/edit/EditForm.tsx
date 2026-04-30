@@ -1,31 +1,39 @@
 'use client'
 
-import { useUpdatePost } from "@/hooks/usePost";
-import { PostFormValues } from "@/lib/zod/schemas/postSchema";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { StudiesResponse } from "@/types/studiesType";
-import { useEffect, useRef, useState } from "react";
-import { UseFormReturn } from "react-hook-form";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getCategoryPath } from "@/lib/constants/study-category";
-import { getRegionPath } from "@/lib/constants/region";
-import { Link, MapPin, Tag, Users } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { useUpdatePost } from "@/hooks/usePost";
+import { getRegionPath } from "@/lib/constants/region";
+import { getCategoryPath } from "@/lib/constants/study-category";
+import { PostFormValues, updatePostSchema } from "@/lib/zod/schemas/postSchema";
 import { PostDetailResponse } from "@/types/postType";
+import { StudiesResponse } from "@/types/studiesType";
+import { zodResolverFirstError } from "@/utils/validation";
+import { Link, MapPin, Tag, Users } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 
 
 export default function EditForm(
-    { form, studies, initialData }: { form: UseFormReturn<PostFormValues>, studies: StudiesResponse, initialData: PostDetailResponse }
+    { studies, initialData }: { studies: StudiesResponse, initialData: PostDetailResponse }
 ) {
 
+      const form = useForm<PostFormValues>({
+      resolver: zodResolverFirstError(updatePostSchema),
+      defaultValues: {
+        ...initialData,  
+        studyId: initialData.study.id, 
+        images: initialData.image_url.map((image) => new File([], image.url)) as File[] || [],
+      },
+    })
     const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([])
 
   const formRef = useRef<HTMLFormElement>(null);
-
 
     const {mutate: updatePostMutation, isPending} = useUpdatePost((field ,message)=>{
       form.setError(field as keyof PostFormValues, {

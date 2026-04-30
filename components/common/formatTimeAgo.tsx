@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { formatDate } from '@/utils/utils'
+import { formatDate } from '@/utils/date'
+import { useEffect, useState } from 'react'
 
 interface TimeAgoProps {
   date: string
   className?: string
 }
 
-export function TimeAgo({ date, className }: TimeAgoProps) {
+export default function TimeAgo({ date, className }: TimeAgoProps) {
   const [text, setText] = useState<string | null>(null)
 
   useEffect(() => {

@@ -148,16 +148,16 @@
 // }
 'use client'
 
-import { getProfileImageUrl } from '@/lib/supabase/storage'
-import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar'
-import { Edit, Lock, LogOut, Settings } from 'lucide-react'
-import { ProfileResponse } from '@/types/profileType'
-import { Badge } from '../ui/badge'
-import Link from 'next/link'
-import { Button } from '../ui/button'
-import { useUpdateProfileImage } from '@/hooks/useProfile'
 import { useLogout } from '@/hooks/useAuth'
-import { useState, useEffect } from 'react'
+import { useUpdateProfileImage } from '@/hooks/useProfile'
+import { getProfileImageUrl } from '@/lib/supabase/storage'
+import { ProfileResponse } from '@/types/profileType'
+import { Edit, Lock, LogOut, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Badge } from '../ui/badge'
+import { Button } from '../ui/button'
 
 export default function ProfileSection({
     currentUser,

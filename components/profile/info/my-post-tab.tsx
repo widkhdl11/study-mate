@@ -1,27 +1,26 @@
 'use client'
 
-import { TabsContent } from '@/components/ui/tabs'
-import Link from 'next/link'
-import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Edit, MapPin, MoreVertical, Trash2 } from 'lucide-react'
-import { ThumbsUp, Eye } from 'lucide-react'
-import { getImageUrl } from '@/lib/supabase/storage'
-import { PostsResponse } from '@/types/postType'
-import { getCategoryPath } from '@/lib/constants/study-category'
-import { getRegionPath } from '@/lib/constants/region'
-import { studyStatusConversion } from '@/utils/conversion/study'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import {
     DropdownMenu,
-    DropdownMenuItem,
     DropdownMenuContent,
+    DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { TabsContent } from '@/components/ui/tabs'
 import { useDeletePost } from '@/hooks/usePost'
-import { useRouter } from 'next/navigation'
-import { formatTimeAgo } from '@/utils/utils'
+import { getRegionPath } from '@/lib/constants/region'
+import { getCategoryPath } from '@/lib/constants/study-category'
+import { getImageUrl } from '@/lib/supabase/storage'
+import { PostsResponse } from '@/types/postType'
+import { studyStatusConversion } from '@/utils/conversion/study'
+import { formatTimeAgo } from '@/utils/date'
+import { Edit, Eye, MapPin, MoreVertical, ThumbsUp, Trash2 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function MyPostTab({
     myPosts,

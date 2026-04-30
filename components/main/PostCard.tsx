@@ -4,19 +4,47 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { getImageUrl, getProfileImageUrl } from '@/lib/supabase/storage'
-import { PostDetailResponse, PostsResponse } from '@/types/postType'
-import { formatTimeAgo } from '@/utils/utils'
+import { PostDetailResponse } from '@/types/postType'
+import { formatTimeAgo } from '@/utils/date'
 import Image from 'next/image'
 
 export default function PostCard({
     post,
-    getCategoryColor,
-    getStatusColor,
+    priority = false,
 }: {
     post: PostDetailResponse
-    getCategoryColor: (category: string) => string
-    getStatusColor: (status: string) => string
+    priority?: boolean
+
 }) {
+    
+
+        const getStatusColor = (status: string) => {
+        switch (status) {
+            case '모집중':
+                return 'bg-success text-white'
+            case '마감':
+                return 'bg-danger text-white'
+            case '수락 대기중':
+                return 'bg-warning text-foreground'
+            default:
+                return 'bg-muted text-muted-foreground'
+        }
+    }
+
+    const getCategoryColor = (category: string) => {
+        const colors: { [key: string]: string } = {
+            프론트엔드:
+                'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+            백엔드: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+            AI: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+            모바일: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+            디자인: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300',
+        }
+        return (
+            colors[category] ||
+            'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
+        )
+    }
     return (
         <Card className='overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col cursor-pointer hover:border-accent/50'>
             {/* Thumbnail Image */}
@@ -28,6 +56,8 @@ export default function PostCard({
                     )}
                     alt={post.title}
                     fill
+                    priority={priority}
+                    fetchPriority={priority ? "high" : "auto"}   
                     sizes="(max-width: 640px) 100vw, 424px"
                     className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
                 />

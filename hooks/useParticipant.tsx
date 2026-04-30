@@ -9,7 +9,7 @@ import {
 } from '@/actions/participantAction'
 import { queryKeys } from '@/lib/reactQuery/queryKeys'
 import { ParticipantResponse } from '@/types/participantType'
-import { isRedirect } from '@/utils/utils'
+import { isRedirect } from '@/utils/format'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useUser } from './useUser'

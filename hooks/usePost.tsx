@@ -12,12 +12,12 @@ import {
   updatePost,
 } from "@/actions/postAction";
 import { queryKeys } from "@/lib/reactQuery/queryKeys";
+import { PostDetailResponse, PostsResponse } from "@/types/postType";
+import { isRedirect } from "@/utils/format";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { useUser } from "./useUser";
-import { isRedirect } from "@/utils/utils";
-import { PostDetailResponse, PostsResponse } from "@/types/postType";
 
 export function useGetMyPosts() {
   return useQuery({
@@ -57,7 +57,7 @@ export function useCreatePost(onFieldError?: (field: string, message: string) =>
 }
 
 
-export function useGetAllPosts() {
+export function useGetAllPosts(initialData: PostDetailResponse[]) {
   const query = useQuery({
     queryKey: queryKeys.posts,
     queryFn: async () => {
@@ -67,6 +67,7 @@ export function useGetAllPosts() {
       }
       throw new Error(response.error.message);
     },
+    initialData: initialData,
   });
 
   useEffect(() => {

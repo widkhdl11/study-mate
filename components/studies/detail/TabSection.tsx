@@ -1,44 +1,38 @@
 'use client'
 
 
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
 import {
-  Users,
-  MessageSquare,
-  FileText,
-  ThumbsUp,
-  Eye,
-  PlusCircle,
-  Edit,
-  Trash2,
-  UserCheck,
-  UserX,
-} from "lucide-react";
-import { useDeleteStudy } from "@/hooks/useStudy";
-import {
-  useAcceptParticipant,
-  useRejectParticipant,
-  useRemoveParticipant,
+    useAcceptParticipant,
+    useRejectParticipant,
+    useRemoveParticipant,
 } from "@/hooks/useParticipant";
-import { StudyResponse } from "@/types/studiesType";
-import { participantStatusConversion } from "@/utils/conversion/participants";
-import { getCategoryPath } from "@/lib/constants/study-category";
-import { getRegionPath } from "@/lib/constants/region";
-import { getStudyStatusColor, studyStatusConversion } from "@/utils/conversion/study";
-import { formatDate } from "date-fns";
 import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
 import { ProfileResponse } from "@/types/profileType";
+import { StudyResponse } from "@/types/studiesType";
+import { participantStatusConversion } from "@/utils/conversion/participants";
+import { getStudyStatusColor, studyStatusConversion } from "@/utils/conversion/study";
+import { formatTimeAgo } from "@/utils/date";
 import { UseMutationResult } from "@tanstack/react-query";
-import { formatTimeAgo } from "@/utils/utils";
-import { PostDetailResponse } from "@/types/postType";
+import { formatDate } from "date-fns";
+import {
+    Edit,
+    Eye,
+    FileText,
+    MessageSquare,
+    PlusCircle,
+    ThumbsUp,
+    Trash2,
+    UserCheck,
+    Users,
+    UserX,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function TabSection(
     { study, user, deleteStudy }

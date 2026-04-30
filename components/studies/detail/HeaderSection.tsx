@@ -1,43 +1,19 @@
 'use client'
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
-import {
-  Users,
-  MapPin,
-  Calendar,
-  Clock,
-  Settings,
-  MessageSquare,
-  FileText,
-  ThumbsUp,
-  Eye,
-  PlusCircle,
-  Edit,
-  Trash2,
-  UserCheck,
-  UserX,
-} from "lucide-react";
-import { useDeleteStudy } from "@/hooks/useStudy";
-import {
-  useAcceptParticipant,
-  useRejectParticipant,
-  useRemoveParticipant,
-} from "@/hooks/useParticipant";
-import { StudyResponse } from "@/types/studiesType";
-import { participantStatusConversion } from "@/utils/conversion/participants";
-import { getCategoryPath } from "@/lib/constants/study-category";
+import { Button } from "@/components/ui/button";
 import { getRegionPath } from "@/lib/constants/region";
+import { getCategoryPath } from "@/lib/constants/study-category";
+import { StudyResponse } from "@/types/studiesType";
 import { getStudyStatusColor, studyStatusConversion } from "@/utils/conversion/study";
-import { formatDate } from "date-fns";
-import { getProfileImageUrl } from "@/lib/supabase/storage";
-import { ProfileResponse } from "@/types/profileType";
 import { UseMutationResult } from "@tanstack/react-query";
+import {
+    MapPin,
+    PlusCircle,
+    Settings,
+    Trash2,
+    Users
+} from "lucide-react";
+import Link from "next/link";
 
 
 export default function HeaderSection(

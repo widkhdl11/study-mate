@@ -1,11 +1,8 @@
-'use client'
-
 import { getImageUrl } from "@/lib/supabase/storage"
 // import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../ui/carousel"
 import { PostDetailResponse } from "@/types/postType"
-import Image from "next/image"
-
 import dynamic from 'next/dynamic'
+import Image from "next/image"
 
 const Carousel = dynamic(() => import('../ui/carousel').then(mod => mod.Carousel))
 const CarouselContent = dynamic(() => import('../ui/carousel').then(mod => mod.CarouselContent))

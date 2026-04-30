@@ -1,16 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import Link from 'next/link'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
 import {
     Form,
     FormControl,
@@ -21,17 +12,25 @@ import {
     FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { MapPin, Tag, Users } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { useCreatePost } from '@/hooks/usePost'
 import { getRegionPath } from '@/lib/constants/region'
 import { getCategoryPath } from '@/lib/constants/study-category'
-import { zodResolverFirstError } from '@/utils/utils'
 import { PostFormValues, postSchema } from '@/lib/zod/schemas/postSchema'
-import { useForm } from 'react-hook-form'
-import { useCreatePost } from '@/hooks/usePost'
 import { StudiesResponse } from '@/types/studiesType'
 import { studyStatusConversion } from '@/utils/conversion/study'
-import Image from 'next/image'
+import { zodResolverFirstError } from '@/utils/validation'
+import { MapPin, Tag, Users } from 'lucide-react'
+import Link from 'next/link'
+import { useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 export default function CreateForm({ studies }: { studies: StudiesResponse }) {
     const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([])

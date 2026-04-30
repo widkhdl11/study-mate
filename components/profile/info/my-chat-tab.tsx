@@ -6,7 +6,7 @@ import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar";
 import {Badge} from "@/components/ui/badge";
 import Link from "next/link";
 import { ChatRoom } from "@/types/chatType";
-import { formatTimeAgo } from "@/utils/utils";
+import { formatTimeAgo } from "@/utils/date";
 import { getProfileImageUrl } from "@/lib/supabase/storage";
 export default function MyChatTab({chatRooms} : {
     chatRooms : ChatRoom[]

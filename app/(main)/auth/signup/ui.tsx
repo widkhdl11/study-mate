@@ -22,7 +22,8 @@ import { SignupFormValues } from "@/lib/zod/schemas/authSchema";
 import { useSignup } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatDateToInput, parseInputToDate, zodResolverFirstError } from "@/utils/utils";
+import { formatDateToInput, parseInputToDate } from "@/utils/format";
+import { zodResolverFirstError } from "@/utils/validation";
 import { format, parse } from "date-fns";
 
 export default function SignupUI() {

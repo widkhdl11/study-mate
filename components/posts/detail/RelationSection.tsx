@@ -1,13 +1,11 @@
-'use client'
-
 import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import Image from "next/image"
+import { Card } from "@/components/ui/card"
 import { PostsResponse } from "@/types/postType"
+import Image from "next/image"
 
 
-export default function RelationSction({ relatedPosts }: { relatedPosts: PostsResponse }) {
+export default function RelationSection({ relatedPosts }: { relatedPosts: PostsResponse }) {
     return (
          <div className="mt-12 pt-8 border-t border-border">
               <h3 className="text-2xl font-bold text-foreground mb-6">

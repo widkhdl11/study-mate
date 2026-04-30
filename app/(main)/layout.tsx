@@ -1,22 +1,15 @@
-import { Suspense } from 'react'
-import Header from '@/components/header'
-import Footer from '@/components/footer'
-import { getMyProfileSSR } from '@/actions/profileAction';
-import { notFound } from 'next/navigation';
+import Footer from '@/components/footer';
+import Header from '@/components/header';
 
-export default async function MainLayout({
+export default function MainLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
 
-    const myProfile = await getMyProfileSSR();
-  
     return (
         <>
-            <Suspense fallback={null}>
-                <Header myProfile={myProfile} />
-            </Suspense>
+            <Header />
             {children}
             <Footer />
         </>

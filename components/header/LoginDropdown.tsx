@@ -1,31 +1,27 @@
+'use client'
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuTrigger,
     DropdownMenuItem,
     DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { NotificationResponse } from '@/types/notificationType'
-import { Badge } from '../ui/badge'
-import { formatTimeAgo } from '@/utils/utils'
-import Link from 'next/link'
-import { UseMutationResult } from '@tanstack/react-query'
-import { ActionResponse } from '@/types/actionType'
-import { ProfileResponse } from '@/types/profileType'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { getProfileImageUrl } from '@/lib/supabase/storage'
-import { useEffect, useState } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
 import { useLogout } from '@/hooks/useAuth'
+import { getProfileImageUrl } from '@/lib/supabase/storage'
+import { ProfileResponse } from '@/types/profileType'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
-export const LoginDropdown = (
+export default function LoginDropdown(
     {
         user,
-    }: {
+    }: {    
         user: ProfileResponse
     }
 
-) => {
+) {
 
     const logoutMutation = useLogout()
     const [profileMenuOpen, setProfileMenuOpen] = useState(false)
@@ -36,68 +32,68 @@ export const LoginDropdown = (
     }, [pathname])
     return (
          <DropdownMenu
-                                    open={profileMenuOpen}
-                                    onOpenChange={setProfileMenuOpen}>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className='flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer'>
-                                            <Avatar className='h-8 w-8'>
-                                                <AvatarImage
-                                                    src={getProfileImageUrl(user.avatar_url)}
-                                                    alt={user.username || ''}
-                                                    width={32}
-                                                    height={32}
-                                                    fetchPriority='high'
-                                                />
-                                                <AvatarFallback className='bg-primary text-primary-foreground text-xs font-semibold'>
-                                                    {user.username?.[0]}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <span className='hidden sm:inline text-sm font-medium text-foreground'>
-                                                {user.username}
-                                            </span>
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align='end'
-                                        className='w-48'>
-                                        <DropdownMenuItem className='cursor-pointer'>
-                                            <Link
-                                                href='/profile'
-                                                className='w-full'>
-                                                프로필
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className='cursor-pointer'>
-                                            <Link
-                                                href='/profile?tab=studies'
-                                                className='w-full'>
-                                                내 스터디
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className='cursor-pointer'>
-                                            <Link
-                                                href='/profile?tab=posts'
-                                                className='w-full'>
-                                                내 게시글
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem className='cursor-pointer'>
-                                            <Link
-                                                href='/profile?tab=chats'
-                                                className='w-full'>
-                                                내 채팅
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                            onClick={() =>
-                                                !logoutMutation.isPending &&
-                                                logoutMutation.mutate()
-                                            }
-                                            disabled={logoutMutation.isPending}>
-                                            로그아웃
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+            open={profileMenuOpen}
+            onOpenChange={setProfileMenuOpen}>
+            <DropdownMenuTrigger asChild>
+                <button className='flex items-center gap-2 p-1 rounded-lg hover:bg-muted transition-colors cursor-pointer'>
+                    <Avatar className='h-8 w-8'>
+                        <AvatarImage
+                            src={getProfileImageUrl(user.avatar_url)}
+                            alt={user.username || ''}
+                            width={32}
+                            height={32}
+                            fetchPriority='high'
+                        />
+                        <AvatarFallback className='bg-primary text-primary-foreground text-xs font-semibold'>
+                            {user.username?.[0]}
+                        </AvatarFallback>
+                    </Avatar>
+                    <span className='hidden sm:inline text-sm font-medium text-foreground'>
+                        {user.username}
+                    </span>
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+                align='end'
+                className='w-48'>
+                <DropdownMenuItem className='cursor-pointer'>
+                    <Link
+                        href='/profile'
+                        className='w-full'>
+                        프로필
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className='cursor-pointer'>
+                    <Link
+                        href='/profile?tab=studies'
+                        className='w-full'>
+                        내 스터디
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className='cursor-pointer'>
+                    <Link
+                        href='/profile?tab=posts'
+                        className='w-full'>
+                        내 게시글
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className='cursor-pointer'>
+                    <Link
+                        href='/profile?tab=chats'
+                        className='w-full'>
+                        내 채팅
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                    onClick={() =>
+                        !logoutMutation.isPending &&
+                        logoutMutation.mutate()
+                    }
+                    disabled={logoutMutation.isPending}>
+                    로그아웃
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }

@@ -1,59 +1,58 @@
-'use client'
-
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { BookOpen, Sparkles, Target, Users } from 'lucide-react'
-import { useGetAllPosts } from '@/hooks/usePost'
 import HeroSection from '@/components/main/HeroSection'
 import LatestSection from '@/components/main/LatestSection'
+import { Suspense } from 'react'
 
-export default function HomeUI() {
-    const { data } = useGetAllPosts()
-    const posts = data || []
+function LatestSectionSkeleton() {
+    return (
+        <section className='py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background'>
+            <div className='max-w-7xl mx-auto space-y-8'>
+                <div className='space-y-2'>
+                    <div className='h-9 w-48 bg-muted animate-pulse rounded-md' />
+                    <div className='h-5 w-64 bg-muted animate-pulse rounded-md' />
+                </div>
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case '모집중':
-                return 'bg-success text-white'
-            case '마감':
-                return 'bg-danger text-white'
-            case '수락 대기중':
-                return 'bg-warning text-foreground'
-            default:
-                return 'bg-muted text-muted-foreground'
-        }
-    }
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className='rounded-xl border bg-card overflow-hidden'>
+                            <div className='h-48 bg-muted animate-pulse' />
+                            <div className='p-5 space-y-3'>
+                                <div className='flex gap-2'>
+                                    <div className='h-5 w-16 bg-muted animate-pulse rounded-full' />
+                                    <div className='h-5 w-14 bg-muted animate-pulse rounded-full' />
+                                </div>
+                                <div className='h-6 w-3/4 bg-muted animate-pulse rounded-md' />
+                                <div className='space-y-1.5'>
+                                    <div className='h-4 w-full bg-muted animate-pulse rounded-md' />
+                                    <div className='h-4 w-2/3 bg-muted animate-pulse rounded-md' />
+                                </div>
+                                <div className='flex items-center justify-between pt-2'>
+                                    <div className='flex items-center gap-2'>
+                                        <div className='h-6 w-6 bg-muted animate-pulse rounded-full' />
+                                        <div className='h-4 w-16 bg-muted animate-pulse rounded-md' />
+                                    </div>
+                                    <div className='h-4 w-12 bg-muted animate-pulse rounded-md' />
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
 
-    const getCategoryColor = (category: string) => {
-        const colors: { [key: string]: string } = {
-            프론트엔드:
-                'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-            백엔드: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
-            AI: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
-            모바일: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-            디자인: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300',
-        }
-        return (
-            colors[category] ||
-            'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
-        )
-    }
+                <div className='text-center pt-6'>
+                    <div className='h-11 w-48 bg-muted animate-pulse rounded-md mx-auto' />
+                </div>
+            </div>
+        </section>
+    )
+}
 
+export default async function HomeUI() {
     return (
         <div className='min-h-screen flex flex-col bg-background'>
             <main className='flex-1'>
-                {/* Hero Section */}
                 <HeroSection />
-
-                {/* Latest Posts Section */}
-                <LatestSection 
-                    posts={posts}
-                    getCategoryColor={getCategoryColor}
-                    getStatusColor={getStatusColor}
-                />
+                <Suspense fallback={<LatestSectionSkeleton />}>
+                    <LatestSection />
+                </Suspense>
             </main>
         </div>
     )

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { login, signup, logout, updatePassword } from '@/actions/authAction'
 import { queryKeys } from '@/lib/reactQuery/queryKeys'
-import { isRedirect } from '@/utils/utils'
+import { isRedirect } from '@/utils/format'
 
 // 로그인
 export function useLogin(

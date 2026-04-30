@@ -1,8 +1,8 @@
 'use client'
 
+import CreateForm from '@/components/posts/create/CreateForm'
 import { Card } from '@/components/ui/card'
 import { StudiesResponse } from '@/types/studiesType'
-import CreateForm from '@/components/posts/create/CreateForm'
 
 export default function PostCreateUI({
     studies,

@@ -8,9 +8,10 @@ import { notFound } from 'next/navigation'
 import { MyProfileCountResponse, ProfileResponse } from '@/types/profileType'
 import { CustomUserAuth } from '@/utils/auth'
 import { ActionResponse } from '@/types/actionType'
-import { validateWithZod } from '@/utils/utils'
+import { validateWithZod } from '@/utils/validation'
 import { User, UserResponse } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
+import { cache } from 'react'
 
 export async function getUser(): Promise<ActionResponse<User> | null> {
     const supabase = await createClient()
@@ -107,7 +108,7 @@ export async function updateMyProfile(
 
 // =================ssr ======================
 
-export async function getMyProfileSSR(): Promise<ProfileResponse | null> {
+export const getMyProfileSSR = cache(async (): Promise<ProfileResponse | null> => {
     const supabase = await createClient()
     const { data: user, error: userError } = await supabase.auth.getUser()
     if (userError) {
@@ -124,7 +125,7 @@ export async function getMyProfileSSR(): Promise<ProfileResponse | null> {
         return null
     }
     return data as unknown as ProfileResponse
-}
+})
 
 export async function getMyProfilesCountSSR(): Promise<MyProfileCountResponse> {
     const supabase = await createClient()
@@ -158,4 +159,4 @@ export async function getMyProfilesCountSSR(): Promise<MyProfileCountResponse> {
         my_participated_studies_count: data.participants?.[0]?.count ?? 0,
         my_participated_chat_rooms_count: data.chat_participants?.[0]?.count ?? 0,
     }
-}   
+}

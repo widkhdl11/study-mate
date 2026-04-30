@@ -7,13 +7,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { StudyActionButton } from "./RenderActionButton"
 import { PostDetailResponse } from "@/types/postType"
 import { getRegionPath } from "@/lib/constants/region"
-import { useApplyParticipant } from "@/hooks/useParticipant"
+import { useApplyParticipant, useParticipant } from "@/hooks/useParticipant"
 import { getProfileImageUrl } from "@/lib/supabase/storage"
+import { STATUS_MAP } from "@/types/studiesType"
+import { ParticipantResponse } from "@/types/participantType"
+import { usePostDetail } from "@/hooks/usePost"
 
-export default function SidebarSection({ post, status }: { post: PostDetailResponse, status: string }) {
-  
-    const { mutate: applyMutation, isPending: isApplying } = useApplyParticipant(post.study.id);
+export default function SidebarSection({ initialPost, participant }: { 
+  initialPost: PostDetailResponse, participant: ParticipantResponse | null
+}) {
 
+    const { data: post } = usePostDetail(initialPost)
+
+    const { data: participantData } = useParticipant(participant, post.study.id);
+    const status = STATUS_MAP[participantData?.status || ""] || "모집중";
     return (
          <div className="lg:col-span-1">
               {/* 스터디 정보 카드 */}
@@ -100,8 +107,7 @@ export default function SidebarSection({ post, status }: { post: PostDetailRespo
                 {/* 액션 버튼 */}
                 <StudyActionButton 
                   status={status} 
-                  isApplying={isApplying} 
-                  onApply={() => applyMutation()} 
+                  studyId={post.study.id}
                 />
               </Card>
             </div>

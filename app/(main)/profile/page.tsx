@@ -1,13 +1,13 @@
+import { getMyChatRoomsSSR } from "@/actions/chatAction";
+import { getMyProfilesCountSSR, getMyProfileSSR } from "@/actions/profileAction";
 import { getMyPostsSSR } from "@/actions/postAction";
 import { getMyStudiesSSR } from "@/actions/studyAction";
-import { getMyProfilesCountSSR, getMyProfileSSR } from "@/actions/profileAction";
-import { notFound } from "next/navigation";
-import { getMyChatRoomsSSR } from "@/actions/chatAction";
-import { Suspense } from "react";
 import ProfileSection from "@/components/profile/ProfileSection";
 import TabSection from "@/components/profile/TabSection";
-import { MyProfileCountResponse, ProfileResponse } from "@/types/profileType";
 import { Skeleton } from "@/components/skeleton";
+import { ProfileResponse } from "@/types/profileType";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 export default async function UserProfilePage() {
   const profileData = await getMyProfileSSR();

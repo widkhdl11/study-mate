@@ -1,8 +1,6 @@
-'use client'
-
 import { BookOpen, Sparkles, Target, Users } from "lucide-react"
-import { Badge } from "../ui/badge"
 import Link from "next/link"
+import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import { Card } from "../ui/card"
 

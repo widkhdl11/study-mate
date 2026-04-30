@@ -1,18 +1,19 @@
 'use client'
 
+import TimeAgo from "@/components/common/FormatTimeAgo";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useCheckIsLiked, useToggleLike,  } from "@/hooks/usePost";
-import { ThumbsUp } from "lucide-react";
+import { useCheckIsLiked, usePostDetail, useToggleLike, } from "@/hooks/usePost";
+import { useTrackPostView } from "@/hooks/useTrackPostView";
+import { getProfileImageUrl } from "@/lib/supabase/storage";
 import { PostDetailResponse } from "@/types/postType";
 import { ProfileResponse } from "@/types/profileType";
-// import { formatDate } from "@/utils/utils";
-import { TimeAgo } from "@/components/common/formatTimeAgo";
-import { getProfileImageUrl } from "@/lib/supabase/storage";
+import { ThumbsUp } from "lucide-react";
 import { useRef } from "react";
-import { useTrackPostView } from "@/hooks/useTrackPostView";
 
-export default function MainSection({ post,user }: { post: PostDetailResponse, user: ProfileResponse | null }) {
+export default function MainSection({ initialPost,user }: { initialPost: PostDetailResponse, user: ProfileResponse | null }) {
+    const { data: post } = usePostDetail(initialPost);
+
     const { mutate: toggleLikeMutation, isPending: isTogglingLike } = useToggleLike(post.id);
 
     const { data: isLikedData } = useCheckIsLiked(post.id);

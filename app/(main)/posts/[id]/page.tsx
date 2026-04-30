@@ -17,10 +17,14 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
   const participant = await checkParticipantStatusSSR(post.study.id);
 
   return (
-    <PostDetailUI
-      initialPost={post}
-      user={user}
-      participant={participant}
-    />
+      <div className="min-h-screen bg-background flex flex-col">
+        <main className="flex-1">
+          <PostDetailUI
+            initialPost={post}
+            user={user}
+            participant={participant}
+          />  
+      </main>
+    </div>
   );
 }

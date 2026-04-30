@@ -1,7 +1,9 @@
-"use server"
-
 import { getChatParticipantsSSR, getChatSSR } from "@/actions/chatAction";
-import { ChatRoomUI } from "./ui";
+import dynamic from "next/dynamic";
+
+const ChatRoomUI = dynamic(
+    () => import('./ui')
+)
 
 export default async function ChatPage({ params }: { params: Promise<{ id: string }> }) {
 
