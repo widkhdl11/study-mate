@@ -1,34 +1,34 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import Link from "next/link"
-import { useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
 import { useUpdateProfile } from "@/hooks/useProfile"
 import profileEditSchema, { ProfileEditFormValues } from "@/lib/zod/schemas/profileSchema"
 import { ProfileResponse } from "@/types/profileType"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ArrowLeft } from "lucide-react"
+import Link from "next/link"
+import { useRef } from "react"
+import { useForm } from "react-hook-form"
 
 
 
-export function ProfileEditUI({ initialData }: { initialData: ProfileResponse }) {
+export function ProfileEditForm({ useData }: { useData: ProfileResponse }) {
   const { mutate: updateProfileMutation, isPending } = useUpdateProfile()
   const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<ProfileEditFormValues>({
     resolver: zodResolver(profileEditSchema),
     defaultValues: {
-      username: initialData.username || "",
-      email: initialData.email || "",
-      bio: initialData.bio || "",
-      birthDate: initialData.birth_date || "",
-      gender: initialData.gender || "",
+      username: useData.username || "",
+      email: useData.email || "",
+      bio: useData.bio || "",
+      birthDate: useData.birth_date || "",
+      gender: useData.gender || "",
     },
   })
 

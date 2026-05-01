@@ -11,8 +11,8 @@ import { ProfileResponse } from "@/types/profileType";
 import { ThumbsUp } from "lucide-react";
 import { useRef } from "react";
 
-export default function MainSection({ initialPost,user }: { initialPost: PostDetailResponse, user: ProfileResponse | null }) {
-    const { data: post } = usePostDetail(initialPost);
+export default function MainSection({ postData,user }: { postData: PostDetailResponse, user: ProfileResponse | null }) {
+    const { data: post } = usePostDetail(postData);
 
     const { mutate: toggleLikeMutation, isPending: isTogglingLike } = useToggleLike(post.id);
 

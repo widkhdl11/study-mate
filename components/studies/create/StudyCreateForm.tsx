@@ -1,41 +1,22 @@
-"use client";
-
-import { useForm } from "react-hook-form";
-import Link from "next/link";
-import { useRef, useState } from "react";
+'use client'
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { studyCreateSchema, StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
 import { useCreateStudy } from "@/hooks/useStudy";
-import {
-  getCategoryCodeByValue,
-  getDetailCategories,
-  getMainCategories,
-  getSubcategories,
-} from "@/lib/constants/study-category";
 import { getMainRegion, getRegionCodeByValue, getSubRegion } from "@/lib/constants/region";
+import { getCategoryCodeByValue, getDetailCategories, getMainCategories, getSubcategories } from "@/lib/constants/study-category";
+import { StudyFormValues, studyCreateSchema } from "@/lib/zod/schemas/studySchema";
 import { zodResolverFirstError } from "@/utils/validation";
+import Link from "next/link";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 
-export default function StudyCreateUI() {
-  const formRef = useRef<HTMLFormElement>(null);
+export default function StudyCreateForm() {
+   const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<StudyFormValues>({
     resolver: zodResolverFirstError(studyCreateSchema),
@@ -58,24 +39,7 @@ export default function StudyCreateUI() {
       message,
     });
   });
-  // 1. 상태 정의
-  const [mainCategoryValue, setMainCategoryValue] = useState("");
-  const [subCategoryValue, setSubCategoryValue] = useState("");
-  const [detailCategoryValue, setDetailCategoryValue] = useState("");
-  const [studyCategoryValue, setStudyCategoryValue] = useState(0);
-  // 지역 상태
-  const [mainRegionValue, setMainRegionValue] = useState("");
-  const [detailRegionValue, setDetailRegionValue] = useState("");
-  const [regionValue, setRegionValue] = useState(0);
 
-  // 2. 동적 옵션 생성
-  const mainCategories = getMainCategories();
-  const subcategories = getSubcategories(mainCategoryValue)
-  const detailCategories = getDetailCategories(mainCategoryValue, subCategoryValue)
-
-  // 동적 옵션
-  const mainRegions = getMainRegion();
-  const detailRegions = getSubRegion(mainRegionValue)
 
   async function onSubmit(values: StudyFormValues) {
     if (!formRef.current) {
@@ -83,49 +47,23 @@ export default function StudyCreateUI() {
     }
     const formData = new FormData(formRef.current);
     createStudyMutation(formData);
-    // try {
-    //   const formData = new FormData(formRef.current);
-      
-    //   if(mainCategoryValue && subCategoryValue && detailCategoryValue) {
-    //     const studyCategory = getCategoryCodeByValue(detailCategoryValue);
-    //     formData.set("studyCategory", studyCategory?.toString() || "");
-    //   }else{
-    //     toast.error("카테고리를 모두 선택해주세요");
-    //     return;
-    //   }
-    //   if(mainRegionValue && detailRegionValue) {
-    //     const regionCode = getRegionCodeByValue(detailRegionValue);
-    //     formData.set("region", regionCode?.toString() || "");
-    //   }else{
-    //     toast.error("지역을 모두 선택해주세요");
-    //     return;
-    //   }
-    //   createStudyMutation(formData);
-    // } catch (error) {
-    //   toast.error("스터디 생성에 실패했습니다.");
-    // }
   }
+  const [mainCategoryValue, setMainCategoryValue] = useState("");
+  const [subCategoryValue, setSubCategoryValue] = useState("");
+  const [detailCategoryValue, setDetailCategoryValue] = useState("");
+  const [studyCategoryValue, setStudyCategoryValue] = useState(0);
+  const [mainRegionValue, setMainRegionValue] = useState("");
+  const [detailRegionValue, setDetailRegionValue] = useState("");
+  const [regionValue, setRegionValue] = useState(0);
 
+  const mainCategories = getMainCategories();
+  const subcategories = getSubcategories(mainCategoryValue)
+  const detailCategories = getDetailCategories(mainCategoryValue, subCategoryValue)
+
+  const mainRegions = getMainRegion();
+  const detailRegions = getSubRegion(mainRegionValue)
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4 py-8">
-      <div className="w-full max-w-2xl">
-        {/* 로고 및 제목 */}
-        <div className="mb-8 text-center">
-          <div className="mb-4 flex items-center justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-lg font-bold text-white">S</span>
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Study Mate
-          </h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            함께 성장하는 스터디 문화
-          </p>
-        </div>
-
-        {/* 스터디 생성 폼 카드 */}
-        <Card className="p-6 md:p-8">
+      <Card className="p-6 md:p-8">
           <h2 className="mb-6 text-2xl font-semibold text-slate-900 dark:text-white">
             스터디 만들기
           </h2>
@@ -444,7 +382,5 @@ export default function StudyCreateUI() {
             </form>
           </Form>
         </Card>
-      </div>
-    </div>
-  );
+  )
 }

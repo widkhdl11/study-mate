@@ -1,23 +1,21 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import Link from "next/link"
-import { useRef, useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Lock } from "lucide-react"
 import { useUpdatePassword } from "@/hooks/useAuth"
-import { passwordChangeSchema } from "@/lib/zod/schemas/authSchema"
+import { PasswordChangeFormValues, passwordChangeSchema } from "@/lib/zod/schemas/authSchema"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ArrowLeft, Lock } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useRef, useState } from "react"
+import { useForm } from "react-hook-form"
 
 
-type PasswordChangeFormValues = z.infer<typeof passwordChangeSchema>
 
-export function PasswordChangeUI() {
+export function PasswordChangeForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)

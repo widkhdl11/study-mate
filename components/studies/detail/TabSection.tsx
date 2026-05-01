@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    useAcceptParticipant,
-    useRejectParticipant,
-    useRemoveParticipant,
+  useAcceptParticipant,
+  useRejectParticipant,
+  useRemoveParticipant,
 } from "@/hooks/useParticipant";
 import { getImageUrl, getProfileImageUrl } from "@/lib/supabase/storage";
 import { ProfileResponse } from "@/types/profileType";
@@ -17,27 +17,26 @@ import { StudyResponse } from "@/types/studiesType";
 import { participantStatusConversion } from "@/utils/conversion/participants";
 import { getStudyStatusColor, studyStatusConversion } from "@/utils/conversion/study";
 import { formatTimeAgo } from "@/utils/date";
-import { UseMutationResult } from "@tanstack/react-query";
 import { formatDate } from "date-fns";
 import {
-    Edit,
-    Eye,
-    FileText,
-    MessageSquare,
-    PlusCircle,
-    ThumbsUp,
-    Trash2,
-    UserCheck,
-    Users,
-    UserX,
+  Edit,
+  Eye,
+  FileText,
+  MessageSquare,
+  PlusCircle,
+  ThumbsUp,
+  Trash2,
+  UserCheck,
+  Users,
+  UserX,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function TabSection(
-    { study, user, deleteStudy }
+    { study, user, deleteStudy, isPending }
     : 
-    { study: StudyResponse, user: ProfileResponse, deleteStudy: UseMutationResult<void, any, void, unknown> }
+    { study: StudyResponse, user: ProfileResponse, deleteStudy: () => void, isPending: boolean }
 ) {
     const acceptParticipant = useAcceptParticipant(Number(study.id));
     const rejectParticipant = useRejectParticipant(Number(study.id));
@@ -293,10 +292,10 @@ export default function TabSection(
                                           "스터디를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
                                         )
                                       ) {
-                                        deleteStudy.mutate();
+                                        deleteStudy();
                                       }
                                     }}
-                                    disabled={deleteStudy.isPending}
+                                    disabled={isPending}
                                   >
                                     <Trash2 className="w-3 h-3" />
                                     스터디 삭제

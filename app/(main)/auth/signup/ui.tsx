@@ -1,10 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef } from "react";
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,14 +15,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signupSchema } from "@/lib/zod/schemas/authSchema";
-import { SignupFormValues } from "@/lib/zod/schemas/authSchema";
-import { useSignup } from "@/hooks/useAuth";
-import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { formatDateToInput, parseInputToDate } from "@/utils/format";
+import { useSignup } from "@/hooks/useAuth";
+import { SignupFormValues, signupSchema } from "@/lib/zod/schemas/authSchema";
 import { zodResolverFirstError } from "@/utils/validation";
-import { format, parse } from "date-fns";
 
 export default function SignupUI() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -56,23 +50,7 @@ export default function SignupUI() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4">
-      <div className="w-full max-w-md">
-        {/* 로고 및 제목 */}
-        <div className="mb-8 text-center">
-          <div className="mb-4 flex items-center justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-lg font-bold text-white">S</span>
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Study Mate
-          </h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            함께 성장하는 스터디 문화
-          </p>
-        </div>
-
+    <>
         {/* 회원가입 폼 카드 */}
         <Card className="p-6">
           <h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">
@@ -238,7 +216,7 @@ export default function SignupUI() {
             </Link>
           </p>
         </div>
-      </div>
-    </div>
+
+  </>
   );
 }

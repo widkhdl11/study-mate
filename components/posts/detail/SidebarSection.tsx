@@ -1,23 +1,23 @@
 'use client'
 
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { getCategoryPath } from "@/lib/constants/study-category"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { StudyActionButton } from "./RenderActionButton"
-import { PostDetailResponse } from "@/types/postType"
-import { getRegionPath } from "@/lib/constants/region"
-import { useApplyParticipant, useParticipant } from "@/hooks/useParticipant"
-import { getProfileImageUrl } from "@/lib/supabase/storage"
-import { STATUS_MAP } from "@/types/studiesType"
-import { ParticipantResponse } from "@/types/participantType"
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+import { useParticipant } from "@/hooks/useParticipant"
 import { usePostDetail } from "@/hooks/usePost"
+import { getRegionPath } from "@/lib/constants/region"
+import { getCategoryPath } from "@/lib/constants/study-category"
+import { getProfileImageUrl } from "@/lib/supabase/storage"
+import { ParticipantResponse } from "@/types/participantType"
+import { PostDetailResponse } from "@/types/postType"
+import { STATUS_MAP } from "@/types/studiesType"
+import { StudyActionButton } from "./RenderActionButton"
 
-export default function SidebarSection({ initialPost, participant }: { 
-  initialPost: PostDetailResponse, participant: ParticipantResponse | null
+export default function SidebarSection({ postData, participant }: { 
+  postData: PostDetailResponse, participant: ParticipantResponse | null
 }) {
 
-    const { data: post } = usePostDetail(initialPost)
+    const { data: post } = usePostDetail(postData)
 
     const { data: participantData } = useParticipant(participant, post.study.id);
     const status = STATUS_MAP[participantData?.status || ""] || "모집중";

@@ -1,11 +1,19 @@
-import { redirect } from "next/navigation";
 import { getMyProfileSSR } from "@/actions/profileAction";
-import { ProfileEditUI } from "./ui"
+import { ProfileEditForm } from "@/components/profile/edit/ProfileEditForm";
+import { ProfileSkeleton } from "@/components/skeleton";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-export default async function ProfileEditPage() {
+export default function ProfileEditPage() {
+  return (
+    <Suspense fallback={<ProfileSkeleton />}>
+      <ProfileEditLoader />
+    </Suspense>
+  );
+}
+
+async function ProfileEditLoader() {
   const currentUser = await getMyProfileSSR();
-  if (!currentUser) {
-    redirect("/login");
-  }
-  return <ProfileEditUI initialData={currentUser} />
+  if (!currentUser) redirect("/login");
+  return <ProfileEditForm useData={currentUser} />;
 }

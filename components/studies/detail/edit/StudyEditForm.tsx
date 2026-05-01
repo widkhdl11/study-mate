@@ -1,49 +1,30 @@
-"use client";
-
-import { useForm } from "react-hook-form";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+'use client'
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
-import {
-  getCategoryCodeByValue,
-  getDetailCategories,
-  getMainCategories,
-  getSubcategories,
-} from "@/lib/constants/study-category";
-import {
-  getMainRegion,
-  getRegionCodeByValue,
-  getRegionPath,
-  getSubRegion,
-} from "@/lib/constants/region";
 import { useUpdateStudy } from "@/hooks/useStudy";
-import { zodResolverFirstError } from "@/utils/validation";
+import { getMainRegion, getRegionCodeByValue, getSubRegion } from "@/lib/constants/region";
+import { getCategoryCodeByValue, getDetailCategories, getMainCategories, getSubcategories } from "@/lib/constants/study-category";
+import { StudyFormValues, studySchema } from "@/lib/zod/schemas/studySchema";
 import { StudyWithAllCategoriesAndRegions } from "@/types/studiesType";
+import { zodResolverFirstError } from "@/utils/validation";
+import Link from "next/link";
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 
-
-export function StudyEditUI({ studyId, initialData }: { studyId: string, initialData: StudyWithAllCategoriesAndRegions }) {
-  const formRef = useRef<HTMLFormElement>(null);
+export default function StudyEditForm({ 
+  initialData, studyId
+}: {
+  initialData: StudyWithAllCategoriesAndRegions
+  , studyId: string
+}) {
+   const formRef = useRef<HTMLFormElement>(null);
   const form = useForm<StudyWithAllCategoriesAndRegions>({
+    
     resolver: zodResolverFirstError(studySchema),
     defaultValues: initialData, 
   });
@@ -53,7 +34,15 @@ export function StudyEditUI({ studyId, initialData }: { studyId: string, initial
       message,
     });
   });
-  // 카테고리 상태
+
+
+  async function onSubmit() {
+    if (!formRef.current) return;
+    const formData = new FormData(formRef.current);
+    updateStudyMutation(formData);
+  }
+
+    // 카테고리 상태
   const [mainCategoryValue, setMainCategoryValue] = useState(initialData.mainCategory);
   const [subCategoryValue, setSubCategoryValue] = useState(initialData.subCategory);
   const [detailCategoryValue, setDetailCategoryValue] = useState(initialData.detailCategory);
@@ -72,32 +61,7 @@ export function StudyEditUI({ studyId, initialData }: { studyId: string, initial
 
   const mainRegions = getMainRegion();
   const detailRegions = getSubRegion(mainRegionValue)
-
-  async function onSubmit() {
-    if (!formRef.current) return;
-    const formData = new FormData(formRef.current);
-    updateStudyMutation(formData);
-  }
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4 py-8">
-      <div className="w-full max-w-2xl">
-        {/* 로고 및 제목 */}
-        <div className="mb-8 text-center">
-          <div className="mb-4 flex items-center justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-lg font-bold text-white">S</span>
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Study Mate
-          </h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            함께 성장하는 스터디 문화
-          </p>
-        </div>
-
-        {/* 스터디 수정 폼 카드 */}
         <Card className="p-6 md:p-8">
           <h2 className="mb-6 text-2xl font-semibold text-slate-900 dark:text-white">
             스터디 수정하기
@@ -432,7 +396,5 @@ export function StudyEditUI({ studyId, initialData }: { studyId: string, initial
             </form>
           </Form>
         </Card>
-      </div>
-    </div>
-  );
+  )
 }

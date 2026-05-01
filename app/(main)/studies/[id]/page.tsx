@@ -1,11 +1,24 @@
-import { getStudyDetailSSR } from "@/actions/studyAction";
-import UserStudyDetailUI from "./ui";
 import { getMyProfileSSR } from "@/actions/profileAction";
-import { ProfileResponse } from "@/types/profileType";
-import { StudiesResponse, StudyResponse } from "@/types/studiesType";
+import { getStudyDetailSSR } from "@/actions/studyAction";
+import { StudyDetailSkeleton } from "@/components/skeleton";
+import StudyDetailUI from "@/components/studies/detail/StudyDetailUI";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
-export default async function StudyDetailPage({
+
+export default function StudyDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense fallback={<StudyDetailSkeleton />}>
+      <StudyDetailLoader params={params} />
+    </Suspense>
+  );
+}
+
+async function StudyDetailLoader({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -13,8 +26,12 @@ export default async function StudyDetailPage({
   const { id } = await params;
   const study = await getStudyDetailSSR(Number(id));
   const user = await getMyProfileSSR();
+
   if (!user) {
-    notFound()
+    notFound();
   }
-  return <UserStudyDetailUI study={study} user={user} />;
+
+  return (
+    <StudyDetailUI study={study} user={user} />
+  )
 }

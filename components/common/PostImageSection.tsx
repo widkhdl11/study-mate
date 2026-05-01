@@ -10,19 +10,19 @@ const CarouselItem = dynamic(() => import('../ui/carousel').then(mod => mod.Caro
 const CarouselNext = dynamic(() => import('../ui/carousel').then(mod => mod.CarouselNext))
 const CarouselPrevious = dynamic(() => import('../ui/carousel').then(mod => mod.CarouselPrevious))
 
-export default function PostImageSection({ post }: { post: PostDetailResponse }) {
+export default function PostImageSection({ postData }: { postData: PostDetailResponse }) {
     return (
         <div className="relative w-full mb-8">
             <Carousel className="w-full">
               <CarouselContent >
-                {post.image_url.length > 0 ? (
+                {postData.image_url.length > 0 ? (
                   <>
-                  {post.image_url.map((image: { url: string }, index: number) => (
+                  {postData.image_url.map((image: { url: string }, index: number) => (
                     <CarouselItem key={index}>
                       <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg" >
                         <Image
                           src={getImageUrl(image.url)}
-                          alt={`${post.title} - 이미지 ${index + 1}`}
+                          alt={`${postData.title} - 이미지 ${index + 1}`}
                           fill
                           className="object-cover rounded-lg"
                           sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, 33vw"

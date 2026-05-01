@@ -5,20 +5,22 @@ import { getRegionPath } from "@/lib/constants/region";
 import { getCategoryPath } from "@/lib/constants/study-category";
 import { StudyResponse } from "@/types/studiesType";
 import { getStudyStatusColor, studyStatusConversion } from "@/utils/conversion/study";
-import { UseMutationResult } from "@tanstack/react-query";
 import {
-    MapPin,
-    PlusCircle,
-    Settings,
-    Trash2,
-    Users
+  MapPin,
+  PlusCircle,
+  Settings,
+  Trash2,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 
 
 export default function HeaderSection(
-    { study, deleteStudy }: { study: StudyResponse, deleteStudy: UseMutationResult<void, any, void, unknown> }) {
-  
+    { 
+      study, deleteStudy, isPending 
+    }: {
+      study: StudyResponse, deleteStudy: () => void, isPending: boolean 
+    }) {
     const categoryPath = getCategoryPath(Number(study.study_category));
 
     return (
@@ -96,10 +98,10 @@ export default function HeaderSection(
                   className="w-full sm:w-auto gap-2 bg-transparent text-red-600 hover:text-red-700 border-red-300 hover:border-red-400"
                   onClick={() => {
                     if (confirm("정말 이 스터디를 삭제하시겠습니까? 모든 모집글과 채팅 기록이 함께 삭제됩니다.")) {
-                      deleteStudy.mutate();
+                      deleteStudy();
                     }
                   }}
-                  disabled={deleteStudy.isPending}
+                  disabled={isPending}
                 >
                   <Trash2 className="w-4 h-4" />
                   스터디 삭제

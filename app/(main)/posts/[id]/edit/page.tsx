@@ -10,10 +10,9 @@ interface PageProps {
 export default async function PostEditPage({ params }: PageProps) {
   const { id } = await params
 
-  const [post, userStudies] = await Promise.all([
-    getPostDetailSSR(Number(id)),
-    getMyCreatedStudiesSSR(),
-  ]);
+  const postData = await getPostDetailSSR(Number(id));
+
+  const studiesPromise = getMyCreatedStudiesSSR();
 
   return (
      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4 py-8">
@@ -31,7 +30,7 @@ export default async function PostEditPage({ params }: PageProps) {
         <Card className="p-6 md:p-8">
           <h2 className="mb-6 text-2xl font-semibold text-slate-900 dark:text-white">모집글 수정</h2>
 
-          <EditForm studies={userStudies} initialData={post} />
+          <EditForm postData={postData} studiesPromise={studiesPromise} />
         </Card>
       </div>
     </div>
